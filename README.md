@@ -18,7 +18,7 @@ Everyone should read and follow the rules in "[How to write a Git Commit Message
 
 # Integration Plan
 - Local branches are personal development branches for work in progress code.
-	- Naming convention: `subsystem/firstname_lastname/week-#/description-as-needed`
+	- Naming convention: `dev/week-#/firstname_lastname/description-as-needed`
 
 - Test branches are branches for code ready to test
 	- Only test branches may be loaded onto a robot or test rig. Test branch merges from personal development branches do not require formal pull requests but should be peer reviewed and must pass build and style checks.
