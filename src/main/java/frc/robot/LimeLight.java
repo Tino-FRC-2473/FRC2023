@@ -2,8 +2,10 @@ package frc.robot;
 
 import org.photonvision.PhotonCamera;
 //import org.photonvision.PhotonUtils;
+import org.photonvision.PhotonUtils;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 /**
 * Handles al actions for the Limelight camera.
@@ -18,17 +20,17 @@ public class LimeLight {
   /**
   * angle of camera.
   */
-  private static final double HUB_CAMERA_ANGLE = Math.toRadians(0);
+  private static final double HUB_CAMERA_ANGLE = Math.toRadians(-1.5);
 
   /**
   * height of AprilTag.
   */
-  private static final double APRIL_TAG_HEIGHT = 0.4699; //METERS
+  private static final double APRIL_TAG_HEIGHT = 0.4318; //METERS
 
   /**
   * height of camera.
   */
-  private static final double CAMERA_HEIGHT = 0.584; //METERS
+  private static final double CAMERA_HEIGHT = 0.4953; //METERS
 
   /**
   * invalid return constant.
@@ -51,8 +53,9 @@ public class LimeLight {
    * Updates values on SmartDashboard.
    */
   public final void update() {
-    // SmartDashboard.putNumber("Distance", getAprilTagDistance());
+    SmartDashboard.putNumber("Distance", getAprilTagDistance());
     SmartDashboard.updateValues();
+	System.out.println("Distance " + getAprilTagDistance());
   }
 
    /**
@@ -68,8 +71,15 @@ public class LimeLight {
       double angle = HUB_CAMERA_ANGLE + Math.toRadians(pitch);
       double visionDist = heightDiff / Math.tan(angle);
       double visionDistInches = METERS_TO_INCHES * visionDist;
-      return visionDist;
-    }
-    return -1;
+      return visionDistInches;
+
+	//   return PhotonUtils.calculateDistanceToTargetMeters(
+	// 							CAMERA_HEIGHT,
+	// 							APRIL_TAG_HEIGHT,
+	// 							HUB_CAMERA_ANGLE,
+	// 							Units.degreesToRadians(result.getBestTarget().getPitch()));
+    //   }
+	}
+	return -1;
 }
 }
