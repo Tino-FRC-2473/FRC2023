@@ -26,5 +26,6 @@
       }
     },
   ],
-  "java.test.defaultConfig": "WPIlibUnitTests"
+  "java.test.defaultConfig": "WPIlibUnitTests",
+  "java.checkstyle.configuration": "/sun_checks.xml"
 }
