@@ -12,13 +12,13 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class TeleopInput {
 	/* ======================== Constants ======================== */
-	private static final int LEFT_JOYSTICK_PORT = 0;
-	private static final int RIGHT_JOYSTICK_PORT = 1;
+	private static final int MECH_JOYSTICK_PORT = 0;
+	private static final int DRIVE_JOYSTICK_PORT = 1;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
-	private Joystick leftJoystick;
-	private Joystick rightJoystick;
+	private Joystick mechJoystick;
+	private Joystick driveJoystick;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -27,9 +27,8 @@ public class TeleopInput {
 	 * by WPILib until teleop mode.
 	 */
 	public TeleopInput() {
-		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
-
-		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
+		mechJoystick = new Joystick(MECH_JOYSTICK_PORT);
+		driveJoystick = new Joystick(DRIVE_JOYSTICK_PORT);
 	}
 
 	/* ======================== Public methods ======================== */
@@ -42,29 +41,29 @@ public class TeleopInput {
 	 * Get X axis of Left Joystick.
 	 * @return Axis value
 	 */
-	public double getLeftJoystickX() {
-		return leftJoystick.getX();
+	public double getmechJoystickX() {
+		return mechJoystick.getX();
 	}
 	/**
 	 * Get Y axis of Left Joystick.
 	 * @return Axis value
 	 */
-	public double getLeftJoystickY() {
-		return leftJoystick.getY();
+	public double getmechJoystickY() {
+		return mechJoystick.getY();
 	}
 	/**
 	 * Get the value of the shooter button.
 	 * @return True if button is pressed
 	 */
 	public boolean isShooterButtonPressed() {
-		return leftJoystick.getRawButton(1);
+		return mechJoystick.getRawButton(1);
 	}
 	/**
 	 * Get the value of the intake button.
 	 * @return True if button is pressed
 	 */
 	public boolean isIntakeButtonPressed() {
-		return leftJoystick.getRawButton(2);
+		return mechJoystick.getRawButton(2);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
@@ -72,17 +71,25 @@ public class TeleopInput {
 	 * Get X axis of Right Joystick.
 	 * @return Axis value
 	 */
-	public double getRightJoystickX() {
-		return rightJoystick.getX();
+	public double getdriveJoystickX() {
+		return driveJoystick.getX();
 	}
 	/**
 	 * Get Y axis of Right Joystick.
 	 * @return Axis value
 	 */
-	public double getRightJoystickY() {
-		return rightJoystick.getY();
+	public double getdriveJoystickY() {
+		return driveJoystick.getY();
 	}
-
+	public boolean getCubeButton() {
+		return mechJoystick.getRawButton(1);
+	}
+	public boolean getConeButton() {
+		return mechJoystick.getRawButton(2);
+	}
+	public boolean getReleaseButton() {
+		return mechJoystick.getRawButton(3);
+	}
 	/* ======================== Private methods ======================== */
 
 }
