@@ -20,17 +20,17 @@ public class LimeLight {
   /**
   * angle of camera.
   */
-  private static final double HUB_CAMERA_ANGLE = Math.toRadians(-1.5);
+  private static final double CAMERA_ANGLE = Math.toRadians(0);
 
   /**
   * height of AprilTag.
   */
-  private static final double APRIL_TAG_HEIGHT = 0.4318; //METERS
+  private static final double APRIL_TAG_HEIGHT = 0.4444; //METERS
 
   /**
   * height of camera.
   */
-  private static final double CAMERA_HEIGHT = 0.4953; //METERS
+  private static final double CAMERA_HEIGHT = 0.3810; //METERS (on robot .4953, on ground .3810)
 
   /**
   * invalid return constant.
@@ -66,20 +66,22 @@ public class LimeLight {
     camera.setPipelineIndex(1);
     var result = camera.getLatestResult();
     if (result.hasTargets()) {
+      /* 
       double heightDiff = APRIL_TAG_HEIGHT - CAMERA_HEIGHT;
       double pitch = result.getBestTarget().getPitch();
-      double angle = HUB_CAMERA_ANGLE + Math.toRadians(pitch);
+      double angle = CAMERA_ANGLE + Math.toRadians(pitch);
       double visionDist = heightDiff / Math.tan(angle);
       double visionDistInches = METERS_TO_INCHES * visionDist;
       return visionDistInches;
+      */
 
-	//   return PhotonUtils.calculateDistanceToTargetMeters(
-	// 							CAMERA_HEIGHT,
-	// 							APRIL_TAG_HEIGHT,
-	// 							HUB_CAMERA_ANGLE,
-	// 							Units.degreesToRadians(result.getBestTarget().getPitch()));
-    //   }
-	}
+	   return METERS_TO_INCHES * PhotonUtils.calculateDistanceToTargetMeters(
+	 							CAMERA_HEIGHT,
+	 							APRIL_TAG_HEIGHT,
+	 							CAMERA_ANGLE,
+	 							(result.getBestTarget().getPitch()*.0174533));
+	  }
 	return -1;
-}
+  }
+
 }
