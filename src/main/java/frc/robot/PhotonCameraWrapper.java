@@ -39,38 +39,48 @@
  import org.photonvision.PhotonCamera;
  import org.photonvision.RobotPoseEstimator;
  import org.photonvision.RobotPoseEstimator.PoseStrategy;
+ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
  
  public class PhotonCameraWrapper {
      public PhotonCamera photonCamera;
      public RobotPoseEstimator robotPoseEstimator;
+
+     public static final double METERS_TO_INCHES = 39.3701;
  
      public PhotonCameraWrapper() {
          // Set up a test arena of two apriltags at the center of each driver station set
-         final AprilTag tag18 =
-                 new AprilTag(
-                         18,
-                         new Pose3d(
-                                 new Pose2d(
-                                         FieldConstants.length,
-                                         FieldConstants.width / 2.0,
-                                         Rotation2d.fromDegrees(180))));
          final AprilTag tag01 =
                  new AprilTag(
-                         01,
-                         new Pose3d(new Pose2d(0.0, FieldConstants.width / 2.0, Rotation2d.fromDegrees(0.0))));
+                         1,
+                         new Pose3d(
+                                 new Pose2d(
+                                         Constants.AprilTagConstants.X1,
+                                         Constants.AprilTagConstants.Y1,
+                                         Rotation2d.fromDegrees(Constants.AprilTagConstants.rot1))));
+         
+         final AprilTag tag02 =
+                 new AprilTag(
+                         2,
+                         new Pose3d(
+                                 new Pose2d(
+                                         Constants.AprilTagConstants.X2,
+                                         Constants.AprilTagConstants.Y2,
+                                         Rotation2d.fromDegrees(Constants.AprilTagConstants.rot2))));
+
          ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
-         atList.add(tag18);
          atList.add(tag01);
- 
+         atList.add(tag02);
+
          // TODO - once 2023 happens, replace this with just loading the 2023 field arrangement
          AprilTagFieldLayout atfl =
                  new AprilTagFieldLayout(atList, FieldConstants.length, FieldConstants.width);
- 
+
          // Forward Camera
          photonCamera =
                  new PhotonCamera(
                          VisionConstants
-                                 .cameraName); // Change the name of your camera here to whatever it is in the
+                                 .cameraName); 
          // PhotonVision UI.
  
          // ... Add other cameras here
@@ -78,18 +88,28 @@
          // Assemble the list of cameras & mount locations
          var camList = new ArrayList<Pair<PhotonCamera, Transform3d>>();
          camList.add(new Pair<PhotonCamera, Transform3d>(photonCamera, VisionConstants.robotToCam));
- 
+
          robotPoseEstimator =
-                 new RobotPoseEstimator(atfl, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camList);
+                 new RobotPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY, camList);
      }
  
      /**
-      * @param estimatedRobotPose The current best guess at robot pose
+     * Updates values on SmartDashboard.
+     */
+    public final void update() {
+        SmartDashboard.putNumber("locationX", getEstimatedGlobalPose().getFirst());
+        SmartDashboard.putNumber("locationY", getEstimatedGlobalPose().getSecond());
+        SmartDashboard.updateValues();
+    }
+
+
+     /**
+      * @param estimatedRobotPose The current best guess at robot poses
       * @return A pair of the fused camera observations to a single Pose2d on the field, and the time
       *     of the observation. Assumes a planar field and the robot is always firmly on the ground
       */
-     public Pair<Pose2d, Double> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
-         robotPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+     public Pair<Pose2d, Double> getEstimatedGlobalPose() {
+         //robotPoseEstimator.setReferencePose(prevEstimatedRobotPose);
  
          double currentTime = Timer.getFPGATimestamp();
          Optional<Pair<Pose3d, Double>> result = robotPoseEstimator.update();

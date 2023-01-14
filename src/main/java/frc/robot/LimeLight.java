@@ -55,7 +55,7 @@ public class LimeLight {
   public final void update() {
     SmartDashboard.putNumber("Distance", getAprilTagDistance());
     SmartDashboard.updateValues();
-	System.out.println("Distance " + getAprilTagDistance());
+	  System.out.println("Distance " + getAprilTagDistance());
   }
 
    /**
