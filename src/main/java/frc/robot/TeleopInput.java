@@ -112,6 +112,7 @@ public class TeleopInput {
 		return mechJoystick.getRawButton(AIM_MID_BUTTON);
 	}
 
+
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
 	 * Get X axis of Right Joystick.
