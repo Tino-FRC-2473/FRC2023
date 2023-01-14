@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import org.opencv.photo.Photo;
+
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -40,7 +42,9 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		fsmSystem.update(null);
+		PhotonCameraWrapper loc = new PhotonCameraWrapper();
+		loc.update();
+		//fsmSystem.update(null);
 	}
 
 	@Override
@@ -51,8 +55,10 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		LimeLight thing = new LimeLight();
-		thing.update();
+		// LimeLight thing = new LimeLight();
+		// thing.update();
+		PhotonCameraWrapper loc = new PhotonCameraWrapper();
+		loc.update();
 	}
 
 	@Override
