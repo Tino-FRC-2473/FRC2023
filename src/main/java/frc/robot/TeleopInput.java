@@ -15,6 +15,14 @@ public class TeleopInput {
 	private static final int LEFT_JOYSTICK_PORT = 0;
 	private static final int RIGHT_JOYSTICK_PORT = 1;
 
+	private static final int PIVOT_INCREASE_ID = 1;
+	private static final int PIVOT_DECREASE_ID = 2;
+	private static final int EXTEND_ID = 3;
+	private static final int RETRACT_ID = 4;
+	private static final int AIM_HIGH_ID = 5;
+	private static final int AIM_MID_ID = 6;
+
+
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private Joystick leftJoystick;
@@ -57,30 +65,46 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isPivotIncreaseButtonPressed() {
-		return leftJoystick.getRawButton(1);
+		return leftJoystick.getRawButton(PIVOT_INCREASE_ID);
 	}
 	/**
 	 * Get the value of the Pivot Decrease button.
 	 * @return True if button is pressed
 	 */
 	public boolean isPivotDecreaseButtonPressed() {
-		return leftJoystick.getRawButton(2);
+		return leftJoystick.getRawButton(PIVOT_DECREASE_ID);
 	}
 
+	/**
+	 * Get the value of the Extend button.
+	 * @return True if button is pressed
+	 */
 	public boolean isExtendButtonPressed() {
-		return leftJoystick.getRawButton(3);
+		return leftJoystick.getRawButton(EXTEND_ID);
 	}
 
+	/**
+	 * Get the value of the Retract button.
+	 * @return True if button is pressed
+	 */
 	public boolean isRetractButtonPressed() {
-		return leftJoystick.getRawButton(4);
+		return leftJoystick.getRawButton(RETRACT_ID);
 	}
 
+	/**
+	 * Get the value of the Shoot High button.
+	 * @return True if button is pressed
+	 */
 	public boolean isShootHighButtonPressed() {
-		return leftJoystick.getRawButton(5);
+		return leftJoystick.getRawButton(AIM_HIGH_ID);
 	}
 
+	/**
+	 * Get the value of the Shoot Mid button.
+	 * @return True if button is pressed
+	 */
 	public boolean isShootMidButtonPressed() {
-		return leftJoystick.getRawButton(6);
+		return leftJoystick.getRawButton(AIM_MID_ID);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
