@@ -7,7 +7,7 @@ import org.photonvision.PhotonUtils;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
-/** Handles all actions for the Limelight camera. */
+/** The LimeLight class handles all actions for the Limelight camera. */
 public class LimeLight {
   /** Photonvision camera object. */
   private PhotonCamera camera;

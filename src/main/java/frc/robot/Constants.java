@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -22,50 +22,82 @@
  * SOFTWARE.
  */
 
- package frc.robot;
+package frc.robot;
 
- import edu.wpi.first.math.geometry.Rotation3d;
- import edu.wpi.first.math.geometry.Rotation2d;
- import edu.wpi.first.math.geometry.Transform3d;
- import edu.wpi.first.math.geometry.Translation3d;
- import edu.wpi.first.math.util.Units;
- 
- public class Constants {
-     static class DriveTrainConstants {
-         static final double kMaxSpeed = 3.0; // meters per second
-         static final double kMaxAngularSpeed = 2 * Math.PI; // one rotation per second
-         static final double kTrackWidth = 0.381 * 2; // meters
-         static final double kWheelRadius = 0.0508; // meters
-         static final int kEncoderResolution = 4096;
-         static final double distancePerPulse = 2 * Math.PI * kWheelRadius / (double) kEncoderResolution;
-     }
- 
-     static class FieldConstants {
-         static final double length = Units.feetToMeters(54);
-         static final double width = Units.feetToMeters(27);
-     }
- 
-     static class VisionConstants {
-         static final Transform3d robotToCam =
-                 new Transform3d(
-                        // Cam mounted facing forward, half a meter forward of center, half a meter up
-                         new Translation3d(0.0, 0.0, 0.5), // x: forward/back, y: left/right, z: up/down
-                         new Rotation3d(
-                                 0, 0,
-                                 0)); 
-         // from center.
-         static final String cameraName = "gloworm";
-     }
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
-     static class AprilTagConstants {
+/**
+ * The Constants class contains constants for drive train, field, vision,
+ * and AprilTags.
+ */
+public class Constants {
+    /**
+     * static class for drive train constants.
+     */
+    static class DriveTrainConstants {
+        /** maximum speed power for robot (meters per second). */
+        static final double KMAXSPEED = 3.0;
+        /** maximum angular speed (1 rotation per second). */
+        static final double K_MAX_ANGULAR_SPEED = 2 * Math.PI;
+        /** width of track (meters). */
+        static final double KTRACKWIDTH = 0.381 * 2;
+        /** wheel radius (meters). */
+        static final double KWHEELRADIUS = 0.0508;
+        /** encoder resolution. */
+        static final int K_ENCODER_RESOLUTION = 4096;
+        /** distance per pulse. */
+        static final double DISTANCEPERPULSE = 2 * Math.PI
+            * KWHEELRADIUS / (double) K_ENCODER_RESOLUTION;
+    }
+
+    /**
+     * static class for field constants.
+     */
+    static class FieldConstants {
+        /** length of field (meters). */
+        static final double LENGTH = Units.feetToMeters(54);
+        /** width of field (meters). */
+        static final double WIDTH = Units.feetToMeters(27);
+    }
+
+    /**
+     * static class for vision constants.
+     */
+    static class VisionConstants {
+        /** position/angle of camera relative to the center of the robot. */
+        static final Transform3d ROBOT_TO_CAM =
+                new Transform3d(
+                        new Translation3d(0.0, 0.0, 0.5),
+                        new Rotation3d(
+                                0, 0,
+                                0));
+        /** name of camera. */
+        static final String CAMERA_NAME = "gloworm";
+    }
+
+    /**
+     * static class for AprilTag constants.
+     */
+    static class AprilTagConstants {
+        /** x coordinate of AprilTag 1. */
         static final double X1 = Units.inchesToMeters(610.77);
+        /** y coordinate of AprilTag 1. */
         static final double Y1 = Units.inchesToMeters(42.19);
+        /** z coordinate of AprilTag 1. */
         static final double Z1 = Units.inchesToMeters(18.22);
-        static final double rot1 = 180.0;
+        /** angle of AprilTag 1. */
+        static final double ROT1 = 180.0;
 
+        /** x coordinate of AprilTag 2. */
         static final double X2 = Units.inchesToMeters(610.77);
+        /** y coordinate of AprilTag 2. */
         static final double Y2 = Units.inchesToMeters(108.19);
+        /** z coordinate of AprilTag 2. */
         static final double Z2 = Units.inchesToMeters(18.22);
-        static final double rot2 = 180.0;
-     }
- }
+        /** angle of AprilTag 2. */
+        static final double ROT2 = 180.0;
+    }
+}
