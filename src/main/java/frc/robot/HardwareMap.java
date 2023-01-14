@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
  */
 public final class HardwareMap {
 	// ID numbers for devices on the CAN bus
-	public static final int CAN_ID_SPARK_PIVOT = 1;
-	public static final int CAN_ID_SPARK_TELEARM = 1;
+	public static final int CAN_ID_SPARK_PIVOT = 32;
+	public static final int CAN_ID_SPARK_TELEARM = 5;
 
 
 
