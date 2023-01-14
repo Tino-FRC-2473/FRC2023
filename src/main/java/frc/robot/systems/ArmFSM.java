@@ -24,7 +24,7 @@ public class ArmFSM {
 	private static final int ARM_ENCODER_HIGH = 500;
 	private static final int ARM_ENCODER_MID = 300;
 	private static final int SHOOT_ANGLE_ENCODER = 300;
-	
+
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -34,7 +34,10 @@ public class ArmFSM {
 
 	/*
 	 * Hardware Map each of the motors
-	 * 
+	 *
+	 */
+	/**
+	 * Creates an instance of an ArmFSM.
 	 */
 	public ArmFSM() {
 		// Perform hardware init
@@ -47,17 +50,17 @@ public class ArmFSM {
 		reset();
 	}
 
-	/*
-	 * Get the current state
-	 * 
+	/**
+	 * Get the current state.
+	 *
 	 * @return current state
 	 */
 	public FSMState getCurrentState() {
 		return currentState;
 	}
 
-	/*
-	 * On robot start set the start to IDLE state
+	/**
+	 * On robot start set the start to IDLE state. Resets robot to original state.
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
@@ -68,8 +71,9 @@ public class ArmFSM {
 		update(null);
 	}
 
-	/*
-	 * what happens in each state
+	/**
+	 * Updates the current FSMState.
+	 * @param input TeleopInput
 	 */
 	public void update(TeleopInput input) {
 		switch (currentState) {
@@ -90,22 +94,23 @@ public class ArmFSM {
 
 	/*
 	 * When inputs are pressed, the states will change likewise
-	 * 
+	 *
 	 * @return expected state
 	 */
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case IDLE:
-				if(input != null && !input.isShootHighButtonPressed() && !input.isShootMidButtonPressed()){
+				if (input != null && !input.isShootHighButtonPressed()
+					&& !input.isShootMidButtonPressed()) {
 					return FSMState.ARM_MOVEMENT;
-				} else if (input.isShootHighButtonPressed()){
+				} else if (input.isShootHighButtonPressed()) {
 					return FSMState.SHOOT_HIGH;
-				} else if (input.isShootMidButtonPressed()){
+				} else if (input.isShootMidButtonPressed()) {
 					return FSMState.SHOOT_MID;
 				}
 				return FSMState.IDLE;
 			case ARM_MOVEMENT:
-				if(input == null){
+				if (input == null) {
 					return FSMState.IDLE;
 				} else if (input.isShootHighButtonPressed()) {
 					return FSMState.SHOOT_HIGH;
@@ -114,12 +119,12 @@ public class ArmFSM {
 				}
 				return FSMState.ARM_MOVEMENT;
 			case SHOOT_HIGH:
-				if(input.isShootHighButtonPressed()) {
+				if (input.isShootHighButtonPressed()) {
 					return FSMState.SHOOT_HIGH;
 				}
 				return FSMState.IDLE;
 			case SHOOT_MID:
-				if(input.isShootMidButtonPressed()) {
+				if (input.isShootMidButtonPressed()) {
 					return FSMState.SHOOT_HIGH;
 				}
 				return FSMState.IDLE;
@@ -141,25 +146,25 @@ public class ArmFSM {
 	 * What to do when in the ARM_MOVEMENT state
 	 */
 	private void handleArmMechState(TeleopInput input) {
-		if(input.isPivotIncreaseButtonPressed()){
+		if (input.isPivotIncreaseButtonPressed()) {
 			pivotMotor.set(PIVOT_MOTOR);
-		}else if(input.isPivotDecreaseButtonPressed()){
+		} else if (input.isPivotDecreaseButtonPressed()) {
 			pivotMotor.set(-PIVOT_MOTOR);
 		}
 
-		if(input.isExtendButtonPressed()){
+		if (input.isExtendButtonPressed()) {
 			teleArmMotor.set(TELEARM_MOTOR);
-		}else if(input.isRetractButtonPressed()){
+		} else if (input.isRetractButtonPressed()) {
 			pivotMotor.set(-TELEARM_MOTOR);
 		}
 	}
 
 	private void handleShootHighState(TeleopInput input) {
-		if(pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
+		if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
 			pivotMotor.set(-PIVOT_MOTOR);
-		} else if(pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
+		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
 			pivotMotor.set(PIVOT_MOTOR);
-		} else{
+		} else {
 			pivotMotor.set(0);
 		}
 		if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH) {
@@ -171,11 +176,11 @@ public class ArmFSM {
 
 
 	private void handleShootMidState(TeleopInput input) {
-		if(pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
+		if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
 			pivotMotor.set(-PIVOT_MOTOR);
-		} else if(pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
+		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
 			pivotMotor.set(PIVOT_MOTOR);
-		} else{
+		} else {
 			pivotMotor.set(0);
 		}
 		if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID) {
