@@ -2,6 +2,11 @@ package frc.robot.systems;
 
 // Third party Hardware Imports
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import com.revrobotics.CANSparkMax;
 
 import java.util.Arrays;
@@ -137,6 +142,10 @@ public class FSMSystem {
 				- rightMotor.getEncoder().getPosition()) / 2.0);
 		updateLineOdometryTele(gyro.getAngle(), currentEncoderPos);
 
+		System.out.println("currentstate: " + currentState);
+		System.out.println("xPos " + roboXPos);
+		System.out.println("yPos: " + roboYPos);
+
 		switch (currentState) {
 
 			case P1:
@@ -188,7 +197,7 @@ public class FSMSystem {
 				// 	return FSMState.P3;
 				// } else if (stateCounter == 4) {
 				// 	return FSMState.P4;
-				}
+				// }
 
 			// case P2:
 			// 	if (stateCounter == 1) {
