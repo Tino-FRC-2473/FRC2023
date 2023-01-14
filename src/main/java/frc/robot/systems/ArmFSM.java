@@ -150,12 +150,16 @@ public class ArmFSM {
 			pivotMotor.set(PIVOT_MOTOR);
 		} else if (input.isPivotDecreaseButtonPressed()) {
 			pivotMotor.set(-PIVOT_MOTOR);
+		} else {
+			pivotMotor.set(0);
 		}
 
 		if (input.isExtendButtonPressed()) {
 			teleArmMotor.set(TELEARM_MOTOR);
 		} else if (input.isRetractButtonPressed()) {
-			pivotMotor.set(-TELEARM_MOTOR);
+			teleArmMotor.set(-TELEARM_MOTOR);
+		} else {
+			teleArmMotor.set(0);
 		}
 	}
 
