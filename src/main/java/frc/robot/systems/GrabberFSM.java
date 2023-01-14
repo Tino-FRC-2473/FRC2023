@@ -16,8 +16,8 @@ public class GrabberFSM {
 	public enum FSMState {
 		START_STATE,
 		OPENING,
-        CLOSING_CONE,
-        CLOSING_CUBE,
+		CLOSING_CONE,
+		CLOSING_CUBE,
 		DONE
 	}
 	//FIX VALUES
@@ -182,10 +182,12 @@ public class GrabberFSM {
 	}
 	private void handleClosingCubeState(TeleopInput input) {
 		double encoderValue = GrabberMotor.getEncoder().getPosition();
-		if (encoderValue < CUBE_MAX_ENCODER_DISTANCE)
-			GrabberMotor.set(MOTOR_RUN_POWER);
-		else
-			GrabberMotor.set(-MOTOR_RUN_POWER);
+		if (encoderValue < CUBE_MAX_ENCODER_DISTANCE) {
+            GrabberMotor.set(MOTOR_RUN_POWER);
+        } else {
+            GrabberMotor.set(-MOTOR_RUN_POWER);
+  
+
 	}
 	private void handleDoneState(TeleopInput input) {
 
