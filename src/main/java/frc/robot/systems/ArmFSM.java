@@ -19,8 +19,8 @@ public class ArmFSM {
 		SHOOT_MID
 	}
 
-	private static final float TELEARM_MOTOR = 0.3f;
-	private static final float PIVOT_MOTOR = 0.3f;
+	private static final float TELEARM_MOTOR = 0.1f;
+	private static final float PIVOT_MOTOR = 0.1f;
 	private static final int ARM_ENCODER_HIGH = 500;
 	private static final int ARM_ENCODER_MID = 300;
 	private static final int SHOOT_ANGLE_ENCODER = 300;
