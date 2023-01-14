@@ -127,13 +127,7 @@ public class TeleopInput {
 		return mechJoystick.getRawButton(AIM_LOW_BUTTON);
 	}
 
-	public boolean isShootHighButtonPressed() {
-		return leftJoystick.getRawButton(5);
-	}
 
-	public boolean isShootMidButtonPressed() {
-		return leftJoystick.getRawButton(6);
-	}
 
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
