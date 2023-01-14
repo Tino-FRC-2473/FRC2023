@@ -55,8 +55,10 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		LimeLight thing = new LimeLight();
-		thing.update();
+		// LimeLight thing = new LimeLight();
+		// thing.update();
+		PhotonCameraWrapper loc = new PhotonCameraWrapper();
+		loc.update();
 	}
 
 	@Override

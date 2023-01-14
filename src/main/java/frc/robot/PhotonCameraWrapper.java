@@ -100,6 +100,8 @@
         SmartDashboard.putNumber("locationX", getEstimatedGlobalPose().getFirst().getX());
         SmartDashboard.putNumber("locationY", getEstimatedGlobalPose().getFirst().getY());
         SmartDashboard.updateValues();
+        System.out.println(" x: " + getEstimatedGlobalPose().getFirst().getX());
+        System.out.println(" y: " + getEstimatedGlobalPose().getFirst().getY());
     }
 
 
