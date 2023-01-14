@@ -14,11 +14,16 @@ public class ArmFSM {
 	// FSM state definitions
 	public enum FSMState {
 		IDLE,
-		ARM_MOVEMENT, 
+		ARM_MOVEMENT,
+		SHOOT_HIGH,
+		SHOOT_MID
 	}
 
 	private static final float TELEARM_MOTOR = 0.3f;
 	private static final float PIVOT_MOTOR = 0.3f;
+	private static final int ARM_ENCODER_HIGH = 500;
+	private static final int ARM_ENCODER_MID = 300;
+	private static final int SHOOT_ANGLE_ENCODER = 300;
 	
 
 	/* ======================== Private variables ======================== */
@@ -56,6 +61,8 @@ public class ArmFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
+		pivotMotor.getEncoder().setPosition(0);
+		teleArmMotor.getEncoder().setPosition(0);
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -71,7 +78,10 @@ public class ArmFSM {
 				break;
 			case ARM_MOVEMENT:
 				handleArmMechState(input);
-
+			case SHOOT_HIGH:
+				handleShootHighState(input);
+			case SHOOT_MID:
+				handleShootMidState(input);
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -86,17 +96,33 @@ public class ArmFSM {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case IDLE:
-				if(input != null){
+				if(input != null && !input.isShootHighButtonPressed() && !input.isShootMidButtonPressed()){
 					return FSMState.ARM_MOVEMENT;
+				} else if (input.isShootHighButtonPressed()){
+					return FSMState.SHOOT_HIGH;
+				} else if (input.isShootMidButtonPressed()){
+					return FSMState.SHOOT_MID;
 				}
 				return FSMState.IDLE;
 			case ARM_MOVEMENT:
 				if(input == null){
 					return FSMState.IDLE;
+				} else if (input.isShootHighButtonPressed()) {
+					return FSMState.SHOOT_HIGH;
+				} else if (input.isShootMidButtonPressed()) {
+					return FSMState.SHOOT_MID;
 				}
 				return FSMState.ARM_MOVEMENT;
-
-
+			case SHOOT_HIGH:
+				if(input.isShootHighButtonPressed()) {
+					return FSMState.SHOOT_HIGH;
+				}
+				return FSMState.IDLE;
+			case SHOOT_MID:
+				if(input.isShootMidButtonPressed()) {
+					return FSMState.SHOOT_HIGH;
+				}
+				return FSMState.IDLE;
 			default :
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -125,6 +151,37 @@ public class ArmFSM {
 			teleArmMotor.set(TELEARM_MOTOR);
 		}else if(input.isRetractButtonPressed()){
 			pivotMotor.set(-TELEARM_MOTOR);
+		}
+	}
+
+	private void handleShootHighState(TeleopInput input) {
+		if(pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
+			pivotMotor.set(-PIVOT_MOTOR);
+		} else if(pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
+			pivotMotor.set(PIVOT_MOTOR);
+		} else{
+			pivotMotor.set(0);
+		}
+		if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH) {
+			teleArmMotor.set(TELEARM_MOTOR);
+		} else {
+			teleArmMotor.set(0);
+		}
+	}
+
+
+	private void handleShootMidState(TeleopInput input) {
+		if(pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
+			pivotMotor.set(-PIVOT_MOTOR);
+		} else if(pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
+			pivotMotor.set(PIVOT_MOTOR);
+		} else{
+			pivotMotor.set(0);
+		}
+		if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID) {
+			teleArmMotor.set(TELEARM_MOTOR);
+		} else {
+			teleArmMotor.set(0);
 		}
 	}
 
