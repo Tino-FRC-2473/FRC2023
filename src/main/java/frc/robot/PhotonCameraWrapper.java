@@ -97,8 +97,8 @@
      * Updates values on SmartDashboard.
      */
     public final void update() {
-        SmartDashboard.putNumber("locationX", getEstimatedGlobalPose().getFirst());
-        SmartDashboard.putNumber("locationY", getEstimatedGlobalPose().getSecond());
+        SmartDashboard.putNumber("locationX", getEstimatedGlobalPose().getFirst().getX());
+        SmartDashboard.putNumber("locationY", getEstimatedGlobalPose().getFirst().getY());
         SmartDashboard.updateValues();
     }
 
