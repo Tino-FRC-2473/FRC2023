@@ -33,8 +33,8 @@ public class GrabberFSM {
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax GrabberMotor;
-    private Servo ExtractionServo;
+	private CANSparkMax grabberMotor;
+	private Servo extractionServo;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -44,9 +44,9 @@ public class GrabberFSM {
 	 */
 	public GrabberFSM() {
 		// Perform hardware init
-		GrabberMotor = new CANSparkMax(HardwareMap.CAN_ID_GRABBER_MOTOR,
+		grabberMotor = new CANSparkMax(HardwareMap.CAN_ID_GRABBER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
-		ExtractionServo = new Servo(0);
+		extractionServo = new Servo(0);
 		// Reset state machine
 		reset();
 	}
@@ -83,13 +83,13 @@ public class GrabberFSM {
 			case START_STATE:
 				handleStartState(input);
 				break;
-            case OPENING:
+			case OPENING:
 				handleOpeningState(input);
 				break;
-            case CLOSING_CONE:
+			case CLOSING_CONE:
 				handleClosingConeState(input);
 				break;
-            case CLOSING_CUBE:
+			case CLOSING_CUBE:
 				handleClosingCubeState(input);
 				break;
 			case DONE:
@@ -122,7 +122,7 @@ public class GrabberFSM {
 				if (input.getConeButton()) {
 					return FSMState.CLOSING_CONE;
 				}
-				if (GrabberMotor.getEncoder().getPosition() > OPEN_ENCODER_DISTANCE) {
+				if (grabberMotor.getEncoder().getPosition() > OPEN_ENCODER_DISTANCE) {
 					return FSMState.DONE;
 				}
 				return FSMState.OPENING;
@@ -133,7 +133,7 @@ public class GrabberFSM {
 				if (input.getCubeButton()) {
 					return FSMState.CLOSING_CUBE;
 				}
-				if (GrabberMotor.getEncoder().getPosition() < CONE_ENCODER_DISTANCE) {
+				if (grabberMotor.getEncoder().getPosition() < CONE_ENCODER_DISTANCE) {
 					return FSMState.DONE;
 				}
 				return FSMState.CLOSING_CONE;
@@ -144,8 +144,8 @@ public class GrabberFSM {
 				if (input.getConeButton()) {
 					return FSMState.CLOSING_CONE;
 				}
-				if (GrabberMotor.getEncoder().getPosition() < CUBE_MAX_ENCODER_DISTANCE &&
-					GrabberMotor.getEncoder().getPosition() > CUBE_MIN_ENCODER_DISTANCE) {
+				if (grabberMotor.getEncoder().getPosition() < CUBE_MAX_ENCODER_DISTANCE
+					&& grabberMotor.getEncoder().getPosition() > CUBE_MIN_ENCODER_DISTANCE) {
 					return FSMState.DONE;
 				}
 				return FSMState.CLOSING_CUBE;
@@ -172,22 +172,21 @@ public class GrabberFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleStartState(TeleopInput input) {
-		
+
 	}
 	private void handleOpeningState(TeleopInput input) {
-		GrabberMotor.set(MOTOR_RUN_POWER);
+		grabberMotor.set(MOTOR_RUN_POWER);
 	}
 	private void handleClosingConeState(TeleopInput input) {
-		GrabberMotor.set(-MOTOR_RUN_POWER);
+		grabberMotor.set(-MOTOR_RUN_POWER);
 	}
 	private void handleClosingCubeState(TeleopInput input) {
-		double encoderValue = GrabberMotor.getEncoder().getPosition();
+		double encoderValue = grabberMotor.getEncoder().getPosition();
 		if (encoderValue < CUBE_MAX_ENCODER_DISTANCE) {
-            GrabberMotor.set(MOTOR_RUN_POWER);
-        } else {
-            GrabberMotor.set(-MOTOR_RUN_POWER);
-  
-
+			grabberMotor.set(MOTOR_RUN_POWER);
+		} else {
+			grabberMotor.set(-MOTOR_RUN_POWER);
+		}
 	}
 	private void handleDoneState(TeleopInput input) {
 
