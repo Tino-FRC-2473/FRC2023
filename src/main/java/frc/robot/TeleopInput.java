@@ -115,8 +115,8 @@ public class TeleopInput {
 	 * Get the value of the Shoot Mid button.
 	 * @return True if button is pressed
 	 */
-	public boolean isShootMidButtonPressed() {
-		return mechJoystick.getRawButton(AIM_MID_BUTTON);
+	public boolean isShooterButtonPressed() {
+		return mechJoystick.getRawButton(1);
 	}
 
 	/**
