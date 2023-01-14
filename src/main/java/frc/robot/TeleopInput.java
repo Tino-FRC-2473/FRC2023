@@ -56,15 +56,23 @@ public class TeleopInput {
 	 * Get the value of the shooter button.
 	 * @return True if button is pressed
 	 */
-	public boolean isShooterButtonPressed() {
+	public boolean isPivotIncreaseButtonPressed() {
 		return leftJoystick.getRawButton(1);
 	}
 	/**
 	 * Get the value of the intake button.
 	 * @return True if button is pressed
 	 */
-	public boolean isIntakeButtonPressed() {
+	public boolean isPivotDecreaseButtonPressed() {
 		return leftJoystick.getRawButton(2);
+	}
+
+	public boolean isExtendButtonPressed() {
+		return leftJoystick.getRawButton(3);
+	}
+
+	public boolean isRetractButtonPressed() {
+		return leftJoystick.getRawButton(4);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
