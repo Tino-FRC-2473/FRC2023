@@ -43,62 +43,79 @@ public class Robot extends TimedRobot {
         fsmSystem.reset();
     }
 
-	public void autonomousPeriodic() {
-		PhotonCameraWrapper loc = new PhotonCameraWrapper();
-		loc.update();
-		//fsmSystem.update(null);
-	}
+    /**
+     * Runs autonomous periodically.
+     */
+    public void autonomousPeriodic() {
+        PhotonCameraWrapper loc = new PhotonCameraWrapper();
+        loc.update();
+        //fsmSystem.update(null);
+    }
 
-	/**
-	 * Initialization for teleop.
-	 */
-	@Override
-	public void teleopInit() {
-		System.out.println("-------- Teleop Init --------");
-		fsmSystem.reset();
-	}
+    /**
+     * Initialization for teleop.
+     */
+    @Override
+    public void teleopInit() {
+        System.out.println("-------- Teleop Init --------");
+        fsmSystem.reset();
+    }
 
-	public void teleopPeriodic() {
-		// LimeLight thing = new LimeLight();
-		// thing.update();
-		PhotonCameraWrapper loc = new PhotonCameraWrapper();
-		loc.update();
-	}
+    /**
+     * Runs teleop periodically.
+     */
+    public void teleopPeriodic() {
+        // LimeLight thing = new LimeLight();
+        // thing.update();
+        PhotonCameraWrapper loc = new PhotonCameraWrapper();
+        loc.update();
+    }
 
-	/**
-	 * Disabled initialization.
-	 */
-	@Override
-	public void disabledInit() {
-		System.out.println("-------- Disabled Init --------");
-	}
+    /**
+     * Disabled initialization.
+     */
+    @Override
+    public void disabledInit() {
+        System.out.println("-------- Disabled Init --------");
+    }
 
-	public void disabledPeriodic() {
+    /**
+     * Disabled periodically.
+     */
+    public void disabledPeriodic() { }
 
-	}
+    /**
+     * Test initialization.
+     */
+    @Override
+    public void testInit() {
+        System.out.println("-------- Test Init --------");
+    }
 
-	/**
-	 * Test initialization.
-	 */
-	@Override
-	public void testInit() {
-		System.out.println("-------- Test Init --------");
-	}
+    /**
+     * Runs test periodically.
+     */
+    @Override
+    public void testPeriodic() { }
 
-	@Override
-	public void testPeriodic() {
-	}
+    // Simulation mode handlers, only used for simulation testing  */
+    /**
+     * Initialize simulation.
+     */
+    public void simulationInit() {
+        System.out.println("-------- Simulation Init --------");
+    }
 
-	/* Simulation mode handlers, only used for simulation testing  */
-	@Override
-	public void simulationInit() {
-		System.out.println("-------- Simulation Init --------");
-	}
+    /**
+     * Runs simulation periodically.
+     */
+    @Override
+    public void simulationPeriodic() { }
 
-	@Override
-	public void simulationPeriodic() { }
-
-	// Do not use robotPeriodic. Use mode specific periodic methods instead.
-	@Override
-	public void robotPeriodic() { }
+    // Do not use robotPeriodic. Use mode specific periodic methods instead.
+    /**
+     * Runs robot periodically.
+     */
+    @Override
+    public void robotPeriodic() { }
 }
