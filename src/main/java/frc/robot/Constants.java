@@ -19,8 +19,10 @@ public class Constants {
 	public static final double MIN_TURN_POWER = 0.125;
 	public static final double TURN_ERROR_THRESHOLD_DEGREE = 1.0;
 	public static final double TURN_ERROR_POWER_RATIO = 360;
+	public static final double ACCELERATION_CONSTANT_FOR_TURN = 2.8;
+	public static final double SPEED_CONSTANT_FOR_TURN = 0.7;
 
-	// PFC Constants
+	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
 	public static final double DY_INCHES_CONST = 1.1742067733;
 	public static final double SHOOTING_CIRCLE_RADIUS = 120.000;

@@ -39,8 +39,10 @@ public class Functions {
 	 * @return the new power for turning
 	 */
 	public static double accelerateDecelerateTurn(double currentGyroAngle, double total) {
-		double power = -Math.pow((2.8 * Math.pow(currentGyroAngle - total / 2.0, 2))
-			/ (currentGyroAngle * currentGyroAngle), 2) + 0.7;
+
+		double power = -Math.pow((Constants.ACCELERATION_CONSTANT_FOR_TURN
+			* Math.pow(currentGyroAngle - total / 2.0, 2))
+			/ (currentGyroAngle * currentGyroAngle), 2) + Constants.SPEED_CONSTANT_FOR_TURN;
 		return power;
 	}
 
@@ -51,6 +53,7 @@ public class Functions {
 	 */
 	public static double calcForwardPower(double joystickInput) {
 		return (1 - Math.cos(Math.PI * joystickInput / 2.0));
+		// return 2 * joystickInput * joystickInput * joystickInput;
 	}
 
 	/**
@@ -60,7 +63,7 @@ public class Functions {
 	 * @return the adjusted steering power
 	 */
 	public static DrivePower calcSteeringPower(double steeringInput) {
-		return new DrivePower(1 + steeringInput, 1 - steeringInput);
+		return new DrivePower((1 + steeringInput), (1 - steeringInput));
 	}
 
 	/**
