@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  */
 public final class Main {
   /**
-   * 
+   * Contructor for Main.
    */
   private Main() {
   }
