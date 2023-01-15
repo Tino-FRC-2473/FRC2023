@@ -15,6 +15,7 @@ public class TeleopInput {
 	private static final int MECH_JOYSTICK_PORT = 0;
 	private static final int DRIVE_JOYSTICK_PORT = 1;
 
+	private static final int RELEASE_BUTTON = 3;
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private Joystick mechJoystick;
@@ -81,14 +82,26 @@ public class TeleopInput {
 	public double getdriveJoystickY() {
 		return driveJoystick.getY();
 	}
+	/**
+	 * Get Button to pick up cube.
+	 * @return Axis value
+	 */
 	public boolean getCubeButton() {
 		return mechJoystick.getRawButton(1);
 	}
+	/**
+	 * Get Button to pick up cone.
+	 * @return Axis value
+	 */
 	public boolean getConeButton() {
 		return mechJoystick.getRawButton(2);
 	}
+	/**
+	 * Get Button to release.
+	 * @return Axis value
+	 */
 	public boolean getReleaseButton() {
-		return mechJoystick.getRawButton(3);
+		return mechJoystick.getRawButton(RELEASE_BUTTON);
 	}
 	/* ======================== Private methods ======================== */
 
