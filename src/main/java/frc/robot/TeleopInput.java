@@ -14,6 +14,7 @@ public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int MECH_JOYSTICK_PORT = 0;
 	private static final int DRIVE_JOYSTICK_PORT = 1;
+	private static final int STEERING_WHEEL_PORT = 3;
 
 	private static final int OPEN_BUTTON = 8;
 	private static final int CUBE_BUTTON = 10;
@@ -28,6 +29,7 @@ public class TeleopInput {
 	// Input objects
 	private Joystick mechJoystick;
 	private Joystick driveJoystick;
+	private Joystick steeringWheel;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -38,6 +40,7 @@ public class TeleopInput {
 	public TeleopInput() {
 		mechJoystick = new Joystick(MECH_JOYSTICK_PORT);
 		driveJoystick = new Joystick(DRIVE_JOYSTICK_PORT);
+		steeringWheel = new Joystick(STEERING_WHEEL_PORT);
 	}
 
 	/* ======================== Public methods ======================== */
@@ -67,6 +70,7 @@ public class TeleopInput {
 	public boolean isPivotIncreaseButtonPressed() {
 		return mechJoystick.getRawButton(PIVOT_INCREASE_BUTTON);
 	}
+
 	/**
 	 * Get the value of the Pivot Decrease button.
 	 * @return True if button is pressed
@@ -143,6 +147,22 @@ public class TeleopInput {
 	public boolean getOpenButton() {
 		return mechJoystick.getRawButton(OPEN_BUTTON);
 	}
-	/* ======================== Private methods ======================== */
+	/**
+	 * Get trigger button is pressed of left joystick.
+	 * @return Axis value
+	 */
+	public boolean isDriveJoystickTriggerPressedRaw() {
+		return driveJoystick.getTrigger();
+	}
 
+	/* ------------------------ Steering Wheel ------------------------ */
+	/**
+	 * Get Angle of the steering Wheel from -1 to 1.
+	 * @return Angle
+	 */
+	public double getSteerAngle() {
+		return steeringWheel.getX();
+	}
+
+	/* ======================== Private methods ======================== */
 }

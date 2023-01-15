@@ -7,12 +7,12 @@ public class DrivePower {
 
 	/**
 	 * Constructor to create the DrivePower object.
-	 * @param leftPower set the left power
-	 * @param rightPower set the right power
+	 * @param leftPower1 set the left power
+	 * @param rightPower1 set the right power
 	 */
-	public DrivePower(double leftPower, double rightPower) {
-		this.leftPower = leftPower;
-		this.rightPower = rightPower;
+	public DrivePower(double leftPower1, double rightPower1) {
+		leftPower = leftPower1;
+		rightPower = rightPower1;
 	}
 
 	/**
@@ -44,17 +44,17 @@ public class DrivePower {
 
 	/**
 	 * Sets the left power to the specified value.
-	 * @param leftPower new power to which the left power will be set
+	 * @param leftPower1 new power to which the left power will be set
 	 */
-	public void setLeftPower(double leftPower) {
-		this.leftPower = leftPower;
+	public void setLeftPower(double leftPower1) {
+		this.leftPower = leftPower1;
 	}
 
 	/**
 	 * Sets the right power to the specified value.
-	 * @param rightPower new power to which the right power will be set
+	 * @param rightPower1 new power to which the right power will be set
 	 */
-	public void setRightPower(double rightPower) {
-		this.rightPower = rightPower;
+	public void setRightPower(double rightPower1) {
+		this.rightPower = rightPower1;
 	}
 }
