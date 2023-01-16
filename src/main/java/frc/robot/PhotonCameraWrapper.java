@@ -1,3 +1,4 @@
+package frc.robot;
 /*
  * MIT License
  *
@@ -22,7 +23,6 @@
  * SOFTWARE.
  */
 
-package frc.robot;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -117,8 +117,6 @@ public class PhotonCameraWrapper {
      *  field and the robot is always firmly on the ground.
      */
      public Pair<Pose2d, Double> getEstimatedGlobalPose() {
-         //robotPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-
          double currentTime = Timer.getFPGATimestamp();
          Optional<Pair<Pose3d, Double>> result = robotPoseEstimator.update();
          if (result.isPresent()) {

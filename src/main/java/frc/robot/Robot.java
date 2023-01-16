@@ -16,7 +16,8 @@ import frc.robot.systems.FSMSystem;
 public class Robot extends TimedRobot {
     /** TeleopInput object to provide driver inputs. */
     private TeleopInput input;
-
+    /** Pose Estimation class for photonvision. */
+    private PhotonCameraWrapper loc;
     // Systems
     /** FSMSystem object manages execution flow of different states. */
     private FSMSystem fsmSystem;
@@ -41,15 +42,15 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         System.out.println("-------- Autonomous Init --------");
         fsmSystem.reset();
+        loc = new PhotonCameraWrapper();
     }
 
     /**
      * Runs autonomous periodically.
      */
     public void autonomousPeriodic() {
-        PhotonCameraWrapper loc = new PhotonCameraWrapper();
         loc.update();
-        //fsmSystem.update(null);
+        fsmSystem.update(null);
     }
 
     /**
@@ -65,10 +66,9 @@ public class Robot extends TimedRobot {
      * Runs teleop periodically.
      */
     public void teleopPeriodic() {
-        // LimeLight thing = new LimeLight();
-        // thing.update();
-        PhotonCameraWrapper loc = new PhotonCameraWrapper();
-        loc.update();
+        LimeLight ll = new LimeLight();
+        ll.update();
+        fsmSystem.update(input);
     }
 
     /**
