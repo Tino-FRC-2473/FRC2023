@@ -15,7 +15,15 @@ public class TeleopInput {
 	private static final int MECH_JOYSTICK_PORT = 0;
 	private static final int DRIVE_JOYSTICK_PORT = 1;
 
-	private static final int RELEASE_BUTTON = 3;
+	private static final int OPEN_BUTTON = 8;
+	private static final int CUBE_BUTTON = 10;
+	private static final int CONE_BUTTON = 12;
+	private static final int PIVOT_INCREASE_BUTTON = 5;
+	private static final int PIVOT_DECREASE_BUTTON = 3;
+	private static final int EXTEND_BUTTON = 6;
+	private static final int RETRACT_BUTTON = 4;
+	private static final int AIM_HIGH_BUTTON = 7;
+	private static final int AIM_MID_BUTTON = 9;
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private Joystick mechJoystick;
@@ -53,18 +61,50 @@ public class TeleopInput {
 		return mechJoystick.getY();
 	}
 	/**
-	 * Get the value of the shooter button.
+	 * Get the value of the Pivot Increase button.
 	 * @return True if button is pressed
 	 */
-	public boolean isShooterButtonPressed() {
-		return mechJoystick.getRawButton(1);
+	public boolean isPivotIncreaseButtonPressed() {
+		return mechJoystick.getRawButton(PIVOT_INCREASE_BUTTON);
 	}
 	/**
-	 * Get the value of the intake button.
+	 * Get the value of the Pivot Decrease button.
 	 * @return True if button is pressed
 	 */
-	public boolean isIntakeButtonPressed() {
-		return mechJoystick.getRawButton(2);
+	public boolean isPivotDecreaseButtonPressed() {
+		return mechJoystick.getRawButton(PIVOT_DECREASE_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Extend button.
+	 * @return True if button is pressed
+	 */
+	public boolean isExtendButtonPressed() {
+		return mechJoystick.getRawButton(EXTEND_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Retract button.
+	 * @return True if button is pressed
+	 */
+	public boolean isRetractButtonPressed() {
+		return mechJoystick.getRawButton(RETRACT_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Shoot High button.
+	 * @return True if button is pressed
+	 */
+	public boolean isShootHighButtonPressed() {
+		return mechJoystick.getRawButton(AIM_HIGH_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Shoot Mid button.
+	 * @return True if button is pressed
+	 */
+	public boolean isShootMidButtonPressed() {
+		return mechJoystick.getRawButton(AIM_MID_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
@@ -87,21 +127,21 @@ public class TeleopInput {
 	 * @return Axis value
 	 */
 	public boolean getCubeButton() {
-		return mechJoystick.getRawButton(1);
+		return mechJoystick.getRawButton(CUBE_BUTTON);
 	}
 	/**
 	 * Get Button to pick up cone.
 	 * @return Axis value
 	 */
 	public boolean getConeButton() {
-		return mechJoystick.getRawButton(2);
+		return mechJoystick.getRawButton(CONE_BUTTON);
 	}
 	/**
 	 * Get Button to release.
 	 * @return Axis value
 	 */
 	public boolean getOpenButton() {
-		return mechJoystick.getRawButton(RELEASE_BUTTON);
+		return mechJoystick.getRawButton(OPEN_BUTTON);
 	}
 	/* ======================== Private methods ======================== */
 
