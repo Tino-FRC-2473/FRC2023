@@ -1,9 +1,12 @@
 package frc.robot.systems;
 
+
+
 // WPILib Imports
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxLimitSwitch;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -19,8 +22,8 @@ public class ArmFSM {
 		SHOOT_MID
 	}
 
-	private static final float TELEARM_MOTOR = 0.1f;
-	private static final float PIVOT_MOTOR = 0.1f;
+	private static final float TELEARM_MOTOR_POWER = 0.1f;
+	private static final float PIVOT_MOTOR_POWER = 0.1f;
 	private static final int ARM_ENCODER_HIGH = 500;
 	private static final int ARM_ENCODER_MID = 300;
 	private static final int SHOOT_ANGLE_ENCODER = 300;
@@ -31,7 +34,8 @@ public class ArmFSM {
 
 	private CANSparkMax pivotMotor;
 	private CANSparkMax teleArmMotor;
-
+	private SparkMaxLimitSwitch pivotLimitSwitchHigh;
+	private SparkMaxLimitSwitch pivotLimitSwitchLow;
 	/*
 	 * Hardware Map each of the motors
 	 *
@@ -43,7 +47,12 @@ public class ArmFSM {
 		// Perform hardware init
 		pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
 										CANSparkMax.MotorType.kBrushless);
-
+		pivotLimitSwitchHigh = pivotMotor.getForwardLimitSwitch(
+								SparkMaxLimitSwitch.Type.kNormallyClosed);
+		pivotLimitSwitchHigh.enableLimitSwitch(true);
+		pivotLimitSwitchLow = pivotMotor.getReverseLimitSwitch(
+								SparkMaxLimitSwitch.Type.kNormallyClosed);
+		pivotLimitSwitchLow.enableLimitSwitch(true);
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
 		// Reset state machine
@@ -133,6 +142,14 @@ public class ArmFSM {
 		}
 	}
 
+
+	private boolean atMaxHeight() {
+		return pivotLimitSwitchHigh.isPressed();
+	}
+
+	private boolean atMinHeight() {
+		return pivotLimitSwitchLow.isPressed();
+	}
 	/*
 	 * What to do when in the IDLE state
 	 */
@@ -146,18 +163,18 @@ public class ArmFSM {
 	 * What to do when in the ARM_MOVEMENT state
 	 */
 	private void handleArmMechState(TeleopInput input) {
-		if (input.isPivotIncreaseButtonPressed()) {
-			pivotMotor.set(PIVOT_MOTOR);
-		} else if (input.isPivotDecreaseButtonPressed()) {
-			pivotMotor.set(-PIVOT_MOTOR);
+		if (input.isPivotIncreaseButtonPressed() && !atMaxHeight()) {
+			pivotMotor.set(PIVOT_MOTOR_POWER);
+		} else if (input.isPivotDecreaseButtonPressed() && !atMinHeight()) {
+			pivotMotor.set(-PIVOT_MOTOR_POWER);
 		} else {
 			pivotMotor.set(0);
 		}
 
 		if (input.isExtendButtonPressed()) {
-			teleArmMotor.set(TELEARM_MOTOR);
+			teleArmMotor.set(TELEARM_MOTOR_POWER);
 		} else if (input.isRetractButtonPressed()) {
-			teleArmMotor.set(-TELEARM_MOTOR);
+			teleArmMotor.set(-TELEARM_MOTOR_POWER);
 		} else {
 			teleArmMotor.set(0);
 		}
@@ -165,30 +182,29 @@ public class ArmFSM {
 
 	private void handleShootHighState(TeleopInput input) {
 		if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(-PIVOT_MOTOR);
+			pivotMotor.set(-PIVOT_MOTOR_POWER);
 		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(PIVOT_MOTOR);
+			pivotMotor.set(PIVOT_MOTOR_POWER);
 		} else {
 			pivotMotor.set(0);
 		}
 		if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH) {
-			teleArmMotor.set(TELEARM_MOTOR);
+			teleArmMotor.set(TELEARM_MOTOR_POWER);
 		} else {
 			teleArmMotor.set(0);
 		}
 	}
 
-
 	private void handleShootMidState(TeleopInput input) {
 		if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(-PIVOT_MOTOR);
+			pivotMotor.set(-PIVOT_MOTOR_POWER);
 		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(PIVOT_MOTOR);
+			pivotMotor.set(PIVOT_MOTOR_POWER);
 		} else {
 			pivotMotor.set(0);
 		}
 		if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID) {
-			teleArmMotor.set(TELEARM_MOTOR);
+			teleArmMotor.set(TELEARM_MOTOR_POWER);
 		} else {
 			teleArmMotor.set(0);
 		}
