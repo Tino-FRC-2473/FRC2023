@@ -49,82 +49,74 @@ import frc.robot.Constants.VisionConstants;
  * with its coordinates.
  */
 public class PhotonCameraWrapper {
-        /** PhotonCamera object representing a camera that is
-         * connected to PhotonVision.*/
-        private PhotonCamera photonCamera;
-        /** RobotPoseEstimator object to estimate position of robot.*/
-        private RobotPoseEstimator robotPoseEstimator;
-        /** conversion constant: 39.3701 inches in a meter. */
-        public static final double METERS_TO_INCHES = 39.3701;
+		/** PhotonCamera object representing a camera that is
+		 * connected to PhotonVision.*/
+	private PhotonCamera photonCamera;
+		/** RobotPoseEstimator object to estimate position of robot.*/
+	private RobotPoseEstimator robotPoseEstimator;
+		/** conversion constant: 39.3701 inches in a meter. */
+	public static final double METERS_TO_INCHES = 39.3701;
 
-        /** Creates a new PhotonCameraWrapper. */
-        public PhotonCameraWrapper() {
-                final AprilTag tag01 = new AprilTag(1, new Pose3d(new Pose2d(
-                                        Constants.AprilTagConstants.X1,
-                                        Constants.AprilTagConstants.Y1,
-                                        Rotation2d.fromDegrees(
-                                        Constants.AprilTagConstants.ROT1))));
-                final AprilTag tag02 = new AprilTag(2, new Pose3d(new Pose2d(
-                                        Constants.AprilTagConstants.X2,
-                                        Constants.AprilTagConstants.Y2,
-                                        Rotation2d.fromDegrees(
-                                        Constants.AprilTagConstants.ROT2))));
+		/** Creates a new PhotonCameraWrapper. */
+	public PhotonCameraWrapper() {
+		ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
+		atList.add(new AprilTag(1, new Pose3d(new Pose2d(
+			Constants.AprilTagConstants.X1,
+			Constants.AprilTagConstants.Y1,
+			Rotation2d.fromDegrees(
+			Constants.AprilTagConstants.ROT1)))));
 
-        ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
-        atList.add(tag01);
-        atList.add(tag02);
+		AprilTagFieldLayout atfl =
+				new AprilTagFieldLayout(atList,
+										FieldConstants.LENGTH,
+										FieldConstants.WIDTH);
 
-        AprilTagFieldLayout atfl =
-                new AprilTagFieldLayout(atList,
-                                        FieldConstants.LENGTH,
-                                        FieldConstants.WIDTH);
+		// Forward Camera
+		photonCamera =
+				new PhotonCamera(
+						VisionConstants
+								.CAMERA_NAME);
+		// PhotonVision UI.
 
-         // Forward Camera
-        photonCamera =
-                new PhotonCamera(
-                        VisionConstants
-                                .CAMERA_NAME);
-        // PhotonVision UI.
+		// ... Add other cameras here
 
-         // ... Add other cameras here
+		// Assemble the list of cameras & mount locations
+		var camList = new ArrayList<Pair<PhotonCamera, Transform3d>>();
+		camList.add(new Pair<PhotonCamera, Transform3d>(photonCamera,
+												VisionConstants.ROBOT_TO_CAM));
 
-         // Assemble the list of cameras & mount locations
-        var camList = new ArrayList<Pair<PhotonCamera, Transform3d>>();
-        camList.add(new Pair<PhotonCamera, Transform3d>(photonCamera,
-                                                VisionConstants.ROBOT_TO_CAM));
+		robotPoseEstimator = new RobotPoseEstimator(atfl,
+										PoseStrategy.LOWEST_AMBIGUITY, camList);
+	}
 
-        robotPoseEstimator = new RobotPoseEstimator(atfl,
-                                        PoseStrategy.LOWEST_AMBIGUITY, camList);
-     }
+	/**
+	 * Updates values on SmartDashboard.
+	 */
+	public final void update() {
+		SmartDashboard.putNumber("locationX",
+								getEstimatedGlobalPose().getFirst().getX());
+		SmartDashboard.putNumber("locationY",
+								getEstimatedGlobalPose().getFirst().getY());
+		SmartDashboard.updateValues();
+		System.out.println(" x: " + getEstimatedGlobalPose().getFirst().getX());
+		System.out.println(" y: " + getEstimatedGlobalPose().getFirst().getY());
+	}
 
-     /**
-     * Updates values on SmartDashboard.
-     */
-    public final void update() {
-        SmartDashboard.putNumber("locationX",
-                                getEstimatedGlobalPose().getFirst().getX());
-        SmartDashboard.putNumber("locationY",
-                                getEstimatedGlobalPose().getFirst().getY());
-        SmartDashboard.updateValues();
-        System.out.println(" x: " + getEstimatedGlobalPose().getFirst().getX());
-        System.out.println(" y: " + getEstimatedGlobalPose().getFirst().getY());
-    }
-
-    /**
-     * Gets estimated global pose.
-     * @return A pair of the fused camera observations to a single Pose2d
-     *  on the field, and the time of the observation. Assumes a planar
-     *  field and the robot is always firmly on the ground.
-     */
-     public Pair<Pose2d, Double> getEstimatedGlobalPose() {
-         double currentTime = Timer.getFPGATimestamp();
-         Optional<Pair<Pose3d, Double>> result = robotPoseEstimator.update();
-         if (result.isPresent()) {
-             return new Pair<Pose2d, Double>(
-                     result.get().getFirst().toPose2d(),
-                     currentTime - result.get().getSecond());
-         } else {
-             return new Pair<Pose2d, Double>(null, 0.0);
-         }
-     }
- }
+	/**
+	 * Gets estimated global pose.
+	 * @return A pair of the fused camera observations to a single Pose2d
+	 *  on the field, and the time of the observation. Assumes a planar
+	 *  field and the robot is always firmly on the ground.
+	 */
+	public Pair<Pose2d, Double> getEstimatedGlobalPose() {
+		double currentTime = Timer.getFPGATimestamp();
+		Optional<Pair<Pose3d, Double>> result = robotPoseEstimator.update();
+		if (result.isPresent()) {
+			return new Pair<Pose2d, Double>(
+					result.get().getFirst().toPose2d(),
+					currentTime - result.get().getSecond());
+		} else {
+			return new Pair<Pose2d, Double>(null, 0.0);
+		}
+	}
+}

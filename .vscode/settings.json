@@ -27,5 +27,9 @@
     },
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
-  "java.checkstyle.configuration": "/sun_checks.xml"
+  "java.checkstyle.configuration": "${workspaceFolder}/checks.xml",
+  "java.checkstyle.version": "9.1",
+    "java.checkstyle.properties": {
+        "basedir": "${workspaceFolder}/src/main/java/frc/robot"
+    }  
 }

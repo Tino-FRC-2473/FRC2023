@@ -11,85 +11,85 @@ import edu.wpi.first.wpilibj.Joystick;
  * for inputs by value, but may not access the internal input objects.
  */
 public class TeleopInput {
-    /* ======================== Constants ======================== */
-    /** left joystick port. */
-    private static final int LEFT_JOYSTICK_PORT = 0;
-    /** right joystick port. */
-    private static final int RIGHT_JOYSTICK_PORT = 1;
+	/* ======================== Constants ======================== */
+	/** left joystick port. */
+	private static final int LEFT_JOYSTICK_PORT = 0;
+	/** right joystick port. */
+	private static final int RIGHT_JOYSTICK_PORT = 1;
 
-    /* ======================== Private variables ======================== */
-    // Input objects
-    /** left joystick. */
-    private Joystick leftJoystick;
-    /** right joystick. */
-    private Joystick rightJoystick;
+	/* ======================== Private variables ======================== */
+	// Input objects
+	/** left joystick. */
+	private Joystick leftJoystick;
+	/** right joystick. */
+	private Joystick rightJoystick;
 
-    /* ======================== Constructor ======================== */
-    /**
-     * Create a TeleopInput and register input devices. Note that while inputs
-     * are registered at robot initialization, valid values will not be provided
-     * by WPILib until teleop mode.
-     */
-    public TeleopInput() {
-        leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
-        rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
-    }
+	/* ======================== Constructor ======================== */
+	/**
+	 * Create a TeleopInput and register input devices. Note that while inputs
+	 * are registered at robot initialization, valid values will not be provided
+	 * by WPILib until teleop mode.
+	 */
+	public TeleopInput() {
+		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
+		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
+	}
 
-    /* ======================== Public methods ======================== */
-    // Getter methods for fetch input values should be defined here.
-    // Method names should be descriptive of the behavior, so the
-    // control mapping is hidden from other classes.
+	/* ======================== Public methods ======================== */
+	// Getter methods for fetch input values should be defined here.
+	// Method names should be descriptive of the behavior, so the
+	// control mapping is hidden from other classes.
 
-    /* ------------------------ Left Joystick ------------------------ */
-    /**
-     * Get X axis of Left Joystick.
-     * @return Axis value
-     */
-    public double getLeftJoystickX() {
-        return leftJoystick.getX();
-    }
+	/* ------------------------ Left Joystick ------------------------ */
+	/**
+	 * Get X axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getLeftJoystickX() {
+		return leftJoystick.getX();
+	}
 
-    /**
-     * Get Y axis of Left Joystick.
-     * @return Axis value
-     */
-    public double getLeftJoystickY() {
-        return leftJoystick.getY();
-    }
+	/**
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getLeftJoystickY() {
+		return leftJoystick.getY();
+	}
 
-    /**
-     * Get the value of the shooter button.
-     * @return True if button is pressed
-     */
-    public boolean isShooterButtonPressed() {
-        return leftJoystick.getRawButton(1);
-    }
+	/**
+	 * Get the value of the shooter button.
+	 * @return True if button is pressed
+	 */
+	public boolean isShooterButtonPressed() {
+		return leftJoystick.getRawButton(1);
+	}
 
-    /**
-     * Get the value of the intake button.
-     * @return True if button is pressed
-     */
-    public boolean isIntakeButtonPressed() {
-        return leftJoystick.getRawButton(2);
-    }
+	/**
+	 * Get the value of the intake button.
+	 * @return True if button is pressed
+	 */
+	public boolean isIntakeButtonPressed() {
+		return leftJoystick.getRawButton(2);
+	}
 
-    /* ------------------------ Right Joystick ------------------------ */
-    /**
-     * Get X axis of Right Joystick.
-     * @return Axis value
-     */
-    public double getRightJoystickX() {
-        return rightJoystick.getX();
-    }
+	/* ------------------------ Right Joystick ------------------------ */
+	/**
+	 * Get X axis of Right Joystick.
+	 * @return Axis value
+	 */
+	public double getRightJoystickX() {
+		return rightJoystick.getX();
+	}
 
-    /**
-     * Get Y axis of Right Joystick.
-     * @return Axis value
-     */
-    public double getRightJoystickY() {
-        return rightJoystick.getY();
-    }
+	/**
+	 * Get Y axis of Right Joystick.
+	 * @return Axis value
+	 */
+	public double getRightJoystickY() {
+		return rightJoystick.getY();
+	}
 
-    /* ======================== Private methods ======================== */
+	/* ======================== Private methods ======================== */
 
 }
