@@ -8,7 +8,6 @@ import com.revrobotics.CANSparkMax;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
-import edu.wpi.first.wpilibj.Servo;
 
 public class GrabberFSM {
 	/* ======================== Constants ======================== */
@@ -22,11 +21,10 @@ public class GrabberFSM {
 	}
 	//FIX VALUES
 	private static final double MOTOR_RUN_POWER = 0.1f;
-	private static final double CONE_ENCODER_DISTANCE = -1;
-	private static final double CUBE_MIN_ENCODER_DISTANCE = -1;
-	private static final double CUBE_MAX_ENCODER_DISTANCE = -1;
-	private static final double OPEN_ENCODER_DISTANCE = -1;
-	private static final double FLIP_ANGLE = -1;
+	private static final double CONE_ENCODER_ROTATIONS = -1;
+	private static final double CUBE_ENCODER_ROTATIONS = -1;
+	private static final double OPEN_ENCODER_ROTATIONS = -1;
+	private static final double ERROR = 0.1;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -34,7 +32,6 @@ public class GrabberFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax grabberMotor;
-	private Servo extractionServo;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -46,7 +43,6 @@ public class GrabberFSM {
 		// Perform hardware init
 		grabberMotor = new CANSparkMax(HardwareMap.CAN_ID_GRABBER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
-		extractionServo = new Servo(0);
 		// Reset state machine
 		reset();
 	}
@@ -100,7 +96,15 @@ public class GrabberFSM {
 		}
 		currentState = nextState(input);
 	}
-
+	/**
+	 * Returns whether the difference between two rotations is within the error.
+	 * @param a rotation value 1
+	 * @param b rotation value 2
+	 * @return whether they are within the error
+	 */
+	private boolean withinError(double a, double b) {
+		return Math.abs(a - b) < ERROR;
+	}
 	/* ======================== Private methods ======================== */
 	/**
 	 * Decide the next state to transition to. This is a function of the inputs
@@ -122,35 +126,34 @@ public class GrabberFSM {
 				if (input.getConeButton()) {
 					return FSMState.CLOSING_CONE;
 				}
-				if (grabberMotor.getEncoder().getPosition() > OPEN_ENCODER_DISTANCE) {
+				if (withinError(grabberMotor.getEncoder().getPosition(), OPEN_ENCODER_ROTATIONS)) {
 					return FSMState.DONE;
 				}
 				return FSMState.OPENING;
 			case CLOSING_CONE:
-				if (input.getReleaseButton()) {
+				if (input.getOpenButton()) {
 					return FSMState.OPENING;
 				}
 				if (input.getCubeButton()) {
 					return FSMState.CLOSING_CUBE;
 				}
-				if (grabberMotor.getEncoder().getPosition() < CONE_ENCODER_DISTANCE) {
+				if (withinError(grabberMotor.getEncoder().getPosition(), CONE_ENCODER_ROTATIONS)) {
 					return FSMState.DONE;
 				}
 				return FSMState.CLOSING_CONE;
 			case CLOSING_CUBE:
-				if (input.getReleaseButton()) {
+				if (input.getOpenButton()) {
 					return FSMState.OPENING;
 				}
 				if (input.getConeButton()) {
 					return FSMState.CLOSING_CONE;
 				}
-				if (grabberMotor.getEncoder().getPosition() < CUBE_MAX_ENCODER_DISTANCE
-					&& grabberMotor.getEncoder().getPosition() > CUBE_MIN_ENCODER_DISTANCE) {
+				if (withinError(grabberMotor.getEncoder().getPosition(), CUBE_ENCODER_ROTATIONS)) {
 					return FSMState.DONE;
 				}
 				return FSMState.CLOSING_CUBE;
 			case DONE:
-				if (input.getReleaseButton()) {
+				if (input.getOpenButton()) {
 					return FSMState.OPENING;
 				}
 				if (input.getConeButton()) {
@@ -175,14 +178,24 @@ public class GrabberFSM {
 
 	}
 	private void handleOpeningState(TeleopInput input) {
-		grabberMotor.set(MOTOR_RUN_POWER);
+		double encoderValue = grabberMotor.getEncoder().getPosition();
+		if (encoderValue < OPEN_ENCODER_ROTATIONS) {
+			grabberMotor.set(MOTOR_RUN_POWER);
+		} else {
+			grabberMotor.set(-MOTOR_RUN_POWER);
+		}
 	}
 	private void handleClosingConeState(TeleopInput input) {
-		grabberMotor.set(-MOTOR_RUN_POWER);
+		double encoderValue = grabberMotor.getEncoder().getPosition();
+		if (encoderValue < CONE_ENCODER_ROTATIONS) {
+			grabberMotor.set(MOTOR_RUN_POWER);
+		} else {
+			grabberMotor.set(-MOTOR_RUN_POWER);
+		}
 	}
 	private void handleClosingCubeState(TeleopInput input) {
 		double encoderValue = grabberMotor.getEncoder().getPosition();
-		if (encoderValue < CUBE_MAX_ENCODER_DISTANCE) {
+		if (encoderValue < CUBE_ENCODER_ROTATIONS) {
 			grabberMotor.set(MOTOR_RUN_POWER);
 		} else {
 			grabberMotor.set(-MOTOR_RUN_POWER);
