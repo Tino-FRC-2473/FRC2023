@@ -100,7 +100,7 @@ public class TeleopInput {
 	 * Get Button to release.
 	 * @return Axis value
 	 */
-	public boolean getReleaseButton() {
+	public boolean getOpenButton() {
 		return mechJoystick.getRawButton(RELEASE_BUTTON);
 	}
 	/* ======================== Private methods ======================== */
