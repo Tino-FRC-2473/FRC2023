@@ -9,21 +9,27 @@ import com.revrobotics.CANSparkMax;
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 
+/** FSMSystem class manages execution flow of different states.*/
 public class FSMSystem {
-	/* ======================== Constants ======================== */
-	// FSM state definitions
+	/** Contains different states. */
 	public enum FSMState {
+		/** Start state. */
 		START_STATE,
+		/** Other state. */
 		OTHER_STATE
 	}
 
+	/** motor power. */
 	private static final float MOTOR_RUN_POWER = 0.1f;
 
-	/* ======================== Private variables ======================== */
+	/** current state. */
 	private FSMState currentState;
 
-	// Hardware devices should be owned by one and only one system. They must
-	// be private to their owner system and may not be used elsewhere.
+	// Hardware devices should be owned by one and only
+	//  one system. They must be private to their owner
+	//  system and may not be used elsewhere.
+
+	/** motor. */
 	private CANSparkMax exampleMotor;
 
 	/* ======================== Constructor ======================== */
@@ -35,7 +41,7 @@ public class FSMSystem {
 	public FSMSystem() {
 		// Perform hardware init
 		exampleMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER,
-										CANSparkMax.MotorType.kBrushless);
+									CANSparkMax.MotorType.kBrushless);
 
 		// Reset state machine
 		reset();
@@ -49,6 +55,7 @@ public class FSMSystem {
 	public FSMState getCurrentState() {
 		return currentState;
 	}
+
 	/**
 	 * Reset this system to its start state. This may be called from mode init
 	 * when the robot is enabled.
@@ -63,24 +70,24 @@ public class FSMSystem {
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
+
 	/**
 	 * Update FSM based on new inputs. This function only calls the FSM state
 	 * specific handlers.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	public void update(TeleopInput input) {
+	public void update(final TeleopInput input) {
 		switch (currentState) {
 			case START_STATE:
 				handleStartState(input);
 				break;
-
 			case OTHER_STATE:
 				handleOtherState(input);
 				break;
-
 			default:
-				throw new IllegalStateException("Invalid state: " + currentState.toString());
+				throw new IllegalStateException(
+							"Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
 	}
@@ -92,10 +99,10 @@ public class FSMSystem {
 	 * effects on outputs. In other words, this method should only read or get
 	 * values to decide what state to go to.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
+	 *              the robot is in autonomous mode.
 	 * @return FSM state for the next iteration
 	 */
-	private FSMState nextState(TeleopInput input) {
+	private FSMState nextState(final TeleopInput input) {
 		switch (currentState) {
 			case START_STATE:
 				if (input != null) {
@@ -103,12 +110,11 @@ public class FSMSystem {
 				} else {
 					return FSMState.START_STATE;
 				}
-
 			case OTHER_STATE:
 				return FSMState.OTHER_STATE;
-
 			default:
-				throw new IllegalStateException("Invalid state: " + currentState.toString());
+				throw new IllegalStateException(
+								"Invalid state: " + currentState.toString());
 		}
 	}
 
@@ -116,17 +122,18 @@ public class FSMSystem {
 	/**
 	 * Handle behavior in START_STATE.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
+	 *              the robot is in autonomous mode.
 	 */
-	private void handleStartState(TeleopInput input) {
+	private void handleStartState(final TeleopInput input) {
 		exampleMotor.set(0);
 	}
+
 	/**
 	 * Handle behavior in OTHER_STATE.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
+	 *              the robot is in autonomous mode.
 	 */
-	private void handleOtherState(TeleopInput input) {
+	private void handleOtherState(final TeleopInput input) {
 		exampleMotor.set(MOTOR_RUN_POWER);
 	}
 }
