@@ -23,6 +23,8 @@ public class FSMSystem {
 
 	// FSM state definitions
 	public enum FSMState {
+		path1,
+		path2,
 		PURE_PERSUIT,
 		P1,
 		P2,
@@ -119,11 +121,11 @@ public class FSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.P1;
+		currentState = FSMState.path2;
 
 		roboXPos = 0;
 		roboYPos = 0;
-		System.out.println(roboXPos + " " + roboYPos);
+		// System.out.println(roboXPos + " " + roboYPos);
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -142,18 +144,25 @@ public class FSMSystem {
 				- rightMotor.getEncoder().getPosition()) / 2.0);
 		updateLineOdometryTele(gyro.getAngle(), currentEncoderPos);
 
-		System.out.println("currentstate: " + currentState);
-		System.out.println("xPos " + roboXPos);
-		System.out.println("yPos: " + roboYPos);
+		// System.out.println("currentstate: " + currentState);
+		// System.out.println("xPos " + roboXPos);
+		// System.out.println("yPos: " + roboYPos);
 
 		switch (currentState) {
+			case path1:
+				path1(input);
+				break;
+
+			case path2:
+				path2(input);
+				break;
 
 			case P1:
 				goToPos(input, 30.876, 0);
 				break;
 
 			case P2:
-				goToPos(input, 117.047, -31.623);
+				goToPos(input, -105.617, 0);
 				break;
 
 			case P3:
@@ -186,51 +195,56 @@ public class FSMSystem {
 	 */
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
+			
+			case path1:
+				return FSMState.path1;
+
+			case path2:
+				return FSMState.path1;
 
 			case P1:
 				if (stateCounter == 1) {
 					return FSMState.P1;
+				} else if (stateCounter == 2) {
+					return FSMState.P2;
+				} else if (stateCounter == 3) {
+					return FSMState.P3;
+				} else if (stateCounter == 4) {
+					return FSMState.P4;
 				}
-				// } else if (stateCounter == 2) {
-				// 	return FSMState.P2;
-				// } else if (stateCounter == 3) {
-				// 	return FSMState.P3;
-				// } else if (stateCounter == 4) {
-				// 	return FSMState.P4;
-				// }
 
-			// case P2:
-			// 	if (stateCounter == 1) {
-			// 		return FSMState.P1;
-			// } else if (stateCounter == 2) {
-				// 	return FSMState.P2;
-				// } else if (stateCounter == 3) {
-				// 	return FSMState.P3;
-				// } else if (stateCounter == 4) {
-				// 	return FSMState.P4;
-			//}
+			case P2:
+				if (stateCounter == 1) {
+					return FSMState.P1;
+			} else if (stateCounter == 2) {
+					return FSMState.P2;
+				} else if (stateCounter == 3) {
+					return FSMState.P3;
+				} else if (stateCounter == 4) {
+					return FSMState.P4;
+			}
 
 			// case P3:
 			// 	if (stateCounter == 1) {
 			// 		return FSMState.P1;
 			// } else if (stateCounter == 2) {
-				// 	return FSMState.P2;
-				// } else if (stateCounter == 3) {
-				// 	return FSMState.P3;
-				// } else if (stateCounter == 4) {
-				// 	return FSMState.P4;
-			//}
+			// 		return FSMState.P2;
+			// 	} else if (stateCounter == 3) {
+			// 		return FSMState.P3;
+			// 	} else if (stateCounter == 4) {
+			// 		return FSMState.P4;
+			// }
 
 			// case P4:
 			// 	if (stateCounter == 1) {
 			// 		return FSMState.P1;
 			// } else if (stateCounter == 2) {
-				// 	return FSMState.P2;
-				// } else if (stateCounter == 3) {
-				// 	return FSMState.P3;
-				// } else if (stateCounter == 4) {
-				// 	return FSMState.P4;
-			//}
+			// 		return FSMState.P2;
+			// 	} else if (stateCounter == 3) {
+			// 		return FSMState.P3;
+			// 	} else if (stateCounter == 4) {
+			// 		return FSMState.P4;
+			// }
 
 			case PURE_PERSUIT:
 				if (stateCounter == 0) {
@@ -479,5 +493,74 @@ public class FSMSystem {
 
 		prevEncoderPos = this.currentEncoderPos;
 		// return new Translation2d(robotPos.getX() + dX, robotPos.getY() + dY);
+	}
+
+	int state = 0;
+    public void path1(TeleopInput input) {
+        if (input != null) {
+            return;
+        }
+        double roboX = -roboXPos;
+        double roboY = roboYPos;
+		System.out.println("x: " + roboX);
+		System.out.println("y: " + roboY);
+		System.out.println("state: " + state);
+        if (state == 0) {
+            leftMotor.set(-0.3);
+            rightMotor.set(0.3);
+            if (Math.abs(roboX - 30.8) <= 5) {
+                leftMotor.set(0);
+                rightMotor.set(0);
+                state++;
+            }
+        } else if (state == 1) {
+			System.out.println("entered 1");
+            leftMotor.set(0.3);
+            rightMotor.set(-0.3);
+            if (Math.abs(roboX + 105.6) <= 5) {
+                leftMotor.set(0);
+                rightMotor.set(0);
+                state++;
+            }
+        } else if (state == 2) {
+            leftMotor.set(-0.3);
+            rightMotor.set(0.3);
+            if (Math.abs(roboX + 50.1) <= 5) {
+                leftMotor.set(0);
+                rightMotor.set(0);
+                System.out.println("end");
+                //state++;
+            }
+        }
+	}
+
+	public void path2(TeleopInput input) {
+		if (input != null) {
+			return;
+		}
+		double roboX = -roboXPos;
+		double roboY = roboYPos;
+		System.out.println("x: " + roboX);
+		System.out.println("y: " + roboY);
+		System.out.println("state: " + state);
+		if (state == 0) {
+			leftMotor.set(-0.3);
+			rightMotor.set(0.3);
+			if (Math.abs(roboX - 49.4) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			}
+		} else if (state == 1) {
+			System.out.println("entered 1");
+			leftMotor.set(0.3);
+			rightMotor.set(-0.3);
+			if (Math.abs(roboX + 47.7) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				System.out.println("end");
+				//state++;
+			}
+		}
 	}
 }
