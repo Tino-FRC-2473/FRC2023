@@ -94,7 +94,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isShootHighButtonPressed() {
-		return leftJoystick.getRawButton(AIM_HIGH_ID);
+		return mechJoystick.getRawButton(AIM_HIGH_ID);
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isShootMidButtonPressed() {
-		return leftJoystick.getRawButton(AIM_MID_ID);
+		return mechJoystick.getRawButton(AIM_MID_ID);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
