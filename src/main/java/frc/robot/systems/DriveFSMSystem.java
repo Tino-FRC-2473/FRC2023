@@ -3,7 +3,9 @@ package frc.robot.systems;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 
-// import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
+
+import com.kauailabs.navx.frc.AHRS;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -45,7 +47,7 @@ public class DriveFSMSystem {
 	private double currentEncoderPos;
 	private double prevEncoderPos = 0;
 	private double gyroAngleForOdo = 0;
-	// private AHRS gyro;
+	private AHRS gyro;
 	private double startAngle;
 
 
@@ -68,7 +70,7 @@ public class DriveFSMSystem {
 
 		finishedTurning = false;
 
-		// gyro = new AHRS(SPI.Port.kMXP);
+		gyro = new AHRS(SPI.Port.kMXP);
 		startAngle = 0;
 
 		// Reset state machine
@@ -98,8 +100,8 @@ public class DriveFSMSystem {
 		rightMotor.getEncoder().setPosition(0);
 		leftMotor.getEncoder().setPosition(0);
 
-		// gyro.reset();
-		// gyro.zeroYaw();
+		gyro.reset();
+		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
 		currentState = FSMState.TELE_STATE_2_MOTOR_DRIVE;
