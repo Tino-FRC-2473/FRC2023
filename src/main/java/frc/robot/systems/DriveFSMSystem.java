@@ -12,7 +12,7 @@ import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 import frc.robot.drive.DriveModes;
 import frc.robot.drive.DrivePower;
-import frc.robot.drive.Functions;
+import frc.robot.drive.DriveFunctions;
 import frc.robot.Constants;
 
 public class DriveFSMSystem {
@@ -238,12 +238,12 @@ public class DriveFSMSystem {
 			DrivePower power;
 
 			// acceleration
-			power = Functions.accelerate(targetPower, new DrivePower(currentLeftPower,
+			power = DriveFunctions.accelerate(targetPower, new DrivePower(currentLeftPower,
 				currentRightPower));
 
 			// turning in place
 			if (Math.abs(input.getLeftJoystickY()) < Constants.TURNING_IN_PLACE_THRESHOLD) {
-				power = Functions.turnInPlace(input.getRightJoystickY(), steerAngle);
+				power = DriveFunctions.turnInPlace(input.getRightJoystickY(), steerAngle);
 			}
 
 			// System.out.println("ANGLE: " + getAngleToHub());

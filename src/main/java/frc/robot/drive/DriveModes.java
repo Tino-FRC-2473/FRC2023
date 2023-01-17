@@ -16,8 +16,8 @@ public class DriveModes {
 	public static DrivePower arcadeDrive(double joystickY, double steerAngle,
 		double currentLeftPower, double currentRightPower, boolean isDrivingForward) {
 
-		double adjustedInput = Functions.calcForwardPower(joystickY);
-		DrivePower adjustedSteering = Functions.calcSteeringPower(steerAngle);
+		double adjustedInput = DriveFunctions.calcForwardPower(joystickY);
+		DrivePower adjustedSteering = DriveFunctions.calcSteeringPower(steerAngle);
 
 		if (joystickY < 0 && adjustedInput > 0) {
 			adjustedInput *= -1;

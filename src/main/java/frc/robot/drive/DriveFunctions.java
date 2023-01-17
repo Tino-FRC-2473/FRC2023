@@ -2,7 +2,7 @@ package frc.robot.drive;
 
 import frc.robot.Constants;
 
-public class Functions {
+public class DriveFunctions {
 
 	/**
 	 * Calculated the new motor powers by accelerating the current
