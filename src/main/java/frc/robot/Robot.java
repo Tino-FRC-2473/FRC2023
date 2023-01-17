@@ -33,10 +33,20 @@ import frc.robot.DrivetrainSim;
 import frc.robot.PoseTelemetry;
 
 
+<<<<<<< Updated upstream
 public class Robot extends TimedRobot {
     //AutoController autoCtrl = new AutoController();
     //Drivetrain dt = new Drivetrain();
     //OperatorInterface opInf = new OperatorInterface();
+=======
+	/**
+	 * Runs autonomous periodically.
+	 */
+	public void autonomousPeriodic() {
+		loc.update();
+		//fsmSystem.update(null);
+	}
+>>>>>>> Stashed changes
 
     DrivetrainSim dtSim = new DrivetrainSim();
     DrivetrainPoseEstimator dtpe = new DrivetrainPoseEstimator(0, 0);
