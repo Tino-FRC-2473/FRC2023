@@ -51,6 +51,7 @@ public class Robot extends TimedRobot {
 	public void autonomousPeriodic() {
 		loc.update();
 		fsmSystem.update(null);
+		
 	}
 
 	/**

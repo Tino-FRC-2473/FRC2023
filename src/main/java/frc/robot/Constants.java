@@ -70,12 +70,12 @@ public class Constants {
 		/** position/angle of camera relative to the center of the robot. */
 		static final Transform3d ROBOT_TO_CAM =
 				new Transform3d(
-						new Translation3d(0.0, 0.0, 0.5),
+						new Translation3d(0.0, 0.0, 0.381),
 						new Rotation3d(
 								0, 0,
 								0));
 		/** name of camera. */
-		static final String CAMERA_NAME = "gloworm";
+		static final String CAMERA_NAME = "OV5647";
 	}
 
 	/**
@@ -83,11 +83,11 @@ public class Constants {
 	 */
 	static class AprilTagConstants {
 		/** x coordinate of AprilTag 1. */
-		static final double X1 = Units.inchesToMeters(610.77);
+		static final double X1 = Units.inchesToMeters(0);
 		/** y coordinate of AprilTag 1. */
-		static final double Y1 = Units.inchesToMeters(42.19);
+		static final double Y1 = Units.inchesToMeters(0);
 		/** z coordinate of AprilTag 1. */
-		static final double Z1 = Units.inchesToMeters(18.22);
+		static final double Z1 = Units.inchesToMeters(23);
 		/** angle of AprilTag 1. */
 		static final double ROT1 = 180.0;
 

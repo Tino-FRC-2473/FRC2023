@@ -16,7 +16,7 @@ public class FSMSystem {
 		/** Start state. */
 		START_STATE,
 		/** Other state. */
-		OTHER_STATE
+		DRIVE_STATE
 	}
 
 	/** motor power. */
@@ -65,7 +65,7 @@ public class FSMSystem {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		currentState = FSMState.START_STATE;
+		currentState = FSMState.DRIVE_STATE;
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -82,8 +82,8 @@ public class FSMSystem {
 			case START_STATE:
 				handleStartState(input);
 				break;
-			case OTHER_STATE:
-				handleOtherState(input);
+			case DRIVE_STATE:
+				handleDriveState(input);
 				break;
 			default:
 				throw new IllegalStateException(
@@ -133,7 +133,7 @@ public class FSMSystem {
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *              the robot is in autonomous mode.
 	 */
-	private void handleOtherState(final TeleopInput input) {
+	private void handleDriveState(final TeleopInput input) {
 		exampleMotor.set(MOTOR_RUN_POWER);
 	}
 }
