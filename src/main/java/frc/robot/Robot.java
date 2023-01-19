@@ -25,66 +25,62 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
-//import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.TimedRobot;
-//import frc.robot.AutoController;
-//import frc.robot.Drivetrain;
+import frc.robot.Drivetrain;
 //import frc.robot.DrivetrainSim;
 //import frc.robot.PoseTelemetry;
 
 
 public class Robot extends TimedRobot {
-    
+	private AutoController autoCtrl = new AutoController();
+	private Drivetrain dt = new Drivetrain();
+	@Override
+	public void robotInit() {
+		// Flush NetworkTables every loop. This ensures that robot pose and other values
+		// are sent during every iteration.
+	}
 
-    @Override
-    public void robotInit() {
-        // Flush NetworkTables every loop. This ensures that robot pose and other values
-        // are sent during every iteration.
-    }
+	@Override
+	public void autonomousInit() {
+		//resetOdometery();
+		//autoCtrl.startPath();
+		setNetworkTablesFlushEnabled(true);
+	}
 
-    @Override
-    public void autonomousInit() {
-        //resetOdometery();
-        //autoCtrl.startPath();
-        setNetworkTablesFlushEnabled(true);
-    }
+	@Override
+	public void autonomousPeriodic() {
+		ChassisSpeeds speeds = autoCtrl.getCurMotorCmds(dt.getCtrlsPoseEstimate());
+		dt.drive(kDefaultPeriod, kDefaultPeriod);
+	}
 
-    @Override
-    public void autonomousPeriodic() {
-        //ChassisSpeeds speeds = autoCtrl.getCurMotorCmds(dt.getCtrlsPoseEstimate());
-        //dt.drive(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
-        //pt.setDesiredPose(autoCtrl.getCurPose2d());
-        pt.setEstimatedPose(dtpe.getPoseEst());
-        pt.update();
-    }
+	@Override
+	public void teleopPeriodic() {
+		//dt.drive(opInf.getFwdRevSpdCmd(), opInf.getRotateSpdCmd());
+	}
 
-    @Override
-    public void teleopPeriodic() {
-        //dt.drive(opInf.getFwdRevSpdCmd(), opInf.getRotateSpdCmd());
-    }
+	@Override
+	public void robotPeriodic() {
+		
+	}
 
-    @Override
-    public void robotPeriodic() {
-        
-    }
+	@Override
+	public void disabledPeriodic() {
+		//dt.drive(0, 0);
+	}
 
-    @Override
-    public void disabledPeriodic() {
-        //dt.drive(0, 0);
-    }
+	@Override
+	public void simulationPeriodic() {
+		//if (opInf.getSimKickCmd()) {
+		//    dtSim.applyKick();
+		//}
+		//dtSim.update();
+		//pt.setActualPose(dtSim.getCurPose());
+	}
 
-    @Override
-    public void simulationPeriodic() {
-        //if (opInf.getSimKickCmd()) {
-        //    dtSim.applyKick();
-        //}
-        //dtSim.update();
-        //pt.setActualPose(dtSim.getCurPose());
-    }
-
-    private void resetOdometery() {
-        //Pose2d startPose = autoCtrl.getInitialPose();
-        //dtSim.resetPose(startPose);
-        //dt.resetOdometry(startPose);
-    }
+	private void resetOdometery() {
+		//Pose2d startPose = autoCtrl.getInitialPose();
+		//dtSim.resetPose(startPose);
+		//dt.resetOdometry(startPose);
+	}
 }
