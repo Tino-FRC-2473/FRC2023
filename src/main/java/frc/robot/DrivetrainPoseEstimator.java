@@ -33,7 +33,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogGyro;
-import org.photonvision.PhotonCamera;
+import edu.wpi.first.math.Pair;
 
 /**
  * Performs estimation of the drivetrain's current position on the field, using a vision system,
@@ -43,7 +43,7 @@ import org.photonvision.PhotonCamera;
 public class DrivetrainPoseEstimator {
 	// Sensors used as part of the Pose Estimation
 	private final AnalogGyro gyro = new AnalogGyro(Constants.kGyroPin);
-	private PhotonCamera cam = new PhotonCamera(Constants.kCamName);
+	private PhotonCameraWrapper cameraWrapper = new PhotonCameraWrapper();
 	// Note - drivetrain encoders are also used. The Drivetrain class must pass us
 	// the relevant readings.
 
@@ -80,15 +80,8 @@ public class DrivetrainPoseEstimator {
 	*/
 	public void update(double leftDist, double rightDist) {
 		m_poseEstimator.update(gyro.getRotation2d(), leftDist, rightDist);
-
-		var res = cam.getLatestResult();
-		if (res.hasTargets()) {
-			var imageCaptureTime = res.getTimestampSeconds();
-			var camToTargetTrans = res.getBestTarget().getBestCameraToTarget();
-			var camPose = Constants.kFarTargetPose.transformBy(camToTargetTrans.inverse());
-			m_poseEstimator.addVisionMeasurement(
-					camPose.transformBy(Constants.kCameraToRobot).toPose2d(), imageCaptureTime);
-		}
+		Pair<Pose2d, Double> poseData = cameraWrapper.getEstimatedGlobalPose();
+		m_poseEstimator.addVisionMeasurement(poseData.getFirst(), poseData.getSecond());
 	}
 
 	/**
