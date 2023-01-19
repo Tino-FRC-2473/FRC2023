@@ -50,7 +50,7 @@ public class Constants {
     public static final int kEncoderResolution = 4096;
 
     public static final DifferentialDriveKinematics kDtKinematics =
-            new DifferentialDriveKinematics(kTrackWidth);
+	    new DifferentialDriveKinematics(kTrackWidth);
 
     //////////////////////////////////////////////////////////////////
     // Electrical IO
@@ -76,37 +76,37 @@ public class Constants {
     // Physical location of the camera on the robot, relative to the center of the
     // robot.
     public static final Transform3d kCameraToRobot =
-            new Transform3d(
-                    new Translation3d(0, 0, -.25), // in meters
-                    new Rotation3d());
+	    new Transform3d(
+		    new Translation3d(0, 0, -.25), // in meters
+		    new Rotation3d());
 
     // See
     // https://firstfrc.blob.core.windows.net/frc2020/PlayingField/2020FieldDrawing-SeasonSpecific.pdf
     // page 208
     public static final double targetWidth =
-            Units.inchesToMeters(41.30) - Units.inchesToMeters(6.70); // meters
+	    Units.inchesToMeters(41.30) - Units.inchesToMeters(6.70); // meters
 
     // See
     // https://firstfrc.blob.core.windows.net/frc2020/PlayingField/2020FieldDrawing-SeasonSpecific.pdf
     // page 197
     public static final double targetHeight =
-            Units.inchesToMeters(98.19) - Units.inchesToMeters(81.19); // meters
+	    Units.inchesToMeters(98.19) - Units.inchesToMeters(81.19); // meters
 
     // See https://firstfrc.blob.core.windows.net/frc2020/PlayingField/LayoutandMarkingDiagram.pdf
     // pages 4 and 5
     public static final double kFarTgtXPos = Units.feetToMeters(54);
     public static final double kFarTgtYPos =
-            Units.feetToMeters(27 / 2) - Units.inchesToMeters(43.75) - Units.inchesToMeters(48.0 / 2.0);
+	    Units.feetToMeters(27 / 2) - Units.inchesToMeters(43.75) - Units.inchesToMeters(48.0 / 2.0);
     public static final double kFarTgtZPos =
-            (Units.inchesToMeters(98.19) - targetHeight) / 2 + targetHeight;
+	    (Units.inchesToMeters(98.19) - targetHeight) / 2 + targetHeight;
 
     public static final Pose3d kFarTargetPose =
-            new Pose3d(
-                    new Translation3d(kFarTgtXPos, kFarTgtYPos, kFarTgtZPos),
-                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(180)));
+	    new Pose3d(
+		    new Translation3d(kFarTgtXPos, kFarTgtYPos, kFarTgtZPos),
+		    new Rotation3d(0.0, 0.0, Units.degreesToRadians(180)));
 
     public static final SimVisionTarget kFarTarget =
-            new SimVisionTarget(kFarTargetPose, targetWidth, targetHeight, 42);
+	    new SimVisionTarget(kFarTargetPose, targetWidth, targetHeight, 42);
 	/**
 	 * static class for vision constants.
 	 */
