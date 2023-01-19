@@ -63,10 +63,10 @@ public class ArmFSM {
 		pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
 										CANSparkMax.MotorType.kBrushless);
 		pivotLimitSwitchHigh = pivotMotor.getForwardLimitSwitch(
-								SparkMaxLimitSwitch.Type.kNormallyClosed);
+								SparkMaxLimitSwitch.Type.kNormallyOpen);
 		pivotLimitSwitchHigh.enableLimitSwitch(true);
 		pivotLimitSwitchLow = pivotMotor.getReverseLimitSwitch(
-								SparkMaxLimitSwitch.Type.kNormallyClosed);
+								SparkMaxLimitSwitch.Type.kNormallyOpen);
 		pivotLimitSwitchLow.enableLimitSwitch(true);
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
@@ -153,8 +153,12 @@ public class ArmFSM {
 					&& !input.isShootHighButtonPressed() && !input.isShootMidButtonPressed()) {
 					return FSMState.ARM_MOVEMENT;
 				} else if (input.isShootHighButtonPressed()) {
+					pivotMotor.getEncoder().setPosition(0);
+					teleArmMotor.getEncoder().setPosition(0);
 					return FSMState.SHOOT_HIGH;
 				} else if (input.isShootMidButtonPressed()) {
+					pivotMotor.getEncoder().setPosition(0);
+					teleArmMotor.getEncoder().setPosition(0);
 					return FSMState.SHOOT_MID;
 				}
 				return FSMState.IDLE;
@@ -162,6 +166,8 @@ public class ArmFSM {
 				if (input.isShootHighButtonPressed()) {
 					return FSMState.SHOOT_HIGH;
 				} else if (input.isShootMidButtonPressed()) {
+					pivotMotor.getEncoder().setPosition(0);
+					teleArmMotor.getEncoder().setPosition(0);
 					return FSMState.SHOOT_MID;
 				} else if (input.isExtendButtonPressed() || input.isRetractButtonPressed()
 					|| input.isPivotIncreaseButtonPressed()
