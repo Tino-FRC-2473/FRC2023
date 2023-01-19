@@ -1,122 +1,90 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/*
+ * MIT License
+ *
+ * Copyright (c) 2022 PhotonVision
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package frc.robot;
 
-// WPILib Imports
+import edu.wpi.first.math.geometry.Pose2d;
+//import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.TimedRobot;
-// Systems
-import frc.robot.systems.FSMSystem;
+//import frc.robot.AutoController;
+//import frc.robot.Drivetrain;
+//import frc.robot.DrivetrainSim;
+//import frc.robot.PoseTelemetry;
 
-/**
- * The VM is configured to automatically run this class, and to call the
- *  functions corresponding to each mode, as described in the TimedRobot
- *  documentation.
- */
+
 public class Robot extends TimedRobot {
-	/** TeleopInput object to provide driver inputs. */
-	private TeleopInput input;
-	/** Pose Estimation class for photonvision. */
-	private PhotonCameraWrapper loc;
-	// Systems
-	/** FSMSystem object manages execution flow of different states. */
-	private FSMSystem fsmSystem;
+    
 
-	/**
-	 * This function is run when the robot is first started up and should
-	 *  be used for any initialization code.
-	 */
-	@Override
-	public void robotInit() {
-		System.out.println("robotInit");
-		input = new TeleopInput();
+    @Override
+    public void robotInit() {
+        // Flush NetworkTables every loop. This ensures that robot pose and other values
+        // are sent during every iteration.
+    }
 
-		// Instantiate all systems here
-		fsmSystem = new FSMSystem();
-	}
+    @Override
+    public void autonomousInit() {
+        //resetOdometery();
+        //autoCtrl.startPath();
+        setNetworkTablesFlushEnabled(true);
+    }
 
-	/**
-	 * Initialization for autonomous.
-	 */
-	@Override
-	public void autonomousInit() {
-		System.out.println("-------- Autonomous Init --------");
-		fsmSystem.reset();
-		loc = new PhotonCameraWrapper();
-	}
+    @Override
+    public void autonomousPeriodic() {
+        //ChassisSpeeds speeds = autoCtrl.getCurMotorCmds(dt.getCtrlsPoseEstimate());
+        //dt.drive(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
+        //pt.setDesiredPose(autoCtrl.getCurPose2d());
+        pt.setEstimatedPose(dtpe.getPoseEst());
+        pt.update();
+    }
 
-	/**
-	 * Runs autonomous periodically.
-	 */
-	public void autonomousPeriodic() {
-		loc.update();
-		fsmSystem.update(null);
-		
-	}
+    @Override
+    public void teleopPeriodic() {
+        //dt.drive(opInf.getFwdRevSpdCmd(), opInf.getRotateSpdCmd());
+    }
 
-	/**
-	 * Initialization for teleop.
-	 */
-	@Override
-	public void teleopInit() {
-		System.out.println("-------- Teleop Init --------");
-		fsmSystem.reset();
-	}
+    @Override
+    public void robotPeriodic() {
+        
+    }
 
-	/**
-	 * Runs teleop periodically.
-	 */
-	public void teleopPeriodic() {
-		LimeLight ll = new LimeLight();
-		ll.update();
-		fsmSystem.update(input);
-	}
+    @Override
+    public void disabledPeriodic() {
+        //dt.drive(0, 0);
+    }
 
-	/**
-	 * Disabled initialization.
-	 */
-	@Override
-	public void disabledInit() {
-		System.out.println("-------- Disabled Init --------");
-	}
+    @Override
+    public void simulationPeriodic() {
+        //if (opInf.getSimKickCmd()) {
+        //    dtSim.applyKick();
+        //}
+        //dtSim.update();
+        //pt.setActualPose(dtSim.getCurPose());
+    }
 
-	/**
-	 * Disabled periodically.
-	 */
-	public void disabledPeriodic() { }
-
-	/**
-	 * Test initialization.
-	 */
-	@Override
-	public void testInit() {
-		System.out.println("-------- Test Init --------");
-	}
-
-	/**
-	 * Runs test periodically.
-	 */
-	@Override
-	public void testPeriodic() { }
-
-	// Simulation mode handlers, only used for simulation testing  */
-	/**
-	 * Initialize simulation.
-	 */
-	public void simulationInit() {
-		System.out.println("-------- Simulation Init --------");
-	}
-
-	/**
-	 * Runs simulation periodically.
-	 */
-	@Override
-	public void simulationPeriodic() { }
-
-	// Do not use robotPeriodic. Use mode specific periodic methods instead.
-	/**
-	 * Runs robot periodically.
-	 */
-	@Override
-	public void robotPeriodic() { }
+    private void resetOdometery() {
+        //Pose2d startPose = autoCtrl.getInitialPose();
+        //dtSim.resetPose(startPose);
+        //dt.resetOdometry(startPose);
+    }
 }

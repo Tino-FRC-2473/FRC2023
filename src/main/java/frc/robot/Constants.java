@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -24,45 +24,89 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import org.photonvision.SimVisionTarget;
 
 /**
- * The Constants class contains constants for drive train, field, vision,
- * and AprilTags.
+ * Holding class for all physical constants that must be used throughout the codebase. These values
+ * should be set by one of a few methods: 1) Talk to your mechanical and electrical teams and
+ * determine how the physical robot is being built and configured. 2) Read the game manual and look
+ * at the field drawings 3) Match with how your vision coprocessor is configured.
  */
 public class Constants {
-	/**
-	 * static class for drive train constants.
-	 */
-	static class DriveTrainConstants {
-		/** maximum speed power for robot (meters per second). */
-		static final double KMAXSPEED = 3.0;
-		/** maximum angular speed (1 rotation per second). */
-		static final double K_MAX_ANGULAR_SPEED = 2 * Math.PI;
-		/** width of track (meters). */
-		static final double KTRACKWIDTH = 0.381 * 2;
-		/** wheel radius (meters). */
-		static final double KWHEELRADIUS = 0.0508;
-		/** encoder resolution. */
-		static final int K_ENCODER_RESOLUTION = 4096;
-		/** distance per pulse. */
-		static final double DISTANCEPERPULSE = 2 * Math.PI
-			* KWHEELRADIUS / (double) K_ENCODER_RESOLUTION;
-	}
+    //////////////////////////////////////////////////////////////////
+    // Drivetrain Physical
+    //////////////////////////////////////////////////////////////////
+    public static final double kMaxSpeed = 3.0; // 3 meters per second.
+    public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second.
 
-	/**
-	 * static class for field constants.
-	 */
-	static class FieldConstants {
-		/** length of field (meters). */
-		static final double LENGTH = Units.feetToMeters(54);
-		/** width of field (meters). */
-		static final double WIDTH = Units.feetToMeters(27);
-	}
+    public static final double kTrackWidth = 0.381 * 2;
+    public static final double kWheelRadius = 0.0508;
+    public static final int kEncoderResolution = 4096;
 
+    public static final DifferentialDriveKinematics kDtKinematics =
+            new DifferentialDriveKinematics(kTrackWidth);
+
+    //////////////////////////////////////////////////////////////////
+    // Electrical IO
+    //////////////////////////////////////////////////////////////////
+    public static final int kGyroPin = 0;
+
+    public static final int kDtLeftEncoderPinA = 0;
+    public static final int kDtLeftEncoderPinB = 1;
+    public static final int kDtRightEncoderPinA = 2;
+    public static final int kDtRightEncoderPinB = 3;
+
+    public static final int kDtLeftLeaderPin = 1;
+    public static final int kDtLeftFollowerPin = 2;
+    public static final int kDtRightLeaderPin = 3;
+    public static final int kDtRightFollowerPin = 4;
+
+    //////////////////////////////////////////////////////////////////
+    // Vision Processing
+    //////////////////////////////////////////////////////////////////
+    // Name configured in the PhotonVision GUI for the camera
+    public static final String kCamName = "mainCam";
+
+    // Physical location of the camera on the robot, relative to the center of the
+    // robot.
+    public static final Transform3d kCameraToRobot =
+            new Transform3d(
+                    new Translation3d(0, 0, -.25), // in meters
+                    new Rotation3d());
+
+    // See
+    // https://firstfrc.blob.core.windows.net/frc2020/PlayingField/2020FieldDrawing-SeasonSpecific.pdf
+    // page 208
+    public static final double targetWidth =
+            Units.inchesToMeters(41.30) - Units.inchesToMeters(6.70); // meters
+
+    // See
+    // https://firstfrc.blob.core.windows.net/frc2020/PlayingField/2020FieldDrawing-SeasonSpecific.pdf
+    // page 197
+    public static final double targetHeight =
+            Units.inchesToMeters(98.19) - Units.inchesToMeters(81.19); // meters
+
+    // See https://firstfrc.blob.core.windows.net/frc2020/PlayingField/LayoutandMarkingDiagram.pdf
+    // pages 4 and 5
+    public static final double kFarTgtXPos = Units.feetToMeters(54);
+    public static final double kFarTgtYPos =
+            Units.feetToMeters(27 / 2) - Units.inchesToMeters(43.75) - Units.inchesToMeters(48.0 / 2.0);
+    public static final double kFarTgtZPos =
+            (Units.inchesToMeters(98.19) - targetHeight) / 2 + targetHeight;
+
+    public static final Pose3d kFarTargetPose =
+            new Pose3d(
+                    new Translation3d(kFarTgtXPos, kFarTgtYPos, kFarTgtZPos),
+                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(180)));
+
+    public static final SimVisionTarget kFarTarget =
+            new SimVisionTarget(kFarTargetPose, targetWidth, targetHeight, 42);
 	/**
 	 * static class for vision constants.
 	 */
@@ -90,14 +134,5 @@ public class Constants {
 		static final double Z1 = Units.inchesToMeters(23);
 		/** angle of AprilTag 1. */
 		static final double ROT1 = 180.0;
-
-		/** x coordinate of AprilTag 2. */
-		static final double X2 = Units.inchesToMeters(610.77);
-		/** y coordinate of AprilTag 2. */
-		static final double Y2 = Units.inchesToMeters(108.19);
-		/** z coordinate of AprilTag 2. */
-		static final double Z2 = Units.inchesToMeters(18.22);
-		/** angle of AprilTag 2. */
-		static final double ROT2 = 180.0;
 	}
 }
