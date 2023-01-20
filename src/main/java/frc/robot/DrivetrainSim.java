@@ -95,7 +95,7 @@ public class DrivetrainSim {
                     minTargetArea);
 
     public DrivetrainSim() {
-        simVision.addSimVisionTarget(Constants.kFarTarget);
+        simVision.addSimVisionTarget(Constants.AT1Target);
     }
 
     /**
