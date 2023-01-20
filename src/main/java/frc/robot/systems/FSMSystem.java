@@ -125,7 +125,7 @@ public class FSMSystem {
 
 		roboXPos = 0;
 		roboYPos = 0;
-		// System.out.println(roboXPos + " " + roboYPos);
+		System.out.println(roboXPos + " " + roboYPos);
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -546,6 +546,7 @@ public class FSMSystem {
 		if (state == 0) {
 			leftMotor.set(-0.3);
 			rightMotor.set(0.3);
+			System.out.println("distace: " + Math.abs(roboX - 49.4));
 			if (Math.abs(roboX - 49.4) <= 5) {
 				leftMotor.set(0);
 				rightMotor.set(0);
