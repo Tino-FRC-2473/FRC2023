@@ -12,12 +12,16 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class TeleopInput {
 	/* ======================== Constants ======================== */
+	/** left joystick port. */
 	private static final int LEFT_JOYSTICK_PORT = 0;
+	/** right joystick port. */
 	private static final int RIGHT_JOYSTICK_PORT = 1;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
+	/** left joystick. */
 	private Joystick leftJoystick;
+	/** right joystick. */
 	private Joystick rightJoystick;
 
 	/* ======================== Constructor ======================== */
@@ -28,7 +32,6 @@ public class TeleopInput {
 	 */
 	public TeleopInput() {
 		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
-
 		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
 	}
 
@@ -45,6 +48,7 @@ public class TeleopInput {
 	public double getLeftJoystickX() {
 		return leftJoystick.getX();
 	}
+
 	/**
 	 * Get Y axis of Left Joystick.
 	 * @return Axis value
@@ -52,6 +56,7 @@ public class TeleopInput {
 	public double getLeftJoystickY() {
 		return leftJoystick.getY();
 	}
+
 	/**
 	 * Get the value of the shooter button.
 	 * @return True if button is pressed
@@ -59,6 +64,7 @@ public class TeleopInput {
 	public boolean isShooterButtonPressed() {
 		return leftJoystick.getRawButton(1);
 	}
+
 	/**
 	 * Get the value of the intake button.
 	 * @return True if button is pressed
@@ -75,6 +81,7 @@ public class TeleopInput {
 	public double getRightJoystickX() {
 		return rightJoystick.getX();
 	}
+
 	/**
 	 * Get Y axis of Right Joystick.
 	 * @return Axis value

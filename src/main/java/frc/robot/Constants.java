@@ -77,7 +77,7 @@
      // robot.
      public static final Transform3d kCameraToRobot =
              new Transform3d(
-                     new Translation3d(-0.25, 0, -.25), // in meters
+                     new Translation3d(0, 0, -.25), // in meters
                      new Rotation3d());
  
      // See
@@ -107,4 +107,32 @@
  
      public static final SimVisionTarget kFarTarget =
              new SimVisionTarget(kFarTargetPose, targetWidth, targetHeight, 42);
+         /**
+          * static class for vision constants.
+          */
+         static class VisionConstants {
+                 /** position/angle of camera relative to the center of the robot. */
+                 static final Transform3d ROBOT_TO_CAM =
+                                 new Transform3d(
+                                                 new Translation3d(0.0, 0.0, 0.381),
+                                                 new Rotation3d(
+                                                                 0, 0,
+                                                                 0));
+                 /** name of camera. */
+                 static final String CAMERA_NAME = "OV5647";
+         }
+ 
+         /**
+          * static class for AprilTag constants.
+          */
+         static class AprilTagConstants {
+                 /** x coordinate of AprilTag 1. */
+                 static final double X1 = Units.inchesToMeters(0);
+                 /** y coordinate of AprilTag 1. */
+                 static final double Y1 = Units.inchesToMeters(0);
+                 /** z coordinate of AprilTag 1. */
+                 static final double Z1 = Units.inchesToMeters(23);
+                 /** angle of AprilTag 1. */
+                 static final double ROT1 = 180.0;
+         }
  }
