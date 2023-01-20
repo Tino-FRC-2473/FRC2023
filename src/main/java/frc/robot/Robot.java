@@ -31,8 +31,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 public class Robot extends TimedRobot {
 	AutoController autoCtrl = new AutoController();
 	Drivetrain dt = new Drivetrain();
-
-
+   
+   DrivetrainSim dtSim = new DrivetrainSim();
+   PoseTelemetry pt = new PoseTelemetry();
 
 	@Override
 	public void robotInit() {
@@ -43,35 +44,51 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousInit() {
-		resetOdometery();
-		autoCtrl.startPath();
+		//resetOdometery();
+		//autoCtrl.startPath();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		ChassisSpeeds speeds = autoCtrl.getCurMotorCmds(dt.getCtrlsPoseEstimate());
-		dt.drive(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
+		//ChassisSpeeds speeds = autoCtrl.getCurMotorCmds(dt.getCtrlsPoseEstimate());
+		//dt.drive(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
+      dtSim.update();
+      pt.setDesiredPose(dtSim.getCurPose());
 	}
 
 	@Override
 	public void teleopPeriodic() {
-	}
+	   //dt.drive(opInf.getFwdRevSpdCmd(), opInf.getRotateSpdCmd());
+   }
 
 	@Override
 	public void robotPeriodic() {
+      //pt.setEstimatedPose(dt.getCtrlsPoseEstimate());
+      //pt.update();
 	}
 
 	@Override
 	public void disabledPeriodic() {
-		dt.drive(0, 0);
+		//dt.drive(0, 0);
 	}
 
 	@Override
 	public void simulationPeriodic() {
+      /*
+      if (opInf.getSimKickCmd()) {
+         dtSim.applyKick();
+      }
+      dtSim.update();
+      pt.setActualPose(dtSim.getCurPose());
+      */
 	}
 
 	private void resetOdometery() {
-		Pose2d startPose = autoCtrl.getInitialPose();
-		dt.resetOdometry(startPose);
+		//Pose2d startPose = autoCtrl.getInitialPose();
+		//dt.resetOdometry(startPose);
+      
+      //Pose2d startPose = autoCtrl.getInitialPose();
+      //dtSim.resetPose(startPose);
+      //dt.resetOdometry(startPose);
 	}
 }
