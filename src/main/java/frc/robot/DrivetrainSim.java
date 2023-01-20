@@ -39,7 +39,6 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
 import org.photonvision.SimVisionSystem;
-import frc.robot.Constants;
 
 /**
  * Implementation of a simulation of robot physics, sensors, motor controllers Includes a Simulated
@@ -104,8 +103,11 @@ public class DrivetrainSim {
      * physics forward by a single 20ms step.
      */
     public void update() {
-        double leftMotorCmd = 0;
-        double rightMotorCmd = 0;
+        //double leftMotorCmd = 0;
+        //double rightMotorCmd = 0;
+
+        double leftMotorCmd = (leftLeader.getSpeed() + leftFollower.getSpeed()) / 2.0;
+        double rightMotorCmd = (rightLeader.getSpeed() + rightFollower.getSpeed()) / 2.0;
 
         if (DriverStation.isEnabled() && !RobotController.isBrownedOut()) {
             // If the motor controllers are enabled...
