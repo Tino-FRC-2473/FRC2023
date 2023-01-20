@@ -42,26 +42,19 @@ public class Constants {
     //////////////////////////////////////////////////////////////////
     // Drivetrain Physical
     //////////////////////////////////////////////////////////////////
+    public static final double kMaxSpeed = 3.0; // 3 meters per second.
+    public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second.
 
-<<<<<<< Updated upstream
     public static final double kTrackWidth = 0.381 * 2;
     public static final double kWheelRadius = 0.0508;
     public static final int kEncoderResolution = 4096;
 
-<<<<<<< Updated upstream
     public static final DifferentialDriveKinematics kDtKinematics =
             new DifferentialDriveKinematics(kTrackWidth);
-=======
-    //public static final double kTrackWidth =;
-    //public static final double distPerPulse = (1 / 42) * 2 * Math.PI * 0.0508;
-    //public static final DifferentialDriveKinematics kDtKinematics =
-	//    new DifferentialDriveKinematics(kTrackWidth);
->>>>>>> Stashed changes
 
     //////////////////////////////////////////////////////////////////
     // Electrical IO
     //////////////////////////////////////////////////////////////////
-<<<<<<< Updated upstream
     public static final int kGyroPin = 0;
 
     public static final int kDtLeftEncoderPinA = 0;
@@ -84,7 +77,7 @@ public class Constants {
     // robot.
     public static final Transform3d kCameraToRobot =
             new Transform3d(
-                    new Translation3d(0, 0, -.25), // in meters
+                    new Translation3d(-0.25, 0, -.25), // in meters
                     new Rotation3d());
 
     // See
@@ -114,61 +107,4 @@ public class Constants {
 
     public static final SimVisionTarget kFarTarget =
             new SimVisionTarget(kFarTargetPose, targetWidth, targetHeight, 42);
-=======
-=======
-    //public static final int kGyroPin =;
-
-    //public static final int kDtLeftEncoderPinA =;
-    //public static final int kDtLeftEncoderPinB =;
-    //public static final int kDtRightEncoderPinA =;
-    //public static final int kDtRightEncoderPinB =;
-
-    //public static final int kDtLeftLeaderPin =;
-    //public static final int kDtLeftFollowerPin =;
-    //public static final int kDtRightLeaderPin =;
-    //public static final int kDtRightFollowerPin =;
-    
->>>>>>> Stashed changes
-	/**
-	 * static class for vision constants.
-	 */
-	static class VisionConstants {
-		/** position/angle of camera relative to the center of the robot. */
-<<<<<<< Updated upstream
-		static final Transform3d ROBOT_TO_CAM =
-				new Transform3d(
-						new Translation3d(0.0, 0.0, 0.45085),
-						new Rotation3d(
-								0, 0,
-								0));
-=======
-		//static final Transform3d ROBOT_TO_CAM =
-		//		new Transform3d(
-		//				new Translation3d(0.0, 0.0, ),
-		//				new Rotation3d(
-		//						0, 0,
-		//						0));
->>>>>>> Stashed changes
-		/** name of camera. */
-		static final String CAMERA_NAME = "OV5647";
-	}
-
-	/**
-	 * static class for AprilTag constants.
-	 */
-	static class AprilTagConstants {
-		/** x coordinate of AprilTag 1. */
-		//static final double X1 =;
-		/** y coordinate of AprilTag 1. */
-		//static final double Y1 =;
-		/** z coordinate of AprilTag 1. */
-<<<<<<< Updated upstream
-		static final double Z1 = Units.inchesToMeters(8);
-=======
-		//static final double Z1 =;
->>>>>>> Stashed changes
-		/** angle of AprilTag 1. */
-		//static final double ROT1 = 180.0;
-	}
->>>>>>> Stashed changes
 }
