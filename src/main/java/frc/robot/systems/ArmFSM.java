@@ -129,23 +129,15 @@ public class ArmFSM {
 					&& !input.isShootHighButtonPressed() && !input.isShootMidButtonPressed()) {
 					return FSMState.ARM_MOVEMENT;
 				} else if (input.isShootHighButtonPressed()) {
-					pivotMotor.getEncoder().setPosition(0);
-					teleArmMotor.getEncoder().setPosition(0);
 					return FSMState.SHOOT_HIGH;
 				} else if (input.isShootMidButtonPressed()) {
-					pivotMotor.getEncoder().setPosition(0);
-					teleArmMotor.getEncoder().setPosition(0);
 					return FSMState.SHOOT_MID;
 				}
 				return FSMState.IDLE;
 			case ARM_MOVEMENT:
 				if (input.isShootHighButtonPressed()) {
-					pivotMotor.getEncoder().setPosition(0);
-					teleArmMotor.getEncoder().setPosition(0);
 					return FSMState.SHOOT_HIGH;
 				} else if (input.isShootMidButtonPressed()) {
-					pivotMotor.getEncoder().setPosition(0);
-					teleArmMotor.getEncoder().setPosition(0);
 					return FSMState.SHOOT_MID;
 				} else if (input.isExtendButtonPressed() || input.isRetractButtonPressed()
 					|| input.isPivotIncreaseButtonPressed()
