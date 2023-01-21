@@ -3,6 +3,7 @@ package frc.robot.systems;
 
 
 // WPILib Imports
+import edu.wpi.first.math.controller.PIDController;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
@@ -30,7 +31,11 @@ public class ArmFSM {
 	private static final double BALANCE_ANGLE_ENCODER = 5;
 	private static final double GRABBER_ANGLE_ENCODER = -5;
 	private static final double ARM_ENCODER_GRAB = 10;
-	private static final double PIVOT_ERROR_ARM = 0.1;
+	private static final double PID_MAX_POWER = 0.3;
+	private static final double PIVOT_ERROR_ARM = 0.3;
+	private static final double PID_CONSTANT_P = 0.00022f;
+	private static final double PID_CONSTANT_I = 0.000055f;
+	private static final double PID_CONSTANT_D = 0.000008f;
 
 
 	/* ======================== Private variables ======================== */
@@ -40,6 +45,7 @@ public class ArmFSM {
 	private CANSparkMax teleArmMotor;
 	private SparkMaxLimitSwitch pivotLimitSwitchHigh;
 	private SparkMaxLimitSwitch pivotLimitSwitchLow;
+	private PIDController pidController;
 	/*
 	 * Hardware Map each of the motors
 	 *
@@ -59,6 +65,7 @@ public class ArmFSM {
 		pivotLimitSwitchLow.enableLimitSwitch(true);
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
+		pidController = new PIDController(PID_CONSTANT_P, PID_CONSTANT_I, PID_CONSTANT_D);
 		// Reset state machine
 		reset();
 	}
@@ -194,9 +201,21 @@ public class ArmFSM {
 	 */
 	private void handleArmMechState(TeleopInput input) {
 		if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-			pivotMotor.set(PIVOT_MOTOR_POWER);
+			//pivotMotor.set(PIVOT_MOTOR_POWER);
+			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+						PIVOT_MOTOR_POWER);
+			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+				return;
+			}
+			pivotMotor.set(pow);
 		} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-			pivotMotor.set(-PIVOT_MOTOR_POWER);
+			//pivotMotor.set(-PIVOT_MOTOR_POWER);
+			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+						-PIVOT_MOTOR_POWER);
+			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+				return;
+			}
+			pivotMotor.set(pow);
 		} else {
 			pivotMotor.set(0);
 		}
@@ -214,9 +233,21 @@ public class ArmFSM {
 		if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
 			pivotMotor.set(0);
 		} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(PIVOT_MOTOR_POWER);
+			//pivotMotor.set(PIVOT_MOTOR_POWER);
+			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+						PIVOT_MOTOR_POWER);
+			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+				return;
+			}
+			pivotMotor.set(pow);
 		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(-PIVOT_MOTOR_POWER);
+			//pivotMotor.set(-PIVOT_MOTOR_POWER);
+			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+						-PIVOT_MOTOR_POWER);
+			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+				return;
+			}
+			pivotMotor.set(pow);
 		} else {
 			pivotMotor.set(0);
 		}
@@ -231,9 +262,21 @@ public class ArmFSM {
 		if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
 			pivotMotor.set(0);
 		} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(PIVOT_MOTOR_POWER);
+			//pivotMotor.set(PIVOT_MOTOR_POWER);
+			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+						PIVOT_MOTOR_POWER);
+			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+				return;
+			}
+			pivotMotor.set(pow);
 		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(-PIVOT_MOTOR_POWER);
+			//pivotMotor.set(-PIVOT_MOTOR_POWER);
+			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+						-PIVOT_MOTOR_POWER);
+			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+				return;
+			}
+			pivotMotor.set(pow);
 		} else {
 			pivotMotor.set(0);
 		}
