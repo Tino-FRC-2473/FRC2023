@@ -226,13 +226,15 @@ public class DriveFSMSystem {
 			if (input.isDriveJoystickEngageButtonPressedRaw()) {
 				inEngageMode = true;
 				System.out.println("button pressed");
-				if (gyro.getPitch() >= -2 && gyro.getPitch() <= 2) {
+				if (gyro.getPitch() >= -Constants.CHARGING_STATION_LEVELED_ERROR
+					&& gyro.getPitch() <= Constants.CHARGING_STATION_LEVELED_ERROR) {
 					leftPower = 0;
 					rightPower = 0;
-				} else if (gyro.getPitch() < -2 || gyro.getPitch() > 2) {
+				} else if (gyro.getPitch() < -Constants.CHARGING_STATION_LEVELED_ERROR
+					|| gyro.getPitch() > Constants.CHARGING_STATION_LEVELED_ERROR) {
 					System.out.println("inside of engage");
-					leftPower = gyro.getPitch() / 200;
-					rightPower = -gyro.getPitch() / 200;
+					leftPower = gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT;
+					rightPower = -gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT;
 				}
 
 			} else {
