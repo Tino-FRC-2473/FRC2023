@@ -13,7 +13,7 @@ public final class HardwareMap {
 
 
 	//grabber testing constants
-	public static final int CAN_ID_GRABBER_MOTOR = 1;
+	public static final int CAN_ID_SPINNER_MOTOR = 1;
 
 	// Place jumper from DIO pin 9 to GND to indicate this is a test setup
 	private static final int DIO_TEST_SETUP_CHANNEL = 9;

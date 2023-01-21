@@ -27,9 +27,10 @@
     },
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
-  "java.checkstyle.configuration": "${workspaceFolder}\\checks.xml",
+
+  "java.checkstyle.configuration": "/Users/andrewqin/Desktop/FRC2023/checks.xml",
   "java.checkstyle.version": "9.1",
   "java.checkstyle.properties": {
-      "basedir": "${workspaceFolder}/src/main/java/frc/robot"
+    "basedir": "/Users/andrewqin/Desktop/FRC2023/src/main/java/frc/robot"
   }
 }

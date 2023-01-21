@@ -4,34 +4,36 @@ package frc.robot.systems;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ColorSensorV3;
+import com.revrobotics.SparkMaxLimitSwitch;
 
+import edu.wpi.first.wpilibj.I2C.Port;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 
-public class GrabberFSM {
+public class SpinningIntakeFSM {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
 	public enum FSMState {
 		START_STATE,
-		OPENING,
-		CLOSING_CONE,
-		CLOSING_CUBE,
-		DONE
+		IDLE_SPINNING,
+		IDLE_STOP,
+		RELEASE
 	}
 	//FIX VALUES
-	private static final double MOTOR_RUN_POWER = 0.1f;
-	private static final double CONE_ENCODER_ROTATIONS = -1;
-	private static final double CUBE_ENCODER_ROTATIONS = -1;
-	private static final double OPEN_ENCODER_ROTATIONS = -1;
-	private static final double ERROR = 0.1;
+	private static final double INTAKE_SPEED = 0.1;
+	private static final double RELEASE_SPEED = -0.1;
+	private static final double RELEASE_TIME = 2;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax grabberMotor;
+	private CANSparkMax spinnerMotor;
+	private SparkMaxLimitSwitch limitSwitchCone;
+	private ColorSensorV3 colorSensorCube;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -39,10 +41,14 @@ public class GrabberFSM {
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public GrabberFSM() {
+	public SpinningIntakeFSM() {
 		// Perform hardware init
-		grabberMotor = new CANSparkMax(HardwareMap.CAN_ID_GRABBER_MOTOR,
+		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
+		limitSwitchCone = spinnerMotor.getReverseLimitSwitch(
+			SparkMaxLimitSwitch.Type.kNormallyOpen);
+		limitSwitchCone.enableLimitSwitch(true);
+		colorSensorCube = new ColorSensorV3(Port.kOnboard);
 		// Reset state machine
 		reset();
 	}
@@ -79,32 +85,33 @@ public class GrabberFSM {
 			case START_STATE:
 				handleStartState(input);
 				break;
-			case OPENING:
-				handleOpeningState(input);
+			case IDLE_SPINNING:
+				handleIdleSpinningState(input);
 				break;
-			case CLOSING_CONE:
-				handleClosingConeState(input);
+			case IDLE_STOP:
+				handleIdleStopState(input);
 				break;
-			case CLOSING_CUBE:
-				handleClosingCubeState(input);
-				break;
-			case DONE:
-				handleDoneState(input);
+			case RELEASE:
+				handleReleaseState(input);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
+		System.out.println(colorSensorCube.getProximity());
 		currentState = nextState(input);
 	}
-	/**
-	 * Returns whether the difference between two rotations is within the error.
-	 * @param a rotation value 1
-	 * @param b rotation value 2
-	 * @return whether they are within the error
-	 */
-	private boolean withinError(double a, double b) {
-		return Math.abs(a - b) < ERROR;
+
+	/*-------------------------NON HANDLER METHODS ------------------------- */
+	private boolean isCubeDetected() {
+		//FIX THIS LATER
+		final int colorProx = 100;
+		return colorSensorCube.getProximity() < colorProx;
 	}
+	private boolean isLimitSwitchConeActivated() {
+		//FIX THIS LATER;
+		return limitSwitchCone.isPressed();
+	}
+
 	/* ======================== Private methods ======================== */
 	/**
 	 * Decide the next state to transition to. This is a function of the inputs
@@ -118,51 +125,22 @@ public class GrabberFSM {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case START_STATE:
-				return FSMState.OPENING;
-			case OPENING:
-				if (input.getCubeButton()) {
-					return FSMState.CLOSING_CUBE;
+				return FSMState.IDLE_SPINNING;
+			case IDLE_SPINNING:
+				if (isCubeDetected() || isLimitSwitchConeActivated()) {
+					return FSMState.IDLE_STOP;
 				}
-				if (input.getConeButton()) {
-					return FSMState.CLOSING_CONE;
+				return FSMState.IDLE_SPINNING;
+			case IDLE_STOP:
+				if (input.isReleaseButtonPressed()) {
+					return FSMState.RELEASE;
 				}
-				if (withinError(grabberMotor.getEncoder().getPosition(), OPEN_ENCODER_ROTATIONS)) {
-					return FSMState.DONE;
+				return FSMState.IDLE_STOP;
+			case RELEASE:
+				if (input.isReleaseButtonReleased()) {
+					return FSMState.IDLE_SPINNING;
 				}
-				return FSMState.OPENING;
-			case CLOSING_CONE:
-				if (input.getOpenButton()) {
-					return FSMState.OPENING;
-				}
-				if (input.getCubeButton()) {
-					return FSMState.CLOSING_CUBE;
-				}
-				if (withinError(grabberMotor.getEncoder().getPosition(), CONE_ENCODER_ROTATIONS)) {
-					return FSMState.DONE;
-				}
-				return FSMState.CLOSING_CONE;
-			case CLOSING_CUBE:
-				if (input.getOpenButton()) {
-					return FSMState.OPENING;
-				}
-				if (input.getConeButton()) {
-					return FSMState.CLOSING_CONE;
-				}
-				if (withinError(grabberMotor.getEncoder().getPosition(), CUBE_ENCODER_ROTATIONS)) {
-					return FSMState.DONE;
-				}
-				return FSMState.CLOSING_CUBE;
-			case DONE:
-				if (input.getOpenButton()) {
-					return FSMState.OPENING;
-				}
-				if (input.getConeButton()) {
-					return FSMState.CLOSING_CONE;
-				}
-				if (input.getCubeButton()) {
-					return FSMState.CLOSING_CUBE;
-				}
-				return FSMState.DONE;
+				return FSMState.RELEASE;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -177,31 +155,13 @@ public class GrabberFSM {
 	private void handleStartState(TeleopInput input) {
 
 	}
-	private void handleOpeningState(TeleopInput input) {
-		double encoderValue = grabberMotor.getEncoder().getPosition();
-		if (encoderValue < OPEN_ENCODER_ROTATIONS) {
-			grabberMotor.set(MOTOR_RUN_POWER);
-		} else {
-			grabberMotor.set(-MOTOR_RUN_POWER);
-		}
+	private void handleIdleSpinningState(TeleopInput input) {
+		spinnerMotor.set(INTAKE_SPEED);
 	}
-	private void handleClosingConeState(TeleopInput input) {
-		double encoderValue = grabberMotor.getEncoder().getPosition();
-		if (encoderValue < CONE_ENCODER_ROTATIONS) {
-			grabberMotor.set(MOTOR_RUN_POWER);
-		} else {
-			grabberMotor.set(-MOTOR_RUN_POWER);
-		}
+	private void handleIdleStopState(TeleopInput input) {
+		spinnerMotor.set(0);
 	}
-	private void handleClosingCubeState(TeleopInput input) {
-		double encoderValue = grabberMotor.getEncoder().getPosition();
-		if (encoderValue < CUBE_ENCODER_ROTATIONS) {
-			grabberMotor.set(MOTOR_RUN_POWER);
-		} else {
-			grabberMotor.set(-MOTOR_RUN_POWER);
-		}
-	}
-	private void handleDoneState(TeleopInput input) {
-
+	private void handleReleaseState(TeleopInput input) {
+		spinnerMotor.set(RELEASE_SPEED);
 	}
 }

@@ -15,9 +15,7 @@ public class TeleopInput {
 	private static final int MECH_JOYSTICK_PORT = 0;
 	private static final int DRIVE_JOYSTICK_PORT = 1;
 
-	private static final int OPEN_BUTTON = 8;
-	private static final int CUBE_BUTTON = 10;
-	private static final int CONE_BUTTON = 12;
+	private static final int RELEASE_BUTTON = 8;
 	private static final int PIVOT_INCREASE_BUTTON = 5;
 	private static final int PIVOT_DECREASE_BUTTON = 3;
 	private static final int EXTEND_BUTTON = 6;
@@ -123,25 +121,18 @@ public class TeleopInput {
 		return driveJoystick.getY();
 	}
 	/**
-	 * Get Button to pick up cube.
-	 * @return Axis value
+	 * Get the value of release button.
+	 * @return True if button pressed
 	 */
-	public boolean getCubeButton() {
-		return mechJoystick.getRawButton(CUBE_BUTTON);
+	public boolean isReleaseButtonPressed() {
+		return mechJoystick.getRawButton(RELEASE_BUTTON);
 	}
 	/**
-	 * Get Button to pick up cone.
-	 * @return Axis value
+	 * Get the value of release button released.
+	 * @return True if button released
 	 */
-	public boolean getConeButton() {
-		return mechJoystick.getRawButton(CONE_BUTTON);
-	}
-	/**
-	 * Get Button to release.
-	 * @return Axis value
-	 */
-	public boolean getOpenButton() {
-		return mechJoystick.getRawButton(OPEN_BUTTON);
+	public boolean isReleaseButtonReleased() {
+		return mechJoystick.getRawButtonReleased(RELEASE_BUTTON);
 	}
 	/* ======================== Private methods ======================== */
 
