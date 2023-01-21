@@ -24,9 +24,12 @@ public class ArmFSM {
 
 	private static final float TELEARM_MOTOR_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_POWER = 0.1f;
-	private static final int ARM_ENCODER_HIGH = 20;
-	private static final int ARM_ENCODER_MID = 10;
-	private static final int SHOOT_ANGLE_ENCODER = 10;
+	private static final double ARM_ENCODER_HIGH = 20;
+	private static final double ARM_ENCODER_MID = 10;
+	private static final double SHOOT_ANGLE_ENCODER = 10;
+	private static final double BALANCE_ANGLE_ENCODER = 5;
+	private static final double GRABBER_ANGLE_ENCODER = -5;
+	private static final double ARM_ENCODER_GRAB = 10;
 	private static final double PIVOT_ERROR_ARM = 0.1;
 
 
@@ -211,9 +214,9 @@ public class ArmFSM {
 		if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
 			pivotMotor.set(0);
 		} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(-PIVOT_MOTOR_POWER);
-		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
 			pivotMotor.set(PIVOT_MOTOR_POWER);
+		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
+			pivotMotor.set(-PIVOT_MOTOR_POWER);
 		} else {
 			pivotMotor.set(0);
 		}
@@ -228,9 +231,9 @@ public class ArmFSM {
 		if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
 			pivotMotor.set(0);
 		} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(-PIVOT_MOTOR_POWER);
-		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
 			pivotMotor.set(PIVOT_MOTOR_POWER);
+		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
+			pivotMotor.set(-PIVOT_MOTOR_POWER);
 		} else {
 			pivotMotor.set(0);
 		}
@@ -241,5 +244,113 @@ public class ArmFSM {
 		}
 	}
 
+	/**
+	 * Method to adjust the arm to go shoot on high height to use in autonomous.
+	 */
+	public void executeShootHigh() {
+		while (!withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)
+			&& teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH) {
+			if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
+				pivotMotor.set(0);
+			} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
+				pivotMotor.set(PIVOT_MOTOR_POWER);
+			} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
+				pivotMotor.set(-PIVOT_MOTOR_POWER);
+			} else {
+				pivotMotor.set(0);
+			}
+			if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH) {
+				teleArmMotor.set(TELEARM_MOTOR_POWER);
+			} else {
+				teleArmMotor.set(0);
+			}
+		}
+		pivotMotor.set(0);
+		teleArmMotor.set(0);
+	}
 
+	/**
+	 * Method to adjust the arm to go shoot on mid height to use in autonomous.
+	 */
+	public void executeShootMid() {
+		while (!withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)
+			&& teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID) {
+			if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
+				pivotMotor.set(0);
+			} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
+				pivotMotor.set(PIVOT_MOTOR_POWER);
+			} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
+				pivotMotor.set(-PIVOT_MOTOR_POWER);
+			} else {
+				pivotMotor.set(0);
+			}
+			if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID) {
+				teleArmMotor.set(TELEARM_MOTOR_POWER);
+			} else {
+				teleArmMotor.set(0);
+			}
+		}
+		pivotMotor.set(0);
+		teleArmMotor.set(0);
+	}
+
+	/**
+	 * Method to move the arm to the best positioning for balancing.
+	 */
+	public void executeBalanceArm() {
+		while (!withinError(pivotMotor.getEncoder().getPosition(), BALANCE_ANGLE_ENCODER)
+			&& teleArmMotor.getEncoder().getPosition() > 0) {
+			if (withinError(pivotMotor.getEncoder().getPosition(), BALANCE_ANGLE_ENCODER)) {
+				pivotMotor.set(0);
+			} else if (pivotMotor.getEncoder().getPosition() < BALANCE_ANGLE_ENCODER) {
+				pivotMotor.set(PIVOT_MOTOR_POWER);
+			} else if (pivotMotor.getEncoder().getPosition() > BALANCE_ANGLE_ENCODER) {
+				pivotMotor.set(-PIVOT_MOTOR_POWER);
+			} else {
+				pivotMotor.set(0);
+			}
+			if (teleArmMotor.getEncoder().getPosition() > 0) {
+				teleArmMotor.set(-TELEARM_MOTOR_POWER);
+			} else {
+				teleArmMotor.set(0);
+			}
+		}
+		pivotMotor.set(0);
+		teleArmMotor.set(0);
+	}
+
+	/**
+	 * Method to move arm for grabbing in autonomous.
+	 */
+	public void executeGrabberArm() {
+		while (!withinError(pivotMotor.getEncoder().getPosition(), GRABBER_ANGLE_ENCODER)
+			&& teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_GRAB) {
+			if (withinError(pivotMotor.getEncoder().getPosition(), GRABBER_ANGLE_ENCODER)) {
+				pivotMotor.set(0);
+			} else if (pivotMotor.getEncoder().getPosition() < GRABBER_ANGLE_ENCODER) {
+				pivotMotor.set(PIVOT_MOTOR_POWER);
+			} else if (pivotMotor.getEncoder().getPosition() > GRABBER_ANGLE_ENCODER) {
+				pivotMotor.set(-PIVOT_MOTOR_POWER);
+			} else {
+				pivotMotor.set(0);
+			}
+			if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_GRAB) {
+				teleArmMotor.set(TELEARM_MOTOR_POWER);
+			} else {
+				teleArmMotor.set(0);
+			}
+		}
+		pivotMotor.set(0);
+		teleArmMotor.set(0);
+	}
+
+	/**
+	 * Method to retract arm to minimum.
+	 */
+	public void executeRetractToMin() {
+		while (teleArmMotor.getEncoder().getPosition() > 0) {
+			teleArmMotor.set(-TELEARM_MOTOR_POWER);
+		}
+		teleArmMotor.set(0);
+	}
 }
