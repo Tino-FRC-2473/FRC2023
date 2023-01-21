@@ -39,6 +39,7 @@ public class DriveFSMSystem {
 	private double rightPower;
 
 	private boolean finishedTurning;
+	private boolean inEngageMode = false;
 
 	private boolean isInArcadeDrive = true;
 
@@ -128,6 +129,7 @@ public class DriveFSMSystem {
 
 		roboXPos = 0;
 		roboYPos = 0;
+		inEngageMode = false;
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -215,8 +217,20 @@ public class DriveFSMSystem {
 
 		if (isInArcadeDrive) {
 
-			// System.out.println("VELOC: " + gyro.getVelocityX());
-			// System.out.print("POPO: " + leftMotor.get());
+			if (input.isDriveJoystickEngageButtonPressedRaw()) {
+				inEngageMode = true;
+				if (gyro.getPitch() >= -Constants.CHARGING_STATION_LEVELED_ERROR
+					&& gyro.getPitch() <= Constants.CHARGING_STATION_LEVELED_ERROR) {
+					leftPower = 0;
+					rightPower = 0;
+				} else if (gyro.getPitch() < -Constants.CHARGING_STATION_LEVELED_ERROR
+					|| gyro.getPitch() > Constants.CHARGING_STATION_LEVELED_ERROR) {
+					leftPower = gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT;
+					rightPower = -gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT;
+				}
+			} else {
+				inEngageMode = false;
+			}
 
 			currentEncoderPos = ((leftMotor.getEncoder().getPosition()
 				- rightMotor.getEncoder().getPosition()) / 2.0);
@@ -252,8 +266,10 @@ public class DriveFSMSystem {
 
 			// System.out.println("ANGLE: " + getAngleToHub());
 
-			leftPower = power.getLeftPower();
-			rightPower = power.getRightPower();
+			if (!inEngageMode) {
+				leftPower = power.getLeftPower();
+				rightPower = power.getRightPower();
+			}
 
 			rightMotor.set(rightPower);
 			leftMotor.set(leftPower);
