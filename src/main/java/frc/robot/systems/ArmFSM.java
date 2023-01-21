@@ -27,7 +27,7 @@ public class ArmFSM {
 	private static final int ARM_ENCODER_HIGH = 20;
 	private static final int ARM_ENCODER_MID = 10;
 	private static final int SHOOT_ANGLE_ENCODER = 10;
-	private static final double ERROR_ARM = 0.1;
+	private static final double PIVOT_ERROR_ARM = 0.1;
 
 
 	/* ======================== Private variables ======================== */
@@ -160,16 +160,21 @@ public class ArmFSM {
 		}
 	}
 
-
+	/**
+	 * Returns whether the difference between two rotations is within the error.
+	 * @param a rotation value 1
+	 * @param b rotation value 2
+	 * @return whether they are within the error
+	 */
 	private boolean withinError(double a, double b) {
-		return Math.abs(a - b) < ERROR_ARM;
+		return Math.abs(a - b) < PIVOT_ERROR_ARM;
 	}
 
-	private boolean atMaxHeight() {
+	private boolean isMaxHeight() {
 		return pivotLimitSwitchHigh.isPressed();
 	}
 
-	private boolean atMinHeight() {
+	private boolean isMinHeight() {
 		return pivotLimitSwitchLow.isPressed();
 	}
 	/*
@@ -185,9 +190,9 @@ public class ArmFSM {
 	 * What to do when in the ARM_MOVEMENT state
 	 */
 	private void handleArmMechState(TeleopInput input) {
-		if (input.isPivotIncreaseButtonPressed() && !atMaxHeight()) {
+		if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
 			pivotMotor.set(PIVOT_MOTOR_POWER);
-		} else if (input.isPivotDecreaseButtonPressed() && !atMinHeight()) {
+		} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
 			pivotMotor.set(-PIVOT_MOTOR_POWER);
 		} else {
 			pivotMotor.set(0);
