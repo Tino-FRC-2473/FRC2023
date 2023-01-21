@@ -5,8 +5,8 @@ package frc.robot.systems;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
-import com.revrobotics.SparkMaxLimitSwitch;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C.Port;
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -32,7 +32,7 @@ public class SpinningIntakeFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotor;
-	private SparkMaxLimitSwitch limitSwitchCone;
+	private DigitalInput limitSwitchCone;
 	private ColorSensorV3 colorSensorCube;
 
 	/* ======================== Constructor ======================== */
@@ -45,9 +45,7 @@ public class SpinningIntakeFSM {
 		// Perform hardware init
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
-		limitSwitchCone = spinnerMotor.getReverseLimitSwitch(
-			SparkMaxLimitSwitch.Type.kNormallyOpen);
-		limitSwitchCone.enableLimitSwitch(true);
+		limitSwitchCone = new DigitalInput(0);
 		colorSensorCube = new ColorSensorV3(Port.kOnboard);
 		// Reset state machine
 		reset();
@@ -81,23 +79,27 @@ public class SpinningIntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+		if (input == null) {
+			return;
+		}
 		switch (currentState) {
 			case START_STATE:
-				handleStartState(input);
+				handleStartState();
 				break;
 			case IDLE_SPINNING:
-				handleIdleSpinningState(input);
+				handleIdleSpinningState();
 				break;
 			case IDLE_STOP:
-				handleIdleStopState(input);
+				handleIdleStopState();
 				break;
 			case RELEASE:
-				handleReleaseState(input);
+				handleReleaseState();
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		System.out.println(colorSensorCube.getProximity());
+		System.out.println(currentState);
 		currentState = nextState(input);
 	}
 
@@ -109,7 +111,7 @@ public class SpinningIntakeFSM {
 	}
 	private boolean isLimitSwitchConeActivated() {
 		//FIX THIS LATER;
-		return limitSwitchCone.isPressed();
+		return limitSwitchCone.get();
 	}
 
 	/* ======================== Private methods ======================== */
@@ -123,6 +125,9 @@ public class SpinningIntakeFSM {
 	 * @return FSM state for the next iteration
 	 */
 	private FSMState nextState(TeleopInput input) {
+		if (input == null) {
+			return FSMState.START_STATE;
+		}
 		switch (currentState) {
 			case START_STATE:
 				return FSMState.IDLE_SPINNING;
@@ -148,20 +153,17 @@ public class SpinningIntakeFSM {
 
 	/* ------------------------ FSM state handlers ------------------------ */
 	/**
-	 * Handle behavior in START_STATE.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
+	 * Handle behavior in states.
 	 */
-	private void handleStartState(TeleopInput input) {
-
+	private void handleStartState() {
 	}
-	private void handleIdleSpinningState(TeleopInput input) {
+	private void handleIdleSpinningState() {
 		spinnerMotor.set(INTAKE_SPEED);
 	}
-	private void handleIdleStopState(TeleopInput input) {
+	private void handleIdleStopState() {
 		spinnerMotor.set(0);
 	}
-	private void handleReleaseState(TeleopInput input) {
+	private void handleReleaseState() {
 		spinnerMotor.set(RELEASE_SPEED);
 	}
 }
