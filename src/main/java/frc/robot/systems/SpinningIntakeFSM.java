@@ -5,15 +5,12 @@ package frc.robot.systems;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.SparkMaxLimitSwitch;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C.Port;
-
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
-import com.revrobotics.ColorMatch;
-import edu.wpi.first.wpilibj.util.Color;
 
 public class SpinningIntakeFSM {
 	/* ======================== Constants ======================== */
@@ -27,23 +24,7 @@ public class SpinningIntakeFSM {
 	//FIX VALUES
 	private static final double INTAKE_SPEED = 0.1;
 	private static final double RELEASE_SPEED = -0.1;
-	private static final int COLOR_PROXIMITY_THRESHOLD = 100;
-
-	//CUBE RGB THRESHOLD VALUES
-	private static final double RED_AVG = 65 / 256f;
-	private static final double GREEN_AVG = 97 / 256f;
-	private static final double BLUE_AVG = 92 / 256f;
-	private static final double TOLERANCE = 15 / 256f;
-
-
-	private static final int HEX_BASE = 16;
-	private static final int RED_START = 1;
-	private static final int RED_END = 3;
-	private static final int GREEN_START = 3;
-	private static final int GREEN_END = 5;
-	private static final int BLUE_START = 5;
-	private static final int BLUE_END = 7;
-
+	private static final double RELEASE_TIME = 2;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -51,9 +32,8 @@ public class SpinningIntakeFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotor;
-	private DigitalInput limitSwitchCone;
+	private SparkMaxLimitSwitch limitSwitchCone;
 	private ColorSensorV3 colorSensorCube;
-	private ColorMatch colorMatch;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -65,12 +45,10 @@ public class SpinningIntakeFSM {
 		// Perform hardware init
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
-		limitSwitchCone = new DigitalInput(0);
+		limitSwitchCone = spinnerMotor.getReverseLimitSwitch(
+			SparkMaxLimitSwitch.Type.kNormallyOpen);
+		limitSwitchCone.enableLimitSwitch(true);
 		colorSensorCube = new ColorSensorV3(Port.kOnboard);
-		colorMatch = new ColorMatch();
-		colorMatch.addColorMatch(Color.kPurple);
-		colorMatch.addColorMatch(Color.kYellow);
-
 		// Reset state machine
 		reset();
 	}
@@ -103,54 +81,35 @@ public class SpinningIntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		if (input == null) {
-			return;
-		}
 		switch (currentState) {
 			case START_STATE:
-				handleStartState();
+				handleStartState(input);
 				break;
 			case IDLE_SPINNING:
-				handleIdleSpinningState();
+				handleIdleSpinningState(input);
 				break;
 			case IDLE_STOP:
-				handleIdleStopState();
+				handleIdleStopState(input);
 				break;
 			case RELEASE:
-				handleReleaseState();
+				handleReleaseState(input);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-
+		System.out.println(colorSensorCube.getProximity());
 		currentState = nextState(input);
 	}
 
 	/*-------------------------NON HANDLER METHODS ------------------------- */
 	private boolean isCubeDetected() {
-		boolean objectDetected = colorSensorCube.getProximity() > COLOR_PROXIMITY_THRESHOLD;
-		double r =  colorSensorCube.getColor().red;
-		double g =  colorSensorCube.getColor().green;
-		double b =  colorSensorCube.getColor().blue;
-
-		System.out.println(r + " " + g + " " + b);
-
-		if (objectDetected && withinRange(r, RED_AVG)
-			&& withinRange(g, GREEN_AVG) && withinRange(b, BLUE_AVG)) {
-			System.out.println("THIS IS A CUBE");
-		} else if (objectDetected) {
-			System.out.println("THIS IS A CONE");
-		}
-
-		return false;
-		//return !isCone && objectDetected;
-	}
-
-	private boolean withinRange(double a, double b) {
-		return Math.abs(a - b) <= TOLERANCE;
+		//FIX THIS LATER
+		final int colorProx = 100;
+		return colorSensorCube.getProximity() < colorProx;
 	}
 	private boolean isLimitSwitchConeActivated() {
-		return limitSwitchCone.get();
+		//FIX THIS LATER;
+		return limitSwitchCone.isPressed();
 	}
 
 	/* ======================== Private methods ======================== */
@@ -164,9 +123,6 @@ public class SpinningIntakeFSM {
 	 * @return FSM state for the next iteration
 	 */
 	private FSMState nextState(TeleopInput input) {
-		if (input == null) {
-			return FSMState.START_STATE;
-		}
 		switch (currentState) {
 			case START_STATE:
 				return FSMState.IDLE_SPINNING;
@@ -192,17 +148,20 @@ public class SpinningIntakeFSM {
 
 	/* ------------------------ FSM state handlers ------------------------ */
 	/**
-	 * Handle behavior in states.
+	 * Handle behavior in START_STATE.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
 	 */
-	private void handleStartState() {
+	private void handleStartState(TeleopInput input) {
+
 	}
-	private void handleIdleSpinningState() {
+	private void handleIdleSpinningState(TeleopInput input) {
 		spinnerMotor.set(INTAKE_SPEED);
 	}
-	private void handleIdleStopState() {
+	private void handleIdleStopState(TeleopInput input) {
 		spinnerMotor.set(0);
 	}
-	private void handleReleaseState() {
+	private void handleReleaseState(TeleopInput input) {
 		spinnerMotor.set(RELEASE_SPEED);
 	}
 }

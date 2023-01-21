@@ -139,13 +139,6 @@ public class TeleopInput {
 	public boolean isReleaseButtonReleased() {
 		return mechJoystick.getRawButtonReleased(RELEASE_BUTTON);
 	}
-	/**
-	 * Get trigger button is pressed of left joystick.
-	 * @return Axis value
-	 */
-	public boolean isDriveJoystickTriggerPressedRaw() {
-		return driveJoystick.getTrigger();
-	}
 
 	/**
 	 * Get if balance button (2) is pressed.
