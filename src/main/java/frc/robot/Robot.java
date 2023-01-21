@@ -3,87 +3,67 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
-// WPILib Imports
+ import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+ import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.TimedRobot;
+ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+ 
+ public class Robot extends TimedRobot { 
+	 Drivetrain dtSim = new Drivetrain();
+	 AutoController autoControl = new AutoController();
+	 DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.5);
+	 @Override
+	 public void robotInit() {
+		 // Flush NetworkTables every loop. This ensures that robot pose and other values
+		 // are sent during every iteration.
+		 setNetworkTablesFlushEnabled(true);
+	 }
+ 
+	 @Override
+	 public void autonomousInit() {
+		 //resetOdometery();
+		 autoControl.startPath();
+	 }
 
-// Systems
-import frc.robot.systems.ArmFSM;
+	 @Override
+	 public void autonomousPeriodic() {
+		 ChassisSpeeds adjustedSpeeds = autoControl.getCurMotorCmds(dtSim.getCurPose());
+		 DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(adjustedSpeeds);
 
-/**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation.
- */
-public class Robot extends TimedRobot {
-	private TeleopInput input;
-
-	// Systems
-	private ArmFSM fsmSystem;
-
-	/**
-	 * This function is run when the robot is first started up and should be used for any
-	 * initialization code.
-	 */
-	@Override
-	public void robotInit() {
-		System.out.println("robotInit");
-		input = new TeleopInput();
-
-		// Instantiate all systems here
-		fsmSystem = new ArmFSM();
-	}
-
-	@Override
-	public void autonomousInit() {
-		System.out.println("-------- Autonomous Init --------");
-		fsmSystem.reset();
-	}
-
-	@Override
-	public void autonomousPeriodic() {
-		fsmSystem.update(null);
-	}
-
-	@Override
-	public void teleopInit() {
-		System.out.println("-------- Teleop Init --------");
-		fsmSystem.reset();
-	}
-
-	@Override
-	public void teleopPeriodic() {
-		fsmSystem.update(input);
-	}
-
-	@Override
-	public void disabledInit() {
-		System.out.println("-------- Disabled Init --------");
-	}
-
-	@Override
-	public void disabledPeriodic() {
-
-	}
-
-	@Override
-	public void testInit() {
-		System.out.println("-------- Test Init --------");
-	}
-
-	@Override
-	public void testPeriodic() {
-
-	}
-
-	/* Simulation mode handlers, only used for simulation testing  */
-	@Override
-	public void simulationInit() {
-		System.out.println("-------- Simulation Init --------");
-	}
-
-	@Override
-	public void simulationPeriodic() { }
-
-	// Do not use robotPeriodic. Use mode specific periodic methods instead.
-	@Override
-	public void robotPeriodic() { }
-}
+		 //CONVERT above to a diff units, maybe voltage?
+		 dtSim.simulationPeriodic(wheelSpeeds.leftMetersPerSecond,wheelSpeeds.rightMetersPerSecond);
+	 }
+ 
+	 @Override
+	 public void teleopPeriodic() {
+		//dt.drive(opInf.getFwdRevSpdCmd(), opInf.getRotateSpdCmd());
+	 }
+ 
+	 @Override
+	 public void robotPeriodic() {
+		//pt.setEstimatedPose(dt.getCtrlsPoseEstimate());
+		//pt.update();
+	 }
+ 
+	 @Override
+	 public void disabledPeriodic() {
+		//dt.drive(0, 0);
+	 }
+ 
+	 @Override
+	 public void simulationPeriodic() {
+		//if (opInf.getSimKickCmd()) {
+		//     dtSim.applyKick();
+		//}
+		//dtSim.update();
+		//pt.setActualPose(dtSim.getCurPose());
+	 }
+ 
+	 private void resetOdometery() {
+		//Pose2d startPose = autoCtrl.getInitialPose();
+		 //dtSim.resetPose(startPose);
+		 //dt.resetOdometry(startPose);
+	 }
+ }
