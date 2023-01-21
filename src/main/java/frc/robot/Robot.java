@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
 import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
+import frc.robot.systems.SpinningIntakeFSM;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,6 +21,7 @@ public class Robot extends TimedRobot {
 	// Systems
 	private ArmFSM armSystem;
 	private DriveFSMSystem driveSystem;
+	private SpinningIntakeFSM fsmSystem;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -33,6 +35,7 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		armSystem = new ArmFSM();
 		driveSystem = new DriveFSMSystem();
+		fsmSystem = new SpinningIntakeFSM();
 	}
 
 	@Override
