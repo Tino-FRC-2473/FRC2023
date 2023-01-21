@@ -158,7 +158,7 @@ public class DriveFSMSystem {
 				break;
 
 			case TURNING_STATE:
-				handleTurnState(input, 180);
+				handleTurnState(input, 0);
 				break;
 
 			default:
@@ -228,12 +228,12 @@ public class DriveFSMSystem {
 			double currentRightPower = rightMotor.get();
 
 
-			DrivePower targetPower = DriveModes.arcadeDrive(input.getLeftJoystickY(),
+			DrivePower targetPower = DriveModes.arcadeDrive(input.getdriveJoystickY(),
 				steerAngle, currentLeftPower,
 				currentRightPower, true);
 
 			// multiple speed modes
-			if (input.isLeftJoystickTriggerPressedRaw()) {
+			if (input.isDriveJoystickTriggerPressedRaw()) {
 				targetPower.scale(Constants.MAX_POWER);
 			} else {
 				targetPower.scale(Constants.REDUCED_MAX_POWER);
@@ -246,8 +246,8 @@ public class DriveFSMSystem {
 				currentRightPower));
 
 			// turning in place
-			if (Math.abs(input.getLeftJoystickY()) < Constants.TURNING_IN_PLACE_THRESHOLD) {
-				power = DriveFunctions.turnInPlace(input.getRightJoystickY(), steerAngle);
+			if (Math.abs(input.getdriveJoystickY()) < Constants.TURNING_IN_PLACE_THRESHOLD) {
+				power = DriveFunctions.turnInPlace(0, steerAngle);
 			}
 
 			// System.out.println("ANGLE: " + getAngleToHub());
@@ -259,8 +259,8 @@ public class DriveFSMSystem {
 			leftMotor.set(leftPower);
 
 		} else {
-			leftMotor.set((input.getLeftJoystickY()));
-			rightMotor.set(-(input.getRightJoystickY()));
+			leftMotor.set((input.getdriveJoystickY()));
+			rightMotor.set(-(input.getmechJoystickY()));
 		}
 
 	}
@@ -279,12 +279,12 @@ public class DriveFSMSystem {
 			return;
 		}
 
-		degrees *= 0.987;
+		degrees *= Constants.GYRO_TURN_MULTIPLER_BELOW_90;
 
 		System.out.println(getHeading());
 		double error = degrees - getHeading();
-		if (error > 180) {
-			error -= 360;
+		if (error > Constants.HALF_REVOLUTION_DEGREES) {
+			error -= Constants.ONE_REVOLUTION_DEGREES;
 		}
 		if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
 			finishedTurning = true;
@@ -297,7 +297,7 @@ public class DriveFSMSystem {
 			power = Constants.MIN_TURN_POWER;
 		}
 
-		power *= (error < 0 && error > -180) ? -1 : 1;
+		power *= (error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -1 : 1;
 
 		leftMotor.set(power);
 		rightMotor.set(power);
@@ -324,10 +324,10 @@ public class DriveFSMSystem {
 		// double angle = startAngle - gyro.getYaw();
 		double angle = startAngle - gyro.getAngle();
 		if (angle < 0) {
-			angle += 360;
+			angle += Constants.ONE_REVOLUTION_DEGREES;
 		}
-		if (angle > 360) {
-			angle -= 360;
+		if (angle > Constants.ONE_REVOLUTION_DEGREES) {
+			angle -= Constants.ONE_REVOLUTION_DEGREES;
 		}
 		return angle;
 	}

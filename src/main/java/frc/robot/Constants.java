@@ -21,6 +21,10 @@ public class Constants {
 	public static final double TURN_ERROR_POWER_RATIO = 360;
 	public static final double ACCELERATION_CONSTANT_FOR_TURN = 2.8;
 	public static final double SPEED_CONSTANT_FOR_TURN = 0.7;
+	public static final double ONE_REVOLUTION_DEGREES = 360;
+	public static final double HALF_REVOLUTION_DEGREES = 180;
+	public static final double GYRO_TURN_MULTIPLER_BELOW_90 = 0.987;
+
 
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
