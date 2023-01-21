@@ -8,8 +8,6 @@ import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.util.Color;
-
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -37,6 +35,14 @@ public class SpinningIntakeFSM {
 	private static final int CONE_BLUE_HIGH = 15;
 	private static final int CONE_BLUE_LOW = 30;
 
+	private static final int HEX_BASE = 16;
+	private static final int RED_START = 1;
+	private static final int RED_END = 3;
+	private static final int GREEN_START = 3;
+	private static final int GREEN_END = 5;
+	private static final int BLUE_START = 5;
+	private static final int BLUE_END = 7;
+
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 
@@ -45,7 +51,7 @@ public class SpinningIntakeFSM {
 	private CANSparkMax spinnerMotor;
 	private DigitalInput limitSwitchCone;
 	private ColorSensorV3 colorSensorCube;
-	
+
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -120,18 +126,15 @@ public class SpinningIntakeFSM {
 		boolean isCone = false;
 
 		String colorOfObject = colorSensorCube.getColor().toHexString();
-		int  r =  Integer.valueOf( colorOfObject.substring( 1, 3 ), 16 );
-    	int  g =  Integer.valueOf( colorOfObject.substring( 3, 5 ), 16 );
-    	int  b =  Integer.valueOf( colorOfObject.substring( 5, 7 ), 16 );
-		if (r>=CONE_RED_LOW && r<=CONE_RED_HIGH && b>=CONE_BLUE_LOW && b<=CONE_BLUE_HIGH && r>=CONE_GREEN_LOW && r<=CONE_GREEN_HIGH) {
+		int  r =  Integer.valueOf(colorOfObject.substring(RED_START, RED_END), HEX_BASE);
+		int  g =  Integer.valueOf(colorOfObject.substring(GREEN_START, GREEN_END), HEX_BASE);
+		int  b =  Integer.valueOf(colorOfObject.substring(BLUE_START, BLUE_END), HEX_BASE);
+		if (r >= CONE_RED_LOW && r <= CONE_RED_HIGH && b >= CONE_BLUE_LOW && b <= CONE_BLUE_HIGH
+			&& g >= CONE_GREEN_LOW && g <= CONE_GREEN_HIGH) {
 			isCone = true;
 		}
 
-		if (!isCone && objectDetected) {
-			return true;
-		} else {
-			return false;
-		}
+		return !isCone && objectDetected;
 
 	}
 	private boolean isLimitSwitchConeActivated() {
