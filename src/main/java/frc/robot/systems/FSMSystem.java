@@ -25,6 +25,7 @@ public class FSMSystem {
 	public enum FSMState {
 		path1,
 		path2,
+		path3,
 		PURE_PERSUIT,
 		P1,
 		P2,
@@ -121,7 +122,7 @@ public class FSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.path2;
+		currentState = FSMState.path3;
 
 		roboXPos = 0;
 		roboYPos = 0;
@@ -155,6 +156,10 @@ public class FSMSystem {
 
 			case path2:
 				path2(input);
+				break;
+
+			case path3:
+				path3(input);
 				break;
 
 			case P1:
@@ -200,7 +205,10 @@ public class FSMSystem {
 				return FSMState.path1;
 
 			case path2:
-				return FSMState.path1;
+				return FSMState.path2;
+			
+			case path3:
+				return FSMState.path3;
 
 			case P1:
 				if (stateCounter == 1) {
@@ -216,35 +224,13 @@ public class FSMSystem {
 			case P2:
 				if (stateCounter == 1) {
 					return FSMState.P1;
-			} else if (stateCounter == 2) {
+				} else if (stateCounter == 2) {
 					return FSMState.P2;
 				} else if (stateCounter == 3) {
 					return FSMState.P3;
 				} else if (stateCounter == 4) {
 					return FSMState.P4;
 			}
-
-			// case P3:
-			// 	if (stateCounter == 1) {
-			// 		return FSMState.P1;
-			// } else if (stateCounter == 2) {
-			// 		return FSMState.P2;
-			// 	} else if (stateCounter == 3) {
-			// 		return FSMState.P3;
-			// 	} else if (stateCounter == 4) {
-			// 		return FSMState.P4;
-			// }
-
-			// case P4:
-			// 	if (stateCounter == 1) {
-			// 		return FSMState.P1;
-			// } else if (stateCounter == 2) {
-			// 		return FSMState.P2;
-			// 	} else if (stateCounter == 3) {
-			// 		return FSMState.P3;
-			// 	} else if (stateCounter == 4) {
-			// 		return FSMState.P4;
-			// }
 
 			case PURE_PERSUIT:
 				if (stateCounter == 0) {
@@ -295,7 +281,8 @@ public class FSMSystem {
 
 		if (deltaX < 0) {
 			angle += 180;
-		} if (deltaX > 0 && deltaY < 0) {
+		}
+		if (deltaX > 0 && deltaY < 0) {
 			angle += 360;
 		}
 
@@ -495,43 +482,89 @@ public class FSMSystem {
 		// return new Translation2d(robotPos.getX() + dX, robotPos.getY() + dY);
 	}
 
-	int state = 0;
-    public void path1(TeleopInput input) {
+	boolean finishedTurning = false;
+
+	public void handleTurnState(TeleopInput input, double degrees) {
         if (input != null) {
             return;
         }
-        double roboX = -roboXPos;
-        double roboY = roboYPos;
+	finishedTurning = false;
+        degrees *= 0.987;
+        System.out.println(getHeading());
+        double error = degrees - getHeading();
+        if (error > 180) {
+            error -= 360;
+        }
+        if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
+            finishedTurning = true;
+            leftMotor.set(0);
+            rightMotor.set(0);
+            return;
+        }
+        double power = Math.abs(error) / Constants.TURN_ERROR_POWER_RATIO;
+        if (power < Constants.MIN_TURN_POWER) {
+            power = Constants.MIN_TURN_POWER;
+        }
+        power *= (error < 0 && error > -180) ? -1 : 1;
+        leftMotor.set(power);
+        rightMotor.set(power);
+    }
+
+	double startAngle = 0;
+
+	/**
+    * Gets the heading from the gyro.
+    * @return the gyro heading
+    */
+    public double getHeading() {
+        // double angle = startAngle - gyro.getYaw();
+        double angle = startAngle - gyro.getAngle();
+        if (angle < 0) {
+            angle += 360;
+        }
+        if (angle > 360) {
+            angle -= 360;
+        }
+        return angle;
+    }
+	
+	int state = 0;
+		public void path1(TeleopInput input) {
+		if (input != null) {
+		    return;
+		}
+		double roboX = -roboXPos;
+		double roboY = roboYPos;
 		System.out.println("x: " + roboX);
 		System.out.println("y: " + roboY);
 		System.out.println("state: " + state);
-        if (state == 0) {
-            leftMotor.set(-0.3);
-            rightMotor.set(0.3);
-            if (Math.abs(roboX - 30.8) <= 5) {
-                leftMotor.set(0);
-                rightMotor.set(0);
-                state++;
-            }
-        } else if (state == 1) {
+		if (state == 0) {
+			leftMotor.set(-0.3);
+			rightMotor.set(0.3);
+			if (Math.abs(roboX - 30.8) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			}
+		} else if (state == 1) {
 			System.out.println("entered 1");
-            leftMotor.set(0.3);
-            rightMotor.set(-0.3);
-            if (Math.abs(roboX + 105.6) <= 5) {
-                leftMotor.set(0);
-                rightMotor.set(0);
-                state++;
-            }
-        } else if (state == 2) {
-            leftMotor.set(-0.3);
-            rightMotor.set(0.3);
-            if (Math.abs(roboX + 50.1) <= 5) {
-                leftMotor.set(0);
-                rightMotor.set(0);
-                System.out.println("end");
-                //state++;
-            }
-        }
+			leftMotor.set(0.3);
+			rightMotor.set(-0.3);
+			if (Math.abs(roboX + 105.6) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			}
+		} else if (state == 2) {
+			leftMotor.set(-0.3);
+			rightMotor.set(0.3);
+			if (Math.abs(roboX + 50.1) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				System.out.println("end");
+				//state++;
+			}
+		}
 	}
 
 	public void path2(TeleopInput input) {
@@ -542,11 +575,11 @@ public class FSMSystem {
 		double roboY = roboYPos;
 		System.out.println("x: " + roboX);
 		System.out.println("y: " + roboY);
-		System.out.println("state: " + state);
+		//System.out.println("state: " + state);
+		System.out.println("dist " + Math.abs(roboX - 49.4));
 		if (state == 0) {
 			leftMotor.set(-0.3);
 			rightMotor.set(0.3);
-			System.out.println("distace: " + Math.abs(roboX - 49.4));
 			if (Math.abs(roboX - 49.4) <= 5) {
 				leftMotor.set(0);
 				rightMotor.set(0);
@@ -556,12 +589,78 @@ public class FSMSystem {
 			System.out.println("entered 1");
 			leftMotor.set(0.3);
 			rightMotor.set(-0.3);
+			System.out.println("dist " + Math.abs(roboX + 47.7));
 			if (Math.abs(roboX + 47.7) <= 5) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				System.out.println("end");
 				//state++;
 			}
+		}
+	}
+
+	public void path3(TeleopInput input) {
+		if (input != null) {
+			return;
+		}
+		double roboX = -roboXPos;
+		double roboY = roboYPos;
+		System.out.println("x: " + roboX);
+		System.out.println("y: " + roboY);
+		System.out.println(gyro.getAngle());
+	
+		if (state == 0) {
+			handleTurnState(input, (180 - 63.9));
+			if (finishedTurning) state--;
+		}
+		else if (state == 0) {
+			leftMotor.set(0.1);
+			rightMotor.set(-0.1);		
+			if (Math.abs(roboX + 191) <= 1.5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			}
+		} else if (state == 1) {
+			System.out.println("entered 1");
+			leftMotor.set(-0.1);
+			rightMotor.set(0.1);
+			if (Math.abs(roboX) <= 1.5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			}
+		} else if (state == 2) {
+			System.out.println("back 3");
+            		leftMotor.set(0.05);
+			    rightMotor.set(-0.05);
+			    if (Math.abs(roboX + 9) <= 1.5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			    }
+      		} else if (state == 3) { //turning right
+            		handleTurnState(input, 243.9);
+			if (finishedTurning) state++;
+		} else if (state == 4) {
+			leftMotor.set(0.1);
+			rightMotor.set(-0.1);
+			if (Math.abs(roboX + 31.5) <= 5 && Math.abs(roboY - 63.1) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			}
+		} else if (state == 5) { //turning left
+			handleTurnState(input, 63.9);
+			if (finishedTurning) state++;
+		} else if (state == 6) {
+			leftMotor.set(0.1);
+            		rightMotor.set(-0.1);
+			if (Math.abs(roboX + 83.9) <= 5 && Math.abs(roboY - 66.1) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				//state++;
+            		}
 		}
 	}
 }
