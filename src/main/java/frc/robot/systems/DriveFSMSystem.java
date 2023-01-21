@@ -120,8 +120,8 @@ public class DriveFSMSystem {
 		rightMotor.getEncoder().setPosition(0);
 		leftMotor.getEncoder().setPosition(0);
 
-		// gyro.reset();
-		// gyro.zeroYaw();
+		gyro.reset();
+		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
 		currentState = FSMState.TELE_STATE_2_MOTOR_DRIVE;
@@ -155,6 +155,10 @@ public class DriveFSMSystem {
 
 			case IDLE:
 				handleIdleState(input);
+				break;
+
+			case TURNING_STATE:
+				handleTurnState(input, 0);
 				break;
 
 			default:
@@ -243,7 +247,7 @@ public class DriveFSMSystem {
 
 			// turning in place
 			if (Math.abs(input.getdriveJoystickY()) < Constants.TURNING_IN_PLACE_THRESHOLD) {
-				power = DriveFunctions.turnInPlace(input.getmechJoystickY(), steerAngle);
+				power = DriveFunctions.turnInPlace(0, steerAngle);
 			}
 
 			// System.out.println("ANGLE: " + getAngleToHub());
@@ -264,37 +268,40 @@ public class DriveFSMSystem {
 	// ——————————————————————————————————————————————————————————————— //
 	// ———————Below commented out due to not having gyro library—————— //
 	// ——————————————————————————————————————————————————————————————— //
-	// /**
-	//  * Handle behavior in TURNING_STATE.
-	//  * @param input Global TeleopInput if robot in teleop mode or null if
-	//  *        the robot is in autonomous mode.
-	//  * @param degrees How many degrees the robot is to turn
-	//  */
-	// public void handleTurnState(TeleopInput input, double degrees) {
-	// 	if (input != null) {
-	// 		return;
-	// 	}
+	/**
+	 * Handle behavior in TURNING_STATE.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 * @param degrees How many degrees the robot is to turn
+	 */
+	public void handleTurnState(TeleopInput input, double degrees) {
+		if (input != null) {
+			return;
+		}
 
-	// 	double error = degrees - getHeading();
-	// 	if (error > 180) {
-	// 		error -= 360;
-	// 	}
-	// 	if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
-	// 		finishedTurning = true;
-	// 		leftMotor.set(0);
-	// 		rightMotor.set(0);
-	// 		return;
-	// 	}
-	// 	double power = Math.abs(error) / Constants.TURN_ERROR_POWER_RATIO;
-	// 	if (power < Constants.MIN_TURN_POWER) {
-	// 		power = Constants.MIN_TURN_POWER;
-	// 	}
+		degrees *= Constants.GYRO_TURN_MULTIPLER_BELOW_90;
 
-	// 	power *= (error < 0 && error > -180) ? -1 : 1;
+		System.out.println(getHeading());
+		double error = degrees - getHeading();
+		if (error > Constants.HALF_REVOLUTION_DEGREES) {
+			error -= Constants.ONE_REVOLUTION_DEGREES;
+		}
+		if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
+			finishedTurning = true;
+			leftMotor.set(0);
+			rightMotor.set(0);
+			return;
+		}
+		double power = Math.abs(error) / Constants.TURN_ERROR_POWER_RATIO;
+		if (power < Constants.MIN_TURN_POWER) {
+			power = Constants.MIN_TURN_POWER;
+		}
 
-	// 	leftMotor.set(power);
-	// 	rightMotor.set(power);
-	// }
+		power *= (error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -1 : 1;
+
+		leftMotor.set(power);
+		rightMotor.set(power);
+	}
 
 	/**
 	 * Handle behavior in IDlE State.
@@ -309,20 +316,21 @@ public class DriveFSMSystem {
 	// ——————————————————————————————————————————————————————————————— //
 	// ———————Below commented out due to not having gyro library—————— //
 	// ——————————————————————————————————————————————————————————————— //
-	// /**
-	// * Gets the heading from the gyro.
-	// * @return the gyro heading
-	// */
-	// public double getHeading() {
-	// 	// double angle = startAngle - gyro.getYaw();
-	// 	if (angle < 0) {
-	// 		angle += 360;
-	// 	}
-	// 	if (angle > 360) {
-	// 		angle -= 360;
-	// 	}
-	// 	return angle;
-	// }
+	/**
+	* Gets the heading from the gyro.
+	* @return the gyro heading
+	*/
+	public double getHeading() {
+		// double angle = startAngle - gyro.getYaw();
+		double angle = startAngle - gyro.getAngle();
+		if (angle < 0) {
+			angle += Constants.ONE_REVOLUTION_DEGREES;
+		}
+		if (angle > Constants.ONE_REVOLUTION_DEGREES) {
+			angle -= Constants.ONE_REVOLUTION_DEGREES;
+		}
+		return angle;
+	}
 
 	/**
 	 * Tracks the robo's position on the field.
