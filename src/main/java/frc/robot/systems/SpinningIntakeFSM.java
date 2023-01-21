@@ -8,6 +8,9 @@ import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.util.Color;
+
+
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -24,7 +27,15 @@ public class SpinningIntakeFSM {
 	//FIX VALUES
 	private static final double INTAKE_SPEED = 0.1;
 	private static final double RELEASE_SPEED = -0.1;
-	private static final double RELEASE_TIME = 2;
+	private static final int COLOR_PROXIMITY_THRESHOLD = 100;
+
+	//CONE RGB THRESHOLD VALUES
+	private static final int CONE_RED_HIGH = 103;
+	private static final int CONE_RED_LOW = 85;
+	private static final int CONE_GREEN_HIGH = 150;
+	private static final int CONE_GREEN_LOW = 127;
+	private static final int CONE_BLUE_HIGH = 15;
+	private static final int CONE_BLUE_LOW = 30;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -34,7 +45,7 @@ public class SpinningIntakeFSM {
 	private CANSparkMax spinnerMotor;
 	private DigitalInput limitSwitchCone;
 	private ColorSensorV3 colorSensorCube;
-
+	
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -98,16 +109,30 @@ public class SpinningIntakeFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		System.out.println(colorSensorCube.getProximity());
+		System.out.println(colorSensorCube.getColor());
 		System.out.println(currentState);
 		currentState = nextState(input);
 	}
 
 	/*-------------------------NON HANDLER METHODS ------------------------- */
 	private boolean isCubeDetected() {
-		//FIX THIS LATER
-		final int colorProx = 100;
-		return colorSensorCube.getProximity() < colorProx;
+		boolean objectDetected = colorSensorCube.getProximity() > COLOR_PROXIMITY_THRESHOLD;
+		boolean isCone = false;
+
+		String colorOfObject = colorSensorCube.getColor().toHexString();
+		int  r =  Integer.valueOf( colorOfObject.substring( 1, 3 ), 16 );
+    	int  g =  Integer.valueOf( colorOfObject.substring( 3, 5 ), 16 );
+    	int  b =  Integer.valueOf( colorOfObject.substring( 5, 7 ), 16 );
+		if (r>=CONE_RED_LOW && r<=CONE_RED_HIGH && b>=CONE_BLUE_LOW && b<=CONE_BLUE_HIGH && r>=CONE_GREEN_LOW && r<=CONE_GREEN_HIGH) {
+			isCone = true;
+		}
+
+		if (!isCone && objectDetected) {
+			return true;
+		} else {
+			return false;
+		}
+
 	}
 	private boolean isLimitSwitchConeActivated() {
 		//FIX THIS LATER;
