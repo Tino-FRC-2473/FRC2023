@@ -155,6 +155,14 @@ public class TeleopInput {
 		return driveJoystick.getTrigger();
 	}
 
+	/**
+	 * Get trigger button is pressed of left joystick.
+	 * @return Axis value
+	 */
+	public boolean isDriveJoystickEngageButtonPressedRaw() {
+		return driveJoystick.getRawButton(2);
+	}
+
 	/* ------------------------ Steering Wheel ------------------------ */
 	/**
 	 * Get Angle of the steering Wheel from -1 to 1.
