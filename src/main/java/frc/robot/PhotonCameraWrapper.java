@@ -39,7 +39,7 @@ public class PhotonCameraWrapper {
 		ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
 		atList.add(new AprilTag(1, new Pose3d(AprilTagConstants.APRILTAG_1_X,
 			AprilTagConstants.APRILTAG_1_Y, AprilTagConstants.APRILTAG_1_HEIGHT,
-		new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE))));
+			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE))));
 
 		AprilTagFieldLayout atfl =
 				new AprilTagFieldLayout(atList,
