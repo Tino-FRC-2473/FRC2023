@@ -1,8 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
 
 public class Constants {
-	//Drive Constants
+	public static final double TRACK_WIDTH = Units.inchesToMeters(20);
 	public static final double WHEEL_DIAMETER_INCHES = 4.0; //7.65
 	public static final double MAX_POWER = 1;
 	public static final double REDUCED_MAX_POWER = 0.5;
@@ -34,5 +35,16 @@ public class Constants {
 
 	public static final double QUARTER_PI = Math.PI / 4;
 
-
+	static class VisionConstants {
+		static final double CAM_OFFSET_X = Units.inchesToMeters(0);
+		static final double CAM_OFFSET_Y = Units.inchesToMeters(0);
+		static final double CAM_HEIGHT = Units.inchesToMeters(14.5);
+		static final double CAM_PITCH = Units.degreesToRadians(0);
+	}
+	static class AprilTagConstants {
+		static final double APRILTAG_1_X = Units.inchesToMeters(0);
+		static final double APRILTAG_1_Y = Units.inchesToMeters(0);
+		static final double APRILTAG_1_HEIGHT = Units.inchesToMeters(12);
+		static final double APRILTAG_1_ANGLE = Units.degreesToRadians(180);
+	}
 }
