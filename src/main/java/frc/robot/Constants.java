@@ -27,7 +27,6 @@ public class Constants {
 	public static final double CHARGING_STATION_LEVELED_ERROR_DEGREES = 2;
 	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 200;
 
-
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
 	public static final double DY_INCHES_CONST = 1.1742067733;

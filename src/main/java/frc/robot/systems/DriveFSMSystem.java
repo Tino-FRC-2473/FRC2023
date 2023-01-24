@@ -222,6 +222,8 @@ public class DriveFSMSystem {
 		}
 
 		if (isInArcadeDrive) {
+			// System.out.println("VELOC: " + gyro.getVelocityX());
+			// System.out.print("POPO: " + leftMotor.get());
 
 			currentEncoderPos = ((leftMotor.getEncoder().getPosition()
 				- rightMotor.getEncoder().getPosition()) / 2.0);
@@ -254,6 +256,8 @@ public class DriveFSMSystem {
 			if (Math.abs(input.getdriveJoystickY()) < Constants.TURNING_IN_PLACE_THRESHOLD) {
 				power = DriveFunctions.turnInPlace(0, steerAngle);
 			}
+
+			// System.out.println("ANGLE: " + getAngleToHub());
 
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
@@ -329,6 +333,9 @@ public class DriveFSMSystem {
 		rightMotor.set(0);
 	}
 
+	// ——————————————————————————————————————————————————————————————— //
+	// ———————Below commented out due to not having gyro library—————— //
+	// ——————————————————————————————————————————————————————————————— //
 	/**
 	* Gets the heading from the gyro.
 	* @return the gyro heading
