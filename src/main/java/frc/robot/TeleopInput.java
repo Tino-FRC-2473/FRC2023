@@ -25,6 +25,7 @@ public class TeleopInput {
 	private static final int RETRACT_BUTTON = 4;
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
+	private static final int AIM_LOW_BUTTON = 11;
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private Joystick mechJoystick;
@@ -111,6 +112,13 @@ public class TeleopInput {
 		return mechJoystick.getRawButton(AIM_MID_BUTTON);
 	}
 
+	/**
+	 * Get the value of the Shoot Low button.
+	 * @return True if button is pressed
+	 */
+	public boolean isShootLowButtonPressed() {
+		return mechJoystick.getRawButton(AIM_LOW_BUTTON);
+	}
 
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
