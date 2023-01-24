@@ -25,6 +25,9 @@ public class Constants {
 	public static final double ONE_REVOLUTION_DEGREES = 360;
 	public static final double HALF_REVOLUTION_DEGREES = 180;
 	public static final double GYRO_TURN_MULTIPLER_BELOW_90 = 0.987;
+	public static final double CHARGING_STATION_LEVELED_ERROR_DEGREES = 2;
+	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 200;
+
 
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
