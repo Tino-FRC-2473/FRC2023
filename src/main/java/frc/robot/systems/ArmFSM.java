@@ -58,10 +58,10 @@ public class ArmFSM {
 		pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
 										CANSparkMax.MotorType.kBrushless);
 		pivotLimitSwitchHigh = pivotMotor.getForwardLimitSwitch(
-								SparkMaxLimitSwitch.Type.kNormallyOpen);
+								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchHigh.enableLimitSwitch(true);
 		pivotLimitSwitchLow = pivotMotor.getReverseLimitSwitch(
-								SparkMaxLimitSwitch.Type.kNormallyOpen);
+								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchLow.enableLimitSwitch(true);
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
@@ -200,90 +200,105 @@ public class ArmFSM {
 	 * What to do when in the ARM_MOVEMENT state
 	 */
 	private void handleArmMechState(TeleopInput input) {
-		if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-			//pivotMotor.set(PIVOT_MOTOR_POWER);
-			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
-						PIVOT_MOTOR_POWER);
-			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
-				return;
+		if (input != null) {
+			if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
+				//pivotMotor.set(PIVOT_MOTOR_POWER);
+				double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+							PIVOT_MOTOR_POWER);
+				if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+					return;
+				}
+				pivotMotor.set(pow);
+			} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
+				//pivotMotor.set(-PIVOT_MOTOR_POWER);
+				double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+							-PIVOT_MOTOR_POWER);
+				if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+					return;
+				}
+				pivotMotor.set(pow);
+			} else {
+				pivotMotor.set(0);
 			}
-			pivotMotor.set(pow);
-		} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-			//pivotMotor.set(-PIVOT_MOTOR_POWER);
-			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
-						-PIVOT_MOTOR_POWER);
-			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
-				return;
-			}
-			pivotMotor.set(pow);
-		} else {
-			pivotMotor.set(0);
-		}
 
-		if (input.isExtendButtonPressed()) {
-			teleArmMotor.set(TELEARM_MOTOR_POWER);
-		} else if (input.isRetractButtonPressed()) {
-			teleArmMotor.set(-TELEARM_MOTOR_POWER);
+			if (input.isExtendButtonPressed()) {
+				teleArmMotor.set(TELEARM_MOTOR_POWER);
+			} else if (input.isRetractButtonPressed()) {
+				teleArmMotor.set(-TELEARM_MOTOR_POWER);
+			} else {
+				teleArmMotor.set(0);
+			}
 		} else {
 			teleArmMotor.set(0);
+			pivotMotor.set(0);
 		}
 	}
 
 	private void handleShootHighState(TeleopInput input) {
-		if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
-			pivotMotor.set(0);
-		} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
-			//pivotMotor.set(PIVOT_MOTOR_POWER);
-			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
-						PIVOT_MOTOR_POWER);
-			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
-				return;
+		if (input != null) {
+			if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
+				pivotMotor.set(0);
+			} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
+				//pivotMotor.set(PIVOT_MOTOR_POWER);
+				double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+							PIVOT_MOTOR_POWER);
+				if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+					return;
+				}
+				pivotMotor.set(pow);
+			} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
+				//pivotMotor.set(-PIVOT_MOTOR_POWER);
+				double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+							-PIVOT_MOTOR_POWER);
+				if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+					return;
+				}
+				pivotMotor.set(pow);
+			} else {
+				pivotMotor.set(0);
 			}
-			pivotMotor.set(pow);
-		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
-			//pivotMotor.set(-PIVOT_MOTOR_POWER);
-			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
-						-PIVOT_MOTOR_POWER);
-			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
-				return;
+			if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH) {
+				teleArmMotor.set(TELEARM_MOTOR_POWER);
+			} else {
+				teleArmMotor.set(0);
 			}
-			pivotMotor.set(pow);
-		} else {
-			pivotMotor.set(0);
-		}
-		if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH) {
-			teleArmMotor.set(TELEARM_MOTOR_POWER);
 		} else {
 			teleArmMotor.set(0);
+			pivotMotor.set(0);
 		}
 	}
 
 	private void handleShootMidState(TeleopInput input) {
-		if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
-			pivotMotor.set(0);
-		} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
-			//pivotMotor.set(PIVOT_MOTOR_POWER);
-			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
-						PIVOT_MOTOR_POWER);
-			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
-				return;
+		if (input != null) {
+			if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
+				pivotMotor.set(0);
+			} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
+				//pivotMotor.set(PIVOT_MOTOR_POWER);
+				double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+							PIVOT_MOTOR_POWER);
+				if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+					return;
+				}
+				pivotMotor.set(pow);
+			} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
+				//pivotMotor.set(-PIVOT_MOTOR_POWER);
+				double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+							-PIVOT_MOTOR_POWER);
+				if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+					return;
+				}
+				pivotMotor.set(pow);
+			} else {
+				pivotMotor.set(0);
 			}
-			pivotMotor.set(pow);
-		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
-			//pivotMotor.set(-PIVOT_MOTOR_POWER);
-			double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
-						-PIVOT_MOTOR_POWER);
-			if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
-				return;
+			if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID) {
+				teleArmMotor.set(TELEARM_MOTOR_POWER);
+			} else {
+				teleArmMotor.set(0);
 			}
-			pivotMotor.set(pow);
-		} else {
-			pivotMotor.set(0);
-		}
-		if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID) {
-			teleArmMotor.set(TELEARM_MOTOR_POWER);
 		} else {
 			teleArmMotor.set(0);
+			pivotMotor.set(0);
 		}
 	}
 
