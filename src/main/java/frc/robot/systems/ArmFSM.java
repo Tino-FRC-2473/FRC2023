@@ -40,13 +40,6 @@ public class ArmFSM {
 	private static final double PID_CONSTANT_P = 0.00022f;
 	private static final double PID_CONSTANT_I = 0.000055f;
 	private static final double PID_CONSTANT_D = 0.000008f;
-=======
-	private static final double SHOOT_ANGLE_ENCODER = 10;
-	private static final double BALANCE_ANGLE_ENCODER = 5;
-	private static final double GRABBER_ANGLE_ENCODER = -5;
-	private static final double ARM_ENCODER_GRAB = 10;
-	private static final double PIVOT_ERROR_ARM = 0.1;
->>>>>>> b4d7c65 (Merging code from dev branch into test branch)
 
 
 	/* ======================== Private variables ======================== */
@@ -70,10 +63,10 @@ public class ArmFSM {
 		pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
 										CANSparkMax.MotorType.kBrushless);
 		pivotLimitSwitchHigh = pivotMotor.getForwardLimitSwitch(
-								SparkMaxLimitSwitch.Type.kNormallyOpen);
+								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchHigh.enableLimitSwitch(true);
 		pivotLimitSwitchLow = pivotMotor.getReverseLimitSwitch(
-								SparkMaxLimitSwitch.Type.kNormallyOpen);
+								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchLow.enableLimitSwitch(true);
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
@@ -131,12 +124,9 @@ public class ArmFSM {
 			case SHOOT_MID:
 				handleShootMidState(input);
 				break;
-<<<<<<< HEAD
 			case SHOOT_LOW:
 				handleShootLowState(input);
 				break;
-=======
->>>>>>> b4d7c65 (Merging code from dev branch into test branch)
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -187,14 +177,11 @@ public class ArmFSM {
 			case SHOOT_MID:
 				if (input.isShootMidButtonPressed()) {
 					return FSMState.SHOOT_MID;
-<<<<<<< HEAD
 				}
 				return FSMState.IDLE;
 			case SHOOT_LOW:
 				if (input.isShootLowButtonPressed()) {
 					return FSMState.SHOOT_LOW;
-=======
->>>>>>> b4d7c65 (Merging code from dev branch into test branch)
 				}
 				return FSMState.IDLE;
 			default :
@@ -232,7 +219,6 @@ public class ArmFSM {
 	 * What to do when in the ARM_MOVEMENT state
 	 */
 	private void handleArmMechState(TeleopInput input) {
-<<<<<<< HEAD
 		if (input != null) {
 			if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
 				//pivotMotor.set(PIVOT_MOTOR_POWER);
@@ -243,15 +229,6 @@ public class ArmFSM {
 			} else {
 				pivotMotor.set(0);
 			}
-=======
-		if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-			pivotMotor.set(PIVOT_MOTOR_POWER);
-		} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-			pivotMotor.set(-PIVOT_MOTOR_POWER);
-		} else {
-			pivotMotor.set(0);
-		}
->>>>>>> b4d7c65 (Merging code from dev branch into test branch)
 
 			if (input.isExtendButtonPressed()) {
 				teleArmMotor.set(TELEARM_MOTOR_POWER);
@@ -267,7 +244,6 @@ public class ArmFSM {
 	}
 
 	private void handleShootHighState(TeleopInput input) {
-<<<<<<< HEAD
 		if (input != null) {
 			if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER_ROTATIONS)) {
 				pivotMotor.set(0);
@@ -285,19 +261,6 @@ public class ArmFSM {
 			} else {
 				teleArmMotor.set(0);
 			}
-=======
-		if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
-			pivotMotor.set(0);
-		} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(PIVOT_MOTOR_POWER);
-		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(-PIVOT_MOTOR_POWER);
-		} else {
-			pivotMotor.set(0);
-		}
-		if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH) {
-			teleArmMotor.set(TELEARM_MOTOR_POWER);
->>>>>>> b4d7c65 (Merging code from dev branch into test branch)
 		} else {
 			teleArmMotor.set(0);
 			pivotMotor.set(0);
@@ -305,7 +268,6 @@ public class ArmFSM {
 	}
 
 	private void handleShootMidState(TeleopInput input) {
-<<<<<<< HEAD
 		if (input != null) {
 			if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER_ROTATIONS)) {
 				pivotMotor.set(0);
@@ -323,26 +285,12 @@ public class ArmFSM {
 			} else {
 				teleArmMotor.set(0);
 			}
-=======
-		if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_ANGLE_ENCODER)) {
-			pivotMotor.set(0);
-		} else if (pivotMotor.getEncoder().getPosition() < SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(PIVOT_MOTOR_POWER);
-		} else if (pivotMotor.getEncoder().getPosition() > SHOOT_ANGLE_ENCODER) {
-			pivotMotor.set(-PIVOT_MOTOR_POWER);
-		} else {
-			pivotMotor.set(0);
-		}
-		if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID) {
-			teleArmMotor.set(TELEARM_MOTOR_POWER);
->>>>>>> b4d7c65 (Merging code from dev branch into test branch)
 		} else {
 			teleArmMotor.set(0);
 			pivotMotor.set(0);
 		}
 	}
 
-<<<<<<< HEAD
 	private void handleShootLowState(TeleopInput input) {
 		if (input != null) {
 			if (withinError(pivotMotor.getEncoder().getPosition(),
@@ -367,8 +315,6 @@ public class ArmFSM {
 			pivotMotor.set(0);
 		}
 	}
-=======
->>>>>>> b4d7c65 (Merging code from dev branch into test branch)
 	/**
 	 * Method to adjust the arm to go shoot on high height to use in autonomous.
 	 */
