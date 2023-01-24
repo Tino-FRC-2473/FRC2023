@@ -25,8 +25,8 @@ public class TeleopInput {
 	private static final int RETRACT_BUTTON = 4;
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
-	private static final int AIM_LOW_BUTTON = 11;
 	private static final int BALANCE_BUTTON = 2;
+	private static final int AIM_LOW_BUTTON = 11;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
