@@ -19,6 +19,11 @@ public class Constants {
 	public static final double MIN_TURN_POWER = 0.125;
 	public static final double TURN_ERROR_THRESHOLD_DEGREE = 1.0;
 	public static final double TURN_ERROR_POWER_RATIO = 360;
+	public static final double TURN_POWER = 0.05;
+	public static final double MOVE_POWER = 0.1;
+	public static final double TURN_THRESHOLD = 5;
+	public static final double MOVE_THRESHOLD = 3;
+	public static final double ROBOT_WIDTH = 20;
 
 	// PFC Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
