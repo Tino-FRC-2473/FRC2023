@@ -4,6 +4,7 @@ package frc.robot.systems;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -14,6 +15,7 @@ import frc.robot.drive.DriveModes;
 import frc.robot.drive.DrivePower;
 import frc.robot.drive.DriveFunctions;
 import frc.robot.Constants;
+import frc.robot.DrivePoseEstimator;
 
 public class DriveFSMSystem {
 
@@ -50,6 +52,8 @@ public class DriveFSMSystem {
 	private double gyroAngleForOdo = 0;
 	private AHRS gyro;
 	private double startAngle;
+
+	private DrivePoseEstimator dpe = new DrivePoseEstimator();
 
 
 	/* ======================== Constructor ======================== */
@@ -141,7 +145,11 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-
+		dpe.updatePose(gyro.getAngle(), leftMotor.getEncoder().getPosition(),
+			rightMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("X", dpe.getCurPose().getX());
+		SmartDashboard.putNumber("Y", dpe.getCurPose().getY());
+		SmartDashboard.putNumber("Rotation", dpe.getCurPose().getRotation().getDegrees());
 		// gyroAngleForOdo = gyro.getAngle();
 
 		currentEncoderPos = ((leftMotor.getEncoder().getPosition()
@@ -226,7 +234,7 @@ public class DriveFSMSystem {
 			currentEncoderPos = ((leftMotor.getEncoder().getPosition()
 				- rightMotor.getEncoder().getPosition()) / 2.0);
 
-			// updateLineOdometryTele(gyroAngleForOdo);
+			updateLineOdometryTele(gyroAngleForOdo);
 
 			double steerAngle = input.getSteerAngle();
 			double currentLeftPower = leftMotor.get();
@@ -257,6 +265,9 @@ public class DriveFSMSystem {
 
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
+
+			System.out.println("X: " + roboXPos);
+			System.out.println("Y: " + roboYPos);
 
 			rightMotor.set(rightPower);
 			leftMotor.set(leftPower);
