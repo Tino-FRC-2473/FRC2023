@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.I2C.Port;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
+import com.revrobotics.ColorMatch;
+import edu.wpi.first.wpilibj.util.Color;
 
 public class SpinningIntakeFSM {
 	/* ======================== Constants ======================== */
@@ -27,13 +29,12 @@ public class SpinningIntakeFSM {
 	private static final double RELEASE_SPEED = -0.1;
 	private static final int COLOR_PROXIMITY_THRESHOLD = 100;
 
-	//CONE RGB THRESHOLD VALUES
-	private static final int CONE_RED_HIGH = 103;
-	private static final int CONE_RED_LOW = 85;
-	private static final int CONE_GREEN_HIGH = 150;
-	private static final int CONE_GREEN_LOW = 127;
-	private static final int CONE_BLUE_HIGH = 15;
-	private static final int CONE_BLUE_LOW = 30;
+	//CUBE RGB THRESHOLD VALUES
+	private static final int RED_AVG = 65;
+	private static final int GREEN_AVG = 97;
+	private static final int BLUE_AVG = 92;
+	private static final int TOLERANCE = 15;
+
 
 	private static final int HEX_BASE = 16;
 	private static final int RED_START = 1;
@@ -43,6 +44,7 @@ public class SpinningIntakeFSM {
 	private static final int BLUE_START = 5;
 	private static final int BLUE_END = 7;
 
+
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 
@@ -51,6 +53,7 @@ public class SpinningIntakeFSM {
 	private CANSparkMax spinnerMotor;
 	private DigitalInput limitSwitchCone;
 	private ColorSensorV3 colorSensorCube;
+	private ColorMatch colorMatch;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -64,6 +67,10 @@ public class SpinningIntakeFSM {
 										CANSparkMax.MotorType.kBrushless);
 		limitSwitchCone = new DigitalInput(0);
 		colorSensorCube = new ColorSensorV3(Port.kOnboard);
+		colorMatch = new ColorMatch();
+		colorMatch.addColorMatch(Color.kPurple);
+		colorMatch.addColorMatch(Color.kYellow);
+
 		// Reset state machine
 		reset();
 	}
@@ -115,30 +122,38 @@ public class SpinningIntakeFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		System.out.println(colorSensorCube.getColor());
-		System.out.println(currentState);
+
 		currentState = nextState(input);
 	}
 
 	/*-------------------------NON HANDLER METHODS ------------------------- */
 	private boolean isCubeDetected() {
 		boolean objectDetected = colorSensorCube.getProximity() > COLOR_PROXIMITY_THRESHOLD;
-		boolean isCone = false;
+		boolean isCube = false;
 
 		String colorOfObject = colorSensorCube.getColor().toHexString();
 		int  r =  Integer.valueOf(colorOfObject.substring(RED_START, RED_END), HEX_BASE);
 		int  g =  Integer.valueOf(colorOfObject.substring(GREEN_START, GREEN_END), HEX_BASE);
 		int  b =  Integer.valueOf(colorOfObject.substring(BLUE_START, BLUE_END), HEX_BASE);
-		if (r >= CONE_RED_LOW && r <= CONE_RED_HIGH && b >= CONE_BLUE_LOW && b <= CONE_BLUE_HIGH
-			&& g >= CONE_GREEN_LOW && g <= CONE_GREEN_HIGH) {
-			isCone = true;
+
+		System.out.println(r + " " + g + " " + b);
+
+		if (objectDetected && withinRange(r, RED_AVG)
+			&& withinRange(g, GREEN_AVG) && withinRange(b, BLUE_AVG)) {
+			System.out.println("THIS IS A CUBE");
+			isCube = true;
+		} else if (objectDetected) {
+			System.out.println("THIS IS A CONE");
 		}
 
-		return !isCone && objectDetected;
+		return false;
+		//return !isCone && objectDetected;
+	}
 
+	private boolean withinRange(int a, int b) {
+		return Math.abs(a - b) <= TOLERANCE;
 	}
 	private boolean isLimitSwitchConeActivated() {
-		//FIX THIS LATER;
 		return limitSwitchCone.get();
 	}
 
