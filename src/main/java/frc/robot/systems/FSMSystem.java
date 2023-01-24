@@ -47,14 +47,10 @@ public class FSMSystem {
 
 	//pure pursuit
 	private int stateCounter = 1;
-	private int partitions = 12; // should be even
-	private double[][] waypoints = new double[2][partitions + 1];
+	private double[][] waypoints = new double[2][Constants.PARTITIONS + 1];
 	private int target = -1;
-	private double innerVelocity = 0.5; // in/s
-	private double outerVelocity = 0.5; // in/s
 	private int direction = 1;
 	private int pointNum = 0;
-	private double lookAheadDistance = 20;
 	private boolean firstRun = true;
 
 	//go to pos
@@ -157,7 +153,7 @@ public class FSMSystem {
 				break;
 
 			// case PURE_PERSUIT:
-			// 	handlePurePursuit(input, 0, 0, 50, 0, 90, -30); 
+			// 	handlePurePursuit(input, 0, 0, 50, 0, 90, -30);
 			// 	break;
 
 			default:
@@ -178,13 +174,13 @@ public class FSMSystem {
 	 */
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
-			
+
 			case path1:
 				return FSMState.path1;
 
 			case path2:
 				return FSMState.path2;
-			
+
 			case path3:
 				return FSMState.path3;
 
@@ -330,33 +326,34 @@ public class FSMSystem {
 		double roboY = roboYPos;
 		double currentAngle = (-gyro.getAngle()) % Constants.FULL_CIRCLE;
 		System.out.println("x: " + roboX + " y: " + roboY);
+		double innerVelocity = 10;
 		
 		if (firstRun) {
 			calculateWaypoints(x1, y1, mx, my, x2, y2);
 			firstRun = false;
 		}
 
-		if (roboX < x2 + 4 && roboX > x2 - 4 && roboY < y2 + 4 && roboY > y2 - 4) { //within range of endpoint
+		if (roboX < x2 + Constants.MOVE_THRESHOLD && roboX > x2 - Constants.MOVE_THRESHOLD && roboY < y2 + Constants.MOVE_THRESHOLD && roboY > y2 - Constants.MOVE_THRESHOLD) { // within range of endpoint
 			System.out.println("STOP");
-			resetPurePursuitProperties(8, 10, 0);
+			resetPurePursuitProperties();
 		}
 
 		if (target != findTargetPoint(roboX, roboY)) { // when there is a new target point
 
 			pointNum++; // robot has advanced to a new point
 			target = findTargetPoint(roboX, roboY);
-			innerVelocity = calculateInnerCurveVelocity(currentAngle, roboX, roboY, waypoints[0][target], waypoints[1][target], outerVelocity);
+			innerVelocity = calculateInnerCurveVelocity(currentAngle, roboX, roboY, waypoints[0][target], waypoints[1][target], Constants.OUTER_VELOCITY);
 		}
 
 		// set motor powers (note: velcoties must be between [-7.9, +7.9])
 		if (direction == -1) { // turning left
 			leftMotor.set(-innerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 			leftMotor2.set(-innerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
-			rightMotor.set(outerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
-			rightMotor2.set(outerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
+			rightMotor.set(Constants.OUTER_VELOCITY / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
+			rightMotor2.set(Constants.OUTER_VELOCITY / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 		} else if (direction == 1) { // turning right
-			leftMotor.set(-outerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
-			leftMotor2.set(-outerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
+			leftMotor.set(-Constants.OUTER_VELOCITY / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
+			leftMotor2.set(-Constants.OUTER_VELOCITY / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 			rightMotor.set(innerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 			rightMotor2.set(innerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 		}
@@ -372,17 +369,17 @@ public class FSMSystem {
 	 * @param y2 ending y position
 	 */
 	public void calculateWaypoints(double x1, double y1, double mx, double my, double x2, double y2) {
-		double dx1 = 2 * (mx - x1) / partitions;
-		double dy1 = 2 * (my - y1) / partitions;
-		for (int i = 0; i <= partitions / 2; i++) {
+		double dx1 = 2 * (mx - x1) / Constants.PARTITIONS;
+		double dy1 = 2 * (my - y1) / Constants.PARTITIONS;
+		for (int i = 0; i <= Constants.PARTITIONS / 2; i++) {
 			waypoints[0][i] = x1 + i * dx1;
 			waypoints[1][i] = y1 + i * dy1;
 		}
-		double dx2 = 2 * (x2 - mx) / partitions;
-		double dy2 = 2 * (y2 - my) / partitions;
-		for (int i = partitions / 2 + 1; i <= partitions; i++) {
-			waypoints[0][i] = mx + (i - partitions / 2) * dx2;
-			waypoints[1][i] = my + (i - partitions / 2) * dy2;
+		double dx2 = 2 * (x2 - mx) / Constants.PARTITIONS;
+		double dy2 = 2 * (y2 - my) / Constants.PARTITIONS;
+		for (int i = Constants.PARTITIONS / 2 + 1; i <= Constants.PARTITIONS; i++) {
+			waypoints[0][i] = mx + (i - Constants.PARTITIONS / 2) * dx2;
+			waypoints[1][i] = my + (i - Constants.PARTITIONS / 2) * dy2;
 		}
 		System.out.println(Arrays.deepToString(waypoints));
 	}
@@ -398,8 +395,8 @@ public class FSMSystem {
 		int target = -1; // index of target point
 		for (int i = pointNum; i < waypoints[0].length; i++) {
 			double dist = Math.hypot(waypoints[0][i] - x, waypoints[1][i] - y); // distance between current pos and potential target point
-			if (Math.abs(lookAheadDistance - dist) <= closestDist) {
-				closestDist = Math.abs(lookAheadDistance - dist);
+			if (Math.abs(Constants.LOOK_DISTANCE - dist) <= closestDist) {
+				closestDist = Math.abs(Constants.LOOK_DISTANCE - dist);
 				target = i;
 			}
 		}
@@ -445,14 +442,10 @@ public class FSMSystem {
 	 * @param lookAheadDistance distance ahead of robot to aim for next waypoint
 	 * @param outerVelocity velocity of outer wheel
 	 */
-	public void resetPurePursuitProperties(int partitions, double lookAheadDistance, double outerVelocity) {
-		this.partitions = partitions; // should be even
-		waypoints = new double[2][partitions + 1];
-		this.lookAheadDistance = lookAheadDistance;
+	public void resetPurePursuitProperties() {
+		waypoints = new double[2][Constants.PARTITIONS + 1];
 		target = -1;
 		pointNum = 0;
-		innerVelocity = outerVelocity;; // in/s
-		this.outerVelocity = outerVelocity; // in/s
 		firstRun = true;
 		stateCounter++;
 	}
@@ -630,13 +623,13 @@ public class FSMSystem {
 			}
 		} else if (state == 2) {
 			System.out.println("back 3");
-				leftMotor.set(Constants.MOVE_POWER);
-				rightMotor.set(-Constants.MOVE_POWER);
-				if (Math.abs(roboX + 9) <= Constants.MOVE_THRESHOLD) {
-					leftMotor.set(0);
-					rightMotor.set(0);
-					state++;
-				}
+			leftMotor.set(Constants.MOVE_POWER);
+			rightMotor.set(-Constants.MOVE_POWER);
+			if (Math.abs(roboX + 9) <= Constants.MOVE_THRESHOLD) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			}
 		} else if (state == 3) { //turning right
 			handleTurnState(input, 243.9);
 			if (finishedTurning) state++;
@@ -650,7 +643,9 @@ public class FSMSystem {
 			}
 		} else if (state == 5) { //turning left
 			handleTurnState(input, 63.9);
-			if (finishedTurning) state++;
+			if (finishedTurning) {
+				state++;
+			}
 		} else if (state == 6) {
 			leftMotor.set(Constants.MOVE_POWER);
 			rightMotor.set(-Constants.MOVE_POWER);
