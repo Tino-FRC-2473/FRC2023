@@ -215,13 +215,8 @@ public class DriveFSMSystem {
 
 		if (isInArcadeDrive) {
 
-			// System.out.println("VELOC: " + gyro.getVelocityX());
-			// System.out.print("POPO: " + leftMotor.get());
-
 			currentEncoderPos = ((leftMotor.getEncoder().getPosition()
 				- rightMotor.getEncoder().getPosition()) / 2.0);
-
-			// updateLineOdometryTele(gyroAngleForOdo);
 
 			double steerAngle = input.getSteerAngle();
 			double currentLeftPower = leftMotor.get();
@@ -250,8 +245,6 @@ public class DriveFSMSystem {
 				power = DriveFunctions.turnInPlace(0, steerAngle);
 			}
 
-			// System.out.println("ANGLE: " + getAngleToHub());
-
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
 
@@ -265,9 +258,6 @@ public class DriveFSMSystem {
 
 	}
 
-	// ——————————————————————————————————————————————————————————————— //
-	// ———————Below commented out due to not having gyro library—————— //
-	// ——————————————————————————————————————————————————————————————— //
 	/**
 	 * Handle behavior in TURNING_STATE.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
@@ -313,9 +303,6 @@ public class DriveFSMSystem {
 		rightMotor.set(0);
 	}
 
-	// ——————————————————————————————————————————————————————————————— //
-	// ———————Below commented out due to not having gyro library—————— //
-	// ——————————————————————————————————————————————————————————————— //
 	/**
 	* Gets the heading from the gyro.
 	* @return the gyro heading
@@ -352,7 +339,6 @@ public class DriveFSMSystem {
 
 		System.out.println("X Pos: " + roboXPos);
 		System.out.println("Y Pos: " + roboYPos);
-		// System.out.println("Gyro: " + gyroAngleForOdo);
 
 	}
 
