@@ -430,55 +430,55 @@ public class FSMSystem {
 	}
 
 	boolean finishedTurning = false;
-
+	
 	public void handleTurnState(TeleopInput input, double degrees) {
-        if (input != null) {
-            return;
-        }
+		if (input != null) {
+			 return;
+		}
 		finishedTurning = false;
-        degrees *= 0.987;
-        System.out.println(getHeading());
-        double error = degrees - getHeading();
-        if (error > Constants.HALF_CIRCLE) {
-            error -= Constants.FULL_CIRCLE;
-        }
-        if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
-            finishedTurning = true;
-            leftMotor.set(0);
-            rightMotor.set(0);
-            return;
-        }
-        double power = Math.abs(error) / Constants.TURN_ERROR_POWER_RATIO;
-        if (power < Constants.MIN_TURN_POWER) {
-            power = Constants.MIN_TURN_POWER;
-        }
-        power *= (error < 0 && error > -Constants.HALF_CIRCLE) ? -1 : 1;
-        leftMotor.set(power);
-        rightMotor.set(power);
-    }
+		degrees *= 0.987;
+		System.out.println(getHeading());
+		double error = degrees - getHeading();
+		if (error > Constants.HALF_CIRCLE) {
+			error -= Constants.FULL_CIRCLE;
+		}
+		if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
+			finishedTurning = true;
+			leftMotor.set(0);
+			rightMotor.set(0);
+			return;
+		}
+		double power = Math.abs(error) / Constants.TURN_ERROR_POWER_RATIO;
+		if (power < Constants.MIN_TURN_POWER) {
+			power = Constants.MIN_TURN_POWER;
+		}
+		power *= (error < 0 && error > -Constants.HALF_CIRCLE) ? -1 : 1;
+		leftMotor.set(power);
+		rightMotor.set(power);
+	}
 
 	double startAngle = 0;
 
 	/**
-    * Gets the heading from the gyro.
-    * @return the gyro heading
-    */
-    public double getHeading() {
-        // double angle = startAngle - gyro.getYaw();
-        double angle = startAngle - gyro.getAngle();
-        if (angle < 0) {
-            angle += Constants.FULL_CIRCLE;
-        }
-        if (angle > Constants.FULL_CIRCLE) {
-            angle -= Constants.FULL_CIRCLE;
-        }
-        return angle;
-    }
+	* Gets the heading from the gyro.
+	* @return the gyro heading
+	*/
+	public double getHeading() {
+		// double angle = startAngle - gyro.getYaw();
+		double angle = startAngle - gyro.getAngle();
+		if (angle < 0) {
+			angle += Constants.FULL_CIRCLE;
+		}
+		if (angle > Constants.FULL_CIRCLE) {
+			angle -= Constants.FULL_CIRCLE;
+		}
+		return angle;
+	}
 	
 	int state = 0;
 		public void path1(TeleopInput input) {
 		if (input != null) {
-		    return;
+			return;
 		}
 		double roboX = -roboXPos;
 		double roboY = roboYPos;
@@ -580,15 +580,15 @@ public class FSMSystem {
 			}
 		} else if (state == 2) {
 			System.out.println("back 3");
-            		leftMotor.set(Constants.MOVE_POWER);
-			    rightMotor.set(-Constants.MOVE_POWER);
-			    if (Math.abs(roboX + 9) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				state++;
-			    }
-      		} else if (state == 3) { //turning right
-            		handleTurnState(input, 243.9);
+				leftMotor.set(Constants.MOVE_POWER);
+				rightMotor.set(-Constants.MOVE_POWER);
+				if (Math.abs(roboX + 9) <= Constants.MOVE_THRESHOLD) {
+					leftMotor.set(0);
+					rightMotor.set(0);
+					state++;
+				}
+		} else if (state == 3) { //turning right
+			handleTurnState(input, 243.9);
 			if (finishedTurning) state++;
 		} else if (state == 4) {
 			leftMotor.set(Constants.MOVE_POWER);
@@ -603,12 +603,12 @@ public class FSMSystem {
 			if (finishedTurning) state++;
 		} else if (state == 6) {
 			leftMotor.set(Constants.MOVE_POWER);
-            rightMotor.set(-Constants.MOVE_POWER);
+			rightMotor.set(-Constants.MOVE_POWER);
 			if (Math.abs(roboX + 83.9) <= 5 && Math.abs(roboY - 66.1) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
-				//state++;
-            }
+					//state++;
+			}
 		}
 	}
 }
