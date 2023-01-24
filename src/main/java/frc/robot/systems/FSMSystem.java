@@ -151,25 +151,9 @@ public class FSMSystem {
 				path3(input);
 				break;
 
-			case P1:
-				goToPos(input, 30.876, 0);
-				break;
-
-			case P2:
-				goToPos(input, -105.617, 0);
-				break;
-
-			case P3:
-				goToPos(input, 56.814, 117.516);
-				break;
-
-			case P4:
-				goToPos(input, 0, 0);
-				break;	
-
-			case PURE_PERSUIT:
-				handlePurePursuit(input, 0, 0, 50, 0, 90, -30); 
-				break;
+			// case PURE_PERSUIT:
+			// 	handlePurePursuit(input, 0, 0, 50, 0, 90, -30); 
+			// 	break;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -198,28 +182,6 @@ public class FSMSystem {
 			
 			case path3:
 				return FSMState.path3;
-
-			case P1:
-				if (stateCounter == 1) {
-					return FSMState.P1;
-				} else if (stateCounter == 2) {
-					return FSMState.P2;
-				} else if (stateCounter == 3) {
-					return FSMState.P3;
-				} else if (stateCounter == 4) {
-					return FSMState.P4;
-				}
-
-			case P2:
-				if (stateCounter == 1) {
-					return FSMState.P1;
-				} else if (stateCounter == 2) {
-					return FSMState.P2;
-				} else if (stateCounter == 3) {
-					return FSMState.P3;
-				} else if (stateCounter == 4) {
-					return FSMState.P4;
-			}
 
 			case PURE_PERSUIT:
 				if (stateCounter == 0) {
@@ -255,24 +217,24 @@ public class FSMSystem {
 		System.out.println("dx " + deltaX + " dy " + deltaY);
 
 		// assume unit circle angles (east = 0, positive counterclockwise)
-		double currentAngle = (-gyro.getAngle()) % 360;
+		double currentAngle = (-gyro.getAngle()) % Constants.FULL_CIRCLE;
 		System.out.println("current angle " + currentAngle);
 
 		// calculates turn angle
 		double angle;
 		if (deltaX == 0 && deltaY >= 0) {
-			angle = 90;
+			angle = Constants.QUARTER_CIRCLE;
 		} else if (deltaX == 0 && deltaY < 0) {
-			angle = 270;
+			angle = Constants.THREE_QUARTER_CIRCLE;
 		} else {
 			angle = Math.toDegrees(Math.atan(deltaY / deltaX));
 		}
 
 		if (deltaX < 0) {
-			angle += 180;
+			angle += Constants.HALF_CIRCLE;
 		}
 		if (deltaX > 0 && deltaY < 0) {
-			angle += 360;
+			angle += Constants.HALF_CIRCLE;
 		}
 
 		System.out.println("turn angle " + angle);
@@ -280,8 +242,8 @@ public class FSMSystem {
 		// calculate turn amount
 		double turnAmount = angle - currentAngle;
 
-		if (Math.abs(turnAmount - 360) < Math.abs(turnAmount)) {
-			turnAmount -= 360;
+		if (Math.abs(turnAmount - Constants.FULL_CIRCLE) < Math.abs(turnAmount)) {
+			turnAmount -= Constants.FULL_CIRCLE;
 		}
 
 		System.out.println("turn amount: " + turnAmount);
@@ -349,7 +311,7 @@ public class FSMSystem {
 
 		double roboX = -roboXPos;
 		double roboY = roboYPos;
-		double currentAngle = (-gyro.getAngle()) % 360;
+		double currentAngle = (-gyro.getAngle()) % Constants.FULL_CIRCLE;
 		System.out.println("x: " + roboX + " y: " + roboY);
 		
 		if (firstRun) {
@@ -400,7 +362,7 @@ public class FSMSystem {
 	}
 
 	public int findTargetPoint(double x, double y) {
-		double closestDist = 1000000;
+		double closestDist = Integer.MAX_VALUE;
 		int target = -1; // index of target point
 		for (int i = pointNum; i < waypoints[0].length; i++) {
 			double dist = Math.hypot(waypoints[0][i] - x, waypoints[1][i] - y); // distance between current pos and potential target point
@@ -477,8 +439,8 @@ public class FSMSystem {
         degrees *= 0.987;
         System.out.println(getHeading());
         double error = degrees - getHeading();
-        if (error > 180) {
-            error -= 360;
+        if (error > Constants.HALF_CIRCLE) {
+            error -= Constants.FULL_CIRCLE;
         }
         if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
             finishedTurning = true;
@@ -490,7 +452,7 @@ public class FSMSystem {
         if (power < Constants.MIN_TURN_POWER) {
             power = Constants.MIN_TURN_POWER;
         }
-        power *= (error < 0 && error > -180) ? -1 : 1;
+        power *= (error < 0 && error > -Constants.HALF_CIRCLE) ? -1 : 1;
         leftMotor.set(power);
         rightMotor.set(power);
     }
@@ -505,10 +467,10 @@ public class FSMSystem {
         // double angle = startAngle - gyro.getYaw();
         double angle = startAngle - gyro.getAngle();
         if (angle < 0) {
-            angle += 360;
+            angle += Constants.FULL_CIRCLE;
         }
-        if (angle > 360) {
-            angle -= 360;
+        if (angle > Constants.FULL_CIRCLE) {
+            angle -= Constants.FULL_CIRCLE;
         }
         return angle;
     }
@@ -526,7 +488,7 @@ public class FSMSystem {
 		if (state == 0) {
 			leftMotor.set(-Constants.MOVE_POWER);
 			rightMotor.set(Constants.MOVE_POWER);
-			if (Math.abs(roboX - 30.8) <= 5) {
+			if (Math.abs(roboX - 30.8) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				state++;
@@ -535,7 +497,7 @@ public class FSMSystem {
 			System.out.println("entered 1");
 			leftMotor.set(Constants.MOVE_POWER);
 			rightMotor.set(-Constants.MOVE_POWER);
-			if (Math.abs(roboX + 105.6) <= 5) {
+			if (Math.abs(roboX + 105.6) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				state++;
@@ -543,7 +505,7 @@ public class FSMSystem {
 		} else if (state == 2) {
 			leftMotor.set(-Constants.MOVE_POWER);
 			rightMotor.set(Constants.MOVE_POWER);
-			if (Math.abs(roboX + 50.1) <= 5) {
+			if (Math.abs(roboX + 50.1) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				System.out.println("end");
@@ -566,7 +528,7 @@ public class FSMSystem {
 			leftMotor.set(-Constants.MOVE_POWER);
 			rightMotor.set(Constants.MOVE_POWER);
 			
-			if (Math.abs(roboX - 49.4) <= 5) {
+			if (Math.abs(roboX - 49.4) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				state++;
@@ -576,7 +538,7 @@ public class FSMSystem {
 			leftMotor.set(Constants.MOVE_POWER);
 			rightMotor.set(-Constants.MOVE_POWER);
 			System.out.println("dist " + Math.abs(roboX + 47.7));
-			if (Math.abs(roboX + 47.7) <= 5) {
+			if (Math.abs(roboX + 47.7) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				System.out.println("end");
@@ -596,13 +558,13 @@ public class FSMSystem {
 		System.out.println(gyro.getAngle());
 	
 		if (state == 0) {
-			handleTurnState(input, (180 - 63.9));
+			handleTurnState(input, (63.9));
 			if (finishedTurning) state--;
 		}
 		else if (state == 0) {
 			leftMotor.set(Constants.MOVE_POWER);
 			rightMotor.set(-Constants.MOVE_POWER);		
-			if (Math.abs(roboX + 191) <= 1.5) {
+			if (Math.abs(roboX + 191) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				state++;
@@ -611,7 +573,7 @@ public class FSMSystem {
 			System.out.println("entered 1");
 			leftMotor.set(-Constants.MOVE_POWER);
 			rightMotor.set(Constants.MOVE_POWER);
-			if (Math.abs(roboX) <= 1.5) {
+			if (Math.abs(roboX) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				state++;
@@ -620,7 +582,7 @@ public class FSMSystem {
 			System.out.println("back 3");
             		leftMotor.set(Constants.MOVE_POWER);
 			    rightMotor.set(-Constants.MOVE_POWER);
-			    if (Math.abs(roboX + 9) <= 1.5) {
+			    if (Math.abs(roboX + 9) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				state++;
@@ -631,7 +593,7 @@ public class FSMSystem {
 		} else if (state == 4) {
 			leftMotor.set(Constants.MOVE_POWER);
 			rightMotor.set(-Constants.MOVE_POWER);
-			if (Math.abs(roboX + 31.5) <= 5 && Math.abs(roboY - 63.1) <= 5) {
+			if (Math.abs(roboX + 31.5) <= 5 && Math.abs(roboY - 63.1) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				state++;
@@ -642,7 +604,7 @@ public class FSMSystem {
 		} else if (state == 6) {
 			leftMotor.set(Constants.MOVE_POWER);
             rightMotor.set(-Constants.MOVE_POWER);
-			if (Math.abs(roboX + 83.9) <= 5 && Math.abs(roboY - 66.1) <= 5) {
+			if (Math.abs(roboX + 83.9) <= 5 && Math.abs(roboY - 66.1) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				//state++;
