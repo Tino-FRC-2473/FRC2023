@@ -281,9 +281,6 @@ public class DriveFSMSystem {
 
 	}
 
-	// ——————————————————————————————————————————————————————————————— //
-	// ———————Below commented out due to not having gyro library—————— //
-	// ——————————————————————————————————————————————————————————————— //
 	/**
 	 * Handle behavior in TURNING_STATE.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
@@ -329,9 +326,6 @@ public class DriveFSMSystem {
 		rightMotor.set(0);
 	}
 
-	// ——————————————————————————————————————————————————————————————— //
-	// ———————Below commented out due to not having gyro library—————— //
-	// ——————————————————————————————————————————————————————————————— //
 	/**
 	* Gets the heading from the gyro.
 	* @return the gyro heading
@@ -368,7 +362,7 @@ public class DriveFSMSystem {
 
 		System.out.println("X Pos: " + roboXPos);
 		System.out.println("Y Pos: " + roboYPos);
-		// System.out.println("Gyro: " + gyroAngleForOdo);
+		System.out.println("Gyro: " + gyroAngleForOdo);
 
 	}
 
