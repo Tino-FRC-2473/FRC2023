@@ -29,31 +29,32 @@ public class PhotonCameraWrapper {
 		/** RobotPoseEstimator object to estimate position of robot.*/
 	private PhotonPoseEstimator robotPoseEstimator;
 
-	public static final double INVALID_TURN_RETURN = 360;
+	public static final double INVALID_TURN_RETURN_DEGREES = 360;
 
-	public static final double FIELD_WIDTH = 500;
-	public static final double FIELD_LENGTH = 500;
+	public static final double FIELD_WIDTH_METERS = 500;
+	public static final double FIELD_LENGTH_METERS = 500;
 
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
 		ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
-		atList.add(new AprilTag(1, new Pose3d(AprilTagConstants.APRILTAG_1_X,
-			AprilTagConstants.APRILTAG_1_Y, AprilTagConstants.APRILTAG_1_HEIGHT,
-			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE))));
+		atList.add(new AprilTag(1, new Pose3d(AprilTagConstants.APRILTAG_1_X_METERS,
+			AprilTagConstants.APRILTAG_1_Y_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
+			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE_RADIANS))));
 
 		AprilTagFieldLayout atfl =
 				new AprilTagFieldLayout(atList,
-										FIELD_LENGTH,
-										FIELD_WIDTH);
+										FIELD_LENGTH_METERS,
+										FIELD_WIDTH_METERS);
 
 		photonCamera =
 				new PhotonCamera("OV5647");
 		robotPoseEstimator = new PhotonPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY,
 		photonCamera, new Transform3d(
-			new Translation3d(VisionConstants.CAM_OFFSET_X, VisionConstants.CAM_OFFSET_Y,
-			VisionConstants.CAM_HEIGHT),
+			new Translation3d(VisionConstants.CAM_OFFSET_X_METERS,
+			VisionConstants.CAM_OFFSET_Y_METERS,
+			VisionConstants.CAM_HEIGHT_METERS),
 			new Rotation3d(
-					0, VisionConstants.CAM_PITCH,
+					0, VisionConstants.CAM_PITCH_RADIANS,
 					0)));
 	}
 	/**
@@ -72,8 +73,8 @@ public class PhotonCameraWrapper {
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return PhotonUtils.calculateDistanceToTargetMeters(
-				VisionConstants.CAM_HEIGHT, AprilTagConstants.APRILTAG_1_HEIGHT,
-				VisionConstants.CAM_PITCH, Units.degreesToRadians(
+				VisionConstants.CAM_HEIGHT_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
+				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
 					result.getBestTarget().getPitch()));
 		}
 		return -1;
@@ -84,8 +85,8 @@ public class PhotonCameraWrapper {
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return PhotonUtils.calculateDistanceToTargetMeters(
-				VisionConstants.CAM_HEIGHT, AprilTagConstants.APRILTAG_1_HEIGHT,
-				VisionConstants.CAM_PITCH, Units.degreesToRadians(
+				VisionConstants.CAM_HEIGHT_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
+				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
 					result.getBestTarget().getPitch()));
 		}
 		return -1;
@@ -98,7 +99,7 @@ public class PhotonCameraWrapper {
 		if (result.hasTargets()) {
 			return result.getBestTarget().getYaw();
 		}
-		return INVALID_TURN_RETURN;
+		return INVALID_TURN_RETURN_DEGREES;
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cube
  * and 360 if there are no cubes.*/
@@ -108,6 +109,6 @@ public class PhotonCameraWrapper {
 		if (result.hasTargets()) {
 			return result.getBestTarget().getYaw();
 		}
-		return INVALID_TURN_RETURN;
+		return INVALID_TURN_RETURN_DEGREES;
 	}
 }
