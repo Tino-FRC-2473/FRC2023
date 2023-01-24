@@ -10,7 +10,7 @@ import org.photonvision.EstimatedRobotPose;
 public class DrivePoseEstimator {
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 	private final DifferentialDriveKinematics kinematics =
-			new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
+			new DifferentialDriveKinematics(Constants.TRACK_WIDTH_METERS);
 
 	private final DifferentialDrivePoseEstimator poseEstimator =
 			new DifferentialDrivePoseEstimator(
