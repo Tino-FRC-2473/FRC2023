@@ -26,6 +26,8 @@ public class TeleopInput {
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
 	private static final int AIM_LOW_BUTTON = 11;
+	private static final int BALANCE_BUTTON = 2;
+
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private Joystick mechJoystick;
@@ -162,6 +164,14 @@ public class TeleopInput {
 	 */
 	public boolean isDriveJoystickTriggerPressedRaw() {
 		return driveJoystick.getTrigger();
+	}
+
+	/**
+	 * Get if balance button (2) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isDriveJoystickEngageButtonPressedRaw() {
+		return driveJoystick.getRawButton(BALANCE_BUTTON);
 	}
 
 	/* ------------------------ Steering Wheel ------------------------ */

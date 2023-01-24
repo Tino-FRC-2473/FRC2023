@@ -21,6 +21,7 @@ public class DriveFSMSystem {
 	// FSM state definitions
 	public enum FSMState {
 		TELE_STATE_2_MOTOR_DRIVE,
+		TELE_STATE_BALANCE,
 		TELE_STATE_MECANUM,
 		PURE_PURSUIT,
 		TURNING_STATE,
@@ -153,6 +154,10 @@ public class DriveFSMSystem {
 				handleTeleOp2MotorState(input);
 				break;
 
+			case TELE_STATE_BALANCE:
+				handleTeleOpBalanceState(input);
+				break;
+
 			case IDLE:
 				handleIdleState(input);
 				break;
@@ -181,6 +186,9 @@ public class DriveFSMSystem {
 		switch (currentState) {
 
 			case TELE_STATE_2_MOTOR_DRIVE:
+				if (input.isDriveJoystickEngageButtonPressedRaw()) {
+					return FSMState.TELE_STATE_BALANCE;
+				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 
 			case TELE_STATE_MECANUM:
@@ -214,7 +222,6 @@ public class DriveFSMSystem {
 		}
 
 		if (isInArcadeDrive) {
-
 			// System.out.println("VELOC: " + gyro.getVelocityX());
 			// System.out.print("POPO: " + leftMotor.get());
 
@@ -265,9 +272,22 @@ public class DriveFSMSystem {
 
 	}
 
-	// ——————————————————————————————————————————————————————————————— //
-	// ———————Below commented out due to not having gyro library—————— //
-	// ——————————————————————————————————————————————————————————————— //
+	/**
+	 * Handle behavior in TELE_STATE_2_MOTOR_DRIVE.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleTeleOpBalanceState(TeleopInput input) {
+		if (gyro.getPitch() >= -Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES
+			&& gyro.getPitch() <= Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES) {
+			leftPower = 0;
+			rightPower = 0;
+		} else {
+			leftPower = gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT_PID_P;
+			rightPower = -gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT_PID_P;
+		}
+	}
+
 	/**
 	 * Handle behavior in TURNING_STATE.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
@@ -352,7 +372,7 @@ public class DriveFSMSystem {
 
 		System.out.println("X Pos: " + roboXPos);
 		System.out.println("Y Pos: " + roboYPos);
-		// System.out.println("Gyro: " + gyroAngleForOdo);
+		System.out.println("Gyro: " + gyroAngleForOdo);
 
 	}
 
