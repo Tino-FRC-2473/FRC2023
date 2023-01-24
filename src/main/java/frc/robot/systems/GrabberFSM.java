@@ -4,6 +4,7 @@ package frc.robot.systems;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
+// import com.revrobotics.CANSparkMax;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -32,6 +33,10 @@ public class GrabberFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax grabberMotor;
+
+	// private AHRS imu;
+
+
 
 	/* ======================== Constructor ======================== */
 	/**
