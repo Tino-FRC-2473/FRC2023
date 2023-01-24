@@ -21,6 +21,7 @@ public class DriveFSMSystem {
 	// FSM state definitions
 	public enum FSMState {
 		TELE_STATE_2_MOTOR_DRIVE,
+		TELE_STATE_BALANCE,
 		TELE_STATE_MECANUM,
 		PURE_PURSUIT,
 		TURNING_STATE,
@@ -39,7 +40,6 @@ public class DriveFSMSystem {
 	private double rightPower;
 
 	private boolean finishedTurning;
-	private boolean inEngageMode = false;
 
 	private boolean isInArcadeDrive = true;
 
@@ -129,7 +129,6 @@ public class DriveFSMSystem {
 
 		roboXPos = 0;
 		roboYPos = 0;
-		inEngageMode = false;
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -153,6 +152,10 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				handleTeleOp2MotorState(input);
+				break;
+
+			case TELE_STATE_BALANCE:
+				handleTeleOpBalanceState(input);
 				break;
 
 			case IDLE:
@@ -183,6 +186,9 @@ public class DriveFSMSystem {
 		switch (currentState) {
 
 			case TELE_STATE_2_MOTOR_DRIVE:
+				if (input.isDriveJoystickEngageButtonPressedRaw()) {
+					return FSMState.TELE_STATE_BALANCE;
+				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 
 			case TELE_STATE_MECANUM:
@@ -217,21 +223,6 @@ public class DriveFSMSystem {
 
 		if (isInArcadeDrive) {
 
-			if (input.isDriveJoystickEngageButtonPressedRaw()) {
-				inEngageMode = true;
-				if (gyro.getPitch() >= -Constants.CHARGING_STATION_LEVELED_ERROR
-					&& gyro.getPitch() <= Constants.CHARGING_STATION_LEVELED_ERROR) {
-					leftPower = 0;
-					rightPower = 0;
-				} else if (gyro.getPitch() < -Constants.CHARGING_STATION_LEVELED_ERROR
-					|| gyro.getPitch() > Constants.CHARGING_STATION_LEVELED_ERROR) {
-					leftPower = gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT;
-					rightPower = -gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT;
-				}
-			} else {
-				inEngageMode = false;
-			}
-
 			currentEncoderPos = ((leftMotor.getEncoder().getPosition()
 				- rightMotor.getEncoder().getPosition()) / 2.0);
 
@@ -264,12 +255,8 @@ public class DriveFSMSystem {
 				power = DriveFunctions.turnInPlace(0, steerAngle);
 			}
 
-			// System.out.println("ANGLE: " + getAngleToHub());
-
-			if (!inEngageMode) {
-				leftPower = power.getLeftPower();
-				rightPower = power.getRightPower();
-			}
+			leftPower = power.getLeftPower();
+			rightPower = power.getRightPower();
 
 			rightMotor.set(rightPower);
 			leftMotor.set(leftPower);
@@ -279,6 +266,22 @@ public class DriveFSMSystem {
 			rightMotor.set(-(input.getmechJoystickY()));
 		}
 
+	}
+
+	/**
+	 * Handle behavior in TELE_STATE_2_MOTOR_DRIVE.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleTeleOpBalanceState(TeleopInput input) {
+		if (gyro.getPitch() >= -Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES
+			&& gyro.getPitch() <= Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES) {
+			leftPower = 0;
+			rightPower = 0;
+		} else {
+			leftPower = gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT_PID_P;
+			rightPower = -gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT_PID_P;
+		}
 	}
 
 	/**
