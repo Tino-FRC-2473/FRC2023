@@ -30,10 +30,10 @@ public class SpinningIntakeFSM {
 	private static final int COLOR_PROXIMITY_THRESHOLD = 100;
 
 	//CUBE RGB THRESHOLD VALUES
-	private static final int RED_AVG = 65;
-	private static final int GREEN_AVG = 97;
-	private static final int BLUE_AVG = 92;
-	private static final int TOLERANCE = 15;
+	private static final double RED_AVG = 65 / 256f;
+	private static final double GREEN_AVG = 97 / 256f;
+	private static final double BLUE_AVG = 92 / 256f;
+	private static final double TOLERANCE = 15 / 256f;
 
 
 	private static final int HEX_BASE = 16;
@@ -129,19 +129,15 @@ public class SpinningIntakeFSM {
 	/*-------------------------NON HANDLER METHODS ------------------------- */
 	private boolean isCubeDetected() {
 		boolean objectDetected = colorSensorCube.getProximity() > COLOR_PROXIMITY_THRESHOLD;
-		boolean isCube = false;
-
-		String colorOfObject = colorSensorCube.getColor().toHexString();
-		int  r =  Integer.valueOf(colorOfObject.substring(RED_START, RED_END), HEX_BASE);
-		int  g =  Integer.valueOf(colorOfObject.substring(GREEN_START, GREEN_END), HEX_BASE);
-		int  b =  Integer.valueOf(colorOfObject.substring(BLUE_START, BLUE_END), HEX_BASE);
+		double r =  colorSensorCube.getColor().red;
+		double g =  colorSensorCube.getColor().green;
+		double b =  colorSensorCube.getColor().blue;
 
 		System.out.println(r + " " + g + " " + b);
 
 		if (objectDetected && withinRange(r, RED_AVG)
 			&& withinRange(g, GREEN_AVG) && withinRange(b, BLUE_AVG)) {
 			System.out.println("THIS IS A CUBE");
-			isCube = true;
 		} else if (objectDetected) {
 			System.out.println("THIS IS A CONE");
 		}
@@ -150,7 +146,7 @@ public class SpinningIntakeFSM {
 		//return !isCone && objectDetected;
 	}
 
-	private boolean withinRange(int a, int b) {
+	private boolean withinRange(double a, double b) {
 		return Math.abs(a - b) <= TOLERANCE;
 	}
 	private boolean isLimitSwitchConeActivated() {
