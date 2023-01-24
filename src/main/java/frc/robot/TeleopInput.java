@@ -86,22 +86,37 @@ public class TeleopInput {
 	 * Get Button to pick up cube.
 	 * @return Axis value
 	 */
+<<<<<<< Updated upstream
 	public boolean getCubeButton() {
 		return mechJoystick.getRawButton(1);
+=======
+	public boolean isCubeButtonPressed() {
+		return mechJoystick.getRawButton(CUBE_BUTTON);
+>>>>>>> Stashed changes
 	}
 	/**
 	 * Get Button to pick up cone.
 	 * @return Axis value
 	 */
+<<<<<<< Updated upstream
 	public boolean getConeButton() {
 		return mechJoystick.getRawButton(2);
+=======
+	public boolean isConeButtonPressed() {
+		return mechJoystick.getRawButton(CONE_BUTTON);
+>>>>>>> Stashed changes
 	}
 	/**
 	 * Get Button to release.
 	 * @return Axis value
 	 */
+<<<<<<< Updated upstream
 	public boolean getOpenButton() {
 		return mechJoystick.getRawButton(RELEASE_BUTTON);
+=======
+	public boolean isOpenButtonPressed() {
+		return mechJoystick.getRawButton(OPEN_BUTTON);
+>>>>>>> Stashed changes
 	}
 	/* ======================== Private methods ======================== */
 

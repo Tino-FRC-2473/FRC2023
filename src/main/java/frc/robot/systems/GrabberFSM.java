@@ -20,10 +20,10 @@ public class GrabberFSM {
 		DONE
 	}
 	//FIX VALUES
-	private static final double MOTOR_RUN_POWER = 0.1f;
-	private static final double CONE_ENCODER_ROTATIONS = -1;
-	private static final double CUBE_ENCODER_ROTATIONS = -1;
-	private static final double OPEN_ENCODER_ROTATIONS = -1;
+	private static final double MOTOR_RUN_POWER = 0.03f;
+	private static final double CONE_ENCODER_ROTATIONS = 0;
+	private static final double CUBE_ENCODER_ROTATIONS = 1;
+	private static final double OPEN_ENCODER_ROTATIONS = 2;
 	private static final double ERROR = 0.1;
 
 	/* ======================== Private variables ======================== */
@@ -116,14 +116,15 @@ public class GrabberFSM {
 	 * @return FSM state for the next iteration
 	 */
 	private FSMState nextState(TeleopInput input) {
+		System.out.println(currentState);
 		switch (currentState) {
 			case START_STATE:
 				return FSMState.OPENING;
 			case OPENING:
-				if (input.getCubeButton()) {
+				if (input.isCubeButtonPressed()) {
 					return FSMState.CLOSING_CUBE;
 				}
-				if (input.getConeButton()) {
+				if (input.isConeButtonPressed()) {
 					return FSMState.CLOSING_CONE;
 				}
 				if (withinError(grabberMotor.getEncoder().getPosition(), OPEN_ENCODER_ROTATIONS)) {
@@ -131,10 +132,10 @@ public class GrabberFSM {
 				}
 				return FSMState.OPENING;
 			case CLOSING_CONE:
-				if (input.getOpenButton()) {
+				if (input.isOpenButtonPressed()) {
 					return FSMState.OPENING;
 				}
-				if (input.getCubeButton()) {
+				if (input.isCubeButtonPressed()) {
 					return FSMState.CLOSING_CUBE;
 				}
 				if (withinError(grabberMotor.getEncoder().getPosition(), CONE_ENCODER_ROTATIONS)) {
@@ -142,10 +143,10 @@ public class GrabberFSM {
 				}
 				return FSMState.CLOSING_CONE;
 			case CLOSING_CUBE:
-				if (input.getOpenButton()) {
+				if (input.isOpenButtonPressed()) {
 					return FSMState.OPENING;
 				}
-				if (input.getConeButton()) {
+				if (input.isConeButtonPressed()) {
 					return FSMState.CLOSING_CONE;
 				}
 				if (withinError(grabberMotor.getEncoder().getPosition(), CUBE_ENCODER_ROTATIONS)) {
@@ -153,13 +154,13 @@ public class GrabberFSM {
 				}
 				return FSMState.CLOSING_CUBE;
 			case DONE:
-				if (input.getOpenButton()) {
+				if (input.isOpenButtonPressed()) {
 					return FSMState.OPENING;
 				}
-				if (input.getConeButton()) {
+				if (input.isConeButtonPressed()) {
 					return FSMState.CLOSING_CONE;
 				}
-				if (input.getCubeButton()) {
+				if (input.isCubeButtonPressed()) {
 					return FSMState.CLOSING_CUBE;
 				}
 				return FSMState.DONE;
@@ -181,6 +182,7 @@ public class GrabberFSM {
 		double encoderValue = grabberMotor.getEncoder().getPosition();
 		if (encoderValue < OPEN_ENCODER_ROTATIONS) {
 			grabberMotor.set(MOTOR_RUN_POWER);
+			System.out.println("set motor to .1");
 		} else {
 			grabberMotor.set(-MOTOR_RUN_POWER);
 		}
@@ -202,6 +204,6 @@ public class GrabberFSM {
 		}
 	}
 	private void handleDoneState(TeleopInput input) {
-
+		grabberMotor.set(0);
 	}
 }

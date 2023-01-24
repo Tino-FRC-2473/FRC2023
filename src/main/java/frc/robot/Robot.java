@@ -7,7 +7,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 // Systems
+<<<<<<< Updated upstream
 import frc.robot.systems.FSMSystem;
+=======
+import frc.robot.systems.GrabberFSM;
+>>>>>>> Stashed changes
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -17,7 +21,11 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
+<<<<<<< Updated upstream
 	private FSMSystem fsmSystem;
+=======
+	private GrabberFSM fsmSystem;
+>>>>>>> Stashed changes
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -29,7 +37,11 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 
 		// Instantiate all systems here
+<<<<<<< Updated upstream
 		fsmSystem = new FSMSystem();
+=======
+		fsmSystem = new GrabberFSM();
+>>>>>>> Stashed changes
 	}
 
 	@Override
