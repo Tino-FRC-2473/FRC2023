@@ -62,6 +62,11 @@ public class FSMSystem {
 	private boolean moving = true;
 	private boolean complete = false;
 
+	//turn state
+	boolean finishedTurning = false;
+	double startAngle = 0;
+
+
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -200,6 +205,8 @@ public class FSMSystem {
 	 * Handle behavior in PURE_PERSUIT.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
+	 * @param x x destination position
+	 * @param y y destination position
 	 */
 	public void goToPos(TeleopInput input, double x, double y) {
 		if (input != null) {
@@ -212,8 +219,12 @@ public class FSMSystem {
 		double roboY = roboYPos;
 		double deltaX = (x - roboX);
 		double deltaY = (y - roboY);
-		if (deltaX > -1 && deltaX < 1) deltaX = 0;
-		if (deltaY > -1 && deltaY < 1) deltaY = 0;
+		if (deltaX > -1 && deltaX < 1) {
+			deltaX = 0;
+		}
+		if (deltaY > -1 && deltaY < 1) {
+			deltaY = 0;
+		}
 		System.out.println("dx " + deltaX + " dy " + deltaY);
 
 		// assume unit circle angles (east = 0, positive counterclockwise)
@@ -297,6 +308,12 @@ public class FSMSystem {
 	 * Handle behavior in PURE_PERSUIT.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
+	 * @param x1 starting x position
+	 * @param y1 starting y position
+	 * @param mx middle x position
+	 * @param my middle y position
+	 * @param x2 ending x position
+	 * @param y2 ending y position
 	 */
 	public void handlePurePursuit(TeleopInput input, double x1, double y1, double mx, double my, double x2, double y2) {
 
@@ -345,6 +362,15 @@ public class FSMSystem {
 		}
 	}
 
+	/**
+	 * Calculate waypoints for Pure Pursuit.
+	 * @param x1 starting x position
+	 * @param y1 starting y position
+	 * @param mx middle x position
+	 * @param my middle y position
+	 * @param x2 ending x position
+	 * @param y2 ending y position
+	 */
 	public void calculateWaypoints(double x1, double y1, double mx, double my, double x2, double y2) {
 		double dx1 = 2 * (mx - x1) / partitions;
 		double dy1 = 2 * (my - y1) / partitions;
@@ -361,6 +387,12 @@ public class FSMSystem {
 		System.out.println(Arrays.deepToString(waypoints));
 	}
 
+	/**
+	 * Finds the target waypoint given the current position.
+	 * @param x x position
+	 * @param y y position
+	 * @return target point index
+	*/
 	public int findTargetPoint(double x, double y) {
 		double closestDist = Integer.MAX_VALUE;
 		int target = -1; // index of target point
@@ -375,6 +407,16 @@ public class FSMSystem {
 		return target;
 	}
 
+	/**
+	 * Calculates velocity of inner wheel
+	 * @param startAngle starting angle
+	 * @param x1 starting x position
+	 * @param y1 starting y position
+	 * @param x2 ending x position
+	 * @param y2 ending y position
+	 * @param outerVelocity velocity of outer wheel
+	 * @return inner wheel velocity
+	 */
 	public double calculateInnerCurveVelocity(double startAngle, double x1, double y1, double x2, double y2, double outerVelocity) {
 		double theta = Math.atan2(y2 - y1, x2 - x1) - Math.toRadians(startAngle);
 		System.out.println("atan" + Math.toDegrees(Math.atan2(y2 - y1, x2 - x1)));
@@ -397,6 +439,12 @@ public class FSMSystem {
 		return innerVelocity;
 	}
 
+	/**
+	 * Reset method for pure pursuit
+	 * @param partitions number of waypoints
+	 * @param lookAheadDistance distance ahead of robot to aim for next waypoint
+	 * @param outerVelocity velocity of outer wheel
+	 */
 	public void resetPurePursuitProperties(int partitions, double lookAheadDistance, double outerVelocity) {
 		this.partitions = partitions; // should be even
 		waypoints = new double[2][partitions + 1];
@@ -429,8 +477,12 @@ public class FSMSystem {
 		// return new Translation2d(robotPos.getX() + dX, robotPos.getY() + dY);
 	}
 
-	boolean finishedTurning = false;
-	
+	/**
+	 * Tracks the robo's position on the field.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 * @param degrees amount of degrees to turn
+	 */
 	public void handleTurnState(TeleopInput input, double degrees) {
 		if (input != null) {
 			 return;
@@ -456,8 +508,6 @@ public class FSMSystem {
 		leftMotor.set(power);
 		rightMotor.set(power);
 	}
-
-	double startAngle = 0;
 
 	/**
 	* Gets the heading from the gyro.

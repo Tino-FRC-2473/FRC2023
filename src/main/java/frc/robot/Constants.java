@@ -22,8 +22,14 @@ public class Constants {
 	public static final double TURN_POWER = 0.05;
 	public static final double MOVE_POWER = 0.1;
 	public static final double TURN_THRESHOLD = 5;
-	public static final double MOVE_THRESHOLD = 3;
+	public static final double MOVE_THRESHOLD = 1.5;
 	public static final double ROBOT_WIDTH = 20;
+	public static final double PURE_PURSUIT_VELOCITY_CONSTANT = 7.95867322835;
+	public static final double HALF_CIRCLE = 180;
+	public static final double FULL_CIRCLE = 360;
+	public static final double QUARTER_CIRCLE = 90;
+	public static final double THREE_QUARTER_CIRCLE = 270;
+
 
 	// PFC Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
