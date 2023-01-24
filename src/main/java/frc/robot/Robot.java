@@ -5,7 +5,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-
+import frc.robot.systems.ArmFSM;
 // Systems
 import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
@@ -21,7 +21,7 @@ public class Robot extends TimedRobot {
 	// Systems
 	private ArmFSM armSystem;
 	private DriveFSMSystem driveSystem;
-	private SpinningIntakeFSM fsmSystem;
+	private SpinningIntakeFSM spinningIntakeFSM;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		armSystem = new ArmFSM();
 		driveSystem = new DriveFSMSystem();
-		fsmSystem = new SpinningIntakeFSM();
+		spinningIntakeFSM = new SpinningIntakeFSM();
 	}
 
 	@Override
@@ -43,12 +43,16 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Autonomous Init --------");
 		armSystem.reset();
 		driveSystem.resetAutonomous();
+		spinningIntakeFSM.reset();
+		//armFSMSystem.reset();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 		armSystem.update(null);
 		driveSystem.update(null);
+		spinningIntakeFSM.update(null);
+		//armFSMSystem.update(null);
 	}
 
 	@Override
@@ -56,12 +60,16 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Teleop Init --------");
 		armSystem.reset();
 		driveSystem.resetTeleop();
+		spinningIntakeFSM.reset();
+		//armFSMSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		armSystem.update(input);
 		driveSystem.update(input);
+		spinningIntakeFSM.update(input);
+		//armFSMSystem.update(input);
 	}
 
 	@Override
