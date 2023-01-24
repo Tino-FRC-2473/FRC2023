@@ -257,8 +257,6 @@ public class DriveFSMSystem {
 				power = DriveFunctions.turnInPlace(0, steerAngle);
 			}
 
-			// System.out.println("ANGLE: " + getAngleToHub());
-
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
 
@@ -333,9 +331,6 @@ public class DriveFSMSystem {
 		rightMotor.set(0);
 	}
 
-	// ——————————————————————————————————————————————————————————————— //
-	// ———————Below commented out due to not having gyro library—————— //
-	// ——————————————————————————————————————————————————————————————— //
 	/**
 	* Gets the heading from the gyro.
 	* @return the gyro heading
