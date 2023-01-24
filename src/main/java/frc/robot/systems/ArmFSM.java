@@ -20,14 +20,17 @@ public class ArmFSM {
 		IDLE,
 		ARM_MOVEMENT,
 		SHOOT_HIGH,
-		SHOOT_MID
+		SHOOT_MID,
+		SHOOT_LOW
 	}
 
 	private static final float TELEARM_MOTOR_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_POWER = 0.1f;
 	private static final double ARM_ENCODER_HIGH = 20;
 	private static final double ARM_ENCODER_MID = 10;
+	private static final double ARM_ENCODER_LOW = 10;
 	private static final double SHOOT_ANGLE_ENCODER = 10;
+	private static final double SHOOT_LOW_ANGLE_ENCODER = 5;
 	private static final double BALANCE_ANGLE_ENCODER = 5;
 	private static final double GRABBER_ANGLE_ENCODER = -5;
 	private static final double ARM_ENCODER_GRAB = 10;
@@ -113,6 +116,9 @@ public class ArmFSM {
 			case SHOOT_MID:
 				handleShootMidState(input);
 				break;
+			case SHOOT_LOW:
+				handleShootLowState(input);
+				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -163,6 +169,11 @@ public class ArmFSM {
 			case SHOOT_MID:
 				if (input.isShootMidButtonPressed()) {
 					return FSMState.SHOOT_MID;
+				}
+				return FSMState.IDLE;
+			case SHOOT_LOW:
+				if (input.isShootLowButtonPressed()) {
+					return FSMState.SHOOT_LOW;
 				}
 				return FSMState.IDLE;
 			default :
@@ -302,6 +313,39 @@ public class ArmFSM {
 		}
 	}
 
+	private void handleShootLowState(TeleopInput input) {
+		if (input != null) {
+			if (withinError(pivotMotor.getEncoder().getPosition(), SHOOT_LOW_ANGLE_ENCODER)) {
+				pivotMotor.set(0);
+			} else if (pivotMotor.getEncoder().getPosition() < SHOOT_LOW_ANGLE_ENCODER) {
+				//pivotMotor.set(PIVOT_MOTOR_POWER);
+				double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+							PIVOT_MOTOR_POWER);
+				if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+					return;
+				}
+				pivotMotor.set(pow);
+			} else if (pivotMotor.getEncoder().getPosition() > SHOOT_LOW_ANGLE_ENCODER) {
+				//pivotMotor.set(-PIVOT_MOTOR_POWER);
+				double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+							-PIVOT_MOTOR_POWER);
+				if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+					return;
+				}
+				pivotMotor.set(pow);
+			} else {
+				pivotMotor.set(0);
+			}
+			if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_LOW) {
+				teleArmMotor.set(TELEARM_MOTOR_POWER);
+			} else {
+				teleArmMotor.set(0);
+			}
+		} else {
+			teleArmMotor.set(0);
+			pivotMotor.set(0);
+		}
+	}
 	/**
 	 * Method to adjust the arm to go shoot on high height to use in autonomous.
 	 */
