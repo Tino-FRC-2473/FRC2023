@@ -224,35 +224,13 @@ public class FSMSystem {
 			case P2:
 				if (stateCounter == 1) {
 					return FSMState.P1;
-			} else if (stateCounter == 2) {
+				} else if (stateCounter == 2) {
 					return FSMState.P2;
 				} else if (stateCounter == 3) {
 					return FSMState.P3;
 				} else if (stateCounter == 4) {
 					return FSMState.P4;
 			}
-
-			// case P3:
-			// 	if (stateCounter == 1) {
-			// 		return FSMState.P1;
-			// } else if (stateCounter == 2) {
-			// 		return FSMState.P2;
-			// 	} else if (stateCounter == 3) {
-			// 		return FSMState.P3;
-			// 	} else if (stateCounter == 4) {
-			// 		return FSMState.P4;
-			// }
-
-			// case P4:
-			// 	if (stateCounter == 1) {
-			// 		return FSMState.P1;
-			// } else if (stateCounter == 2) {
-			// 		return FSMState.P2;
-			// 	} else if (stateCounter == 3) {
-			// 		return FSMState.P3;
-			// 	} else if (stateCounter == 4) {
-			// 		return FSMState.P4;
-			// }
 
 			case PURE_PERSUIT:
 				if (stateCounter == 0) {
@@ -303,7 +281,8 @@ public class FSMSystem {
 
 		if (deltaX < 0) {
 			angle += 180;
-		} if (deltaX > 0 && deltaY < 0) {
+		}
+		if (deltaX > 0 && deltaY < 0) {
 			angle += 360;
 		}
 
@@ -548,44 +527,44 @@ public class FSMSystem {
         }
         return angle;
     }
-
+	
 	int state = 0;
-    public void path1(TeleopInput input) {
-        if (input != null) {
-            return;
-        }
-        double roboX = -roboXPos;
-        double roboY = roboYPos;
+		public void path1(TeleopInput input) {
+		if (input != null) {
+		    return;
+		}
+		double roboX = -roboXPos;
+		double roboY = roboYPos;
 		System.out.println("x: " + roboX);
 		System.out.println("y: " + roboY);
 		System.out.println("state: " + state);
-        if (state == 0) {
-            leftMotor.set(-0.3);
-            rightMotor.set(0.3);
-            if (Math.abs(roboX - 30.8) <= 5) {
-                leftMotor.set(0);
-                rightMotor.set(0);
-                state++;
-            }
-        } else if (state == 1) {
+		if (state == 0) {
+			leftMotor.set(-0.3);
+			rightMotor.set(0.3);
+			if (Math.abs(roboX - 30.8) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			}
+		} else if (state == 1) {
 			System.out.println("entered 1");
-            leftMotor.set(0.3);
-            rightMotor.set(-0.3);
-            if (Math.abs(roboX + 105.6) <= 5) {
-                leftMotor.set(0);
-                rightMotor.set(0);
-                state++;
-            }
-        } else if (state == 2) {
-            leftMotor.set(-0.3);
-            rightMotor.set(0.3);
-            if (Math.abs(roboX + 50.1) <= 5) {
-                leftMotor.set(0);
-                rightMotor.set(0);
-                System.out.println("end");
-                //state++;
-            }
-        }
+			leftMotor.set(0.3);
+			rightMotor.set(-0.3);
+			if (Math.abs(roboX + 105.6) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			}
+		} else if (state == 2) {
+			leftMotor.set(-0.3);
+			rightMotor.set(0.3);
+			if (Math.abs(roboX + 50.1) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				System.out.println("end");
+				//state++;
+			}
+		}
 	}
 
 	public void path2(TeleopInput input) {
@@ -654,34 +633,34 @@ public class FSMSystem {
 			}
 		} else if (state == 2) {
 			System.out.println("back 3");
-            leftMotor.set(0.05);
-            rightMotor.set(-0.05);
-            if (Math.abs(roboX + 9) <= 1.5) {
-                leftMotor.set(0);
-                rightMotor.set(0);
-                state++;
-            }
-        } else if (state == 3) { //turning right
-            handleTurnState(input, 243.9);
+            		leftMotor.set(0.05);
+			    rightMotor.set(-0.05);
+			    if (Math.abs(roboX + 9) <= 1.5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			    }
+      		} else if (state == 3) { //turning right
+            		handleTurnState(input, 243.9);
 			if (finishedTurning) state++;
 		} else if (state == 4) {
-            leftMotor.set(0.1);
-            rightMotor.set(-0.1);
-            if (Math.abs(roboX + 31.5) <= 5 && Math.abs(roboY - 63.1) <= 5) {
-                leftMotor.set(0);
-                rightMotor.set(0);
-                state++;
-            }
+			leftMotor.set(0.1);
+			rightMotor.set(-0.1);
+			if (Math.abs(roboX + 31.5) <= 5 && Math.abs(roboY - 63.1) <= 5) {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				state++;
+			}
 		} else if (state == 5) { //turning left
-            handleTurnState(input, 63.9);
+			handleTurnState(input, 63.9);
 			if (finishedTurning) state++;
 		} else if (state == 6) {
-            leftMotor.set(0.1);
-            rightMotor.set(-0.1);
+			leftMotor.set(0.1);
+            		rightMotor.set(-0.1);
 			if (Math.abs(roboX + 83.9) <= 5 && Math.abs(roboY - 66.1) <= 5) {
-                leftMotor.set(0);
-                rightMotor.set(0);
-                //state++;
+				leftMotor.set(0);
+				rightMotor.set(0);
+				//state++;
             }
 		}
 	}
