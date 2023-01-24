@@ -222,8 +222,6 @@ public class DriveFSMSystem {
 		}
 
 		if (isInArcadeDrive) {
-			// System.out.println("VELOC: " + gyro.getVelocityX());
-			// System.out.print("POPO: " + leftMotor.get());
 
 			currentEncoderPos = ((leftMotor.getEncoder().getPosition()
 				- rightMotor.getEncoder().getPosition()) / 2.0);
