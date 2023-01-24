@@ -45,7 +45,7 @@ public class FSMSystem {
 	private double gyroAngleForOdo = 0;
 	private AHRS gyro;
 
-	//pure pursuit
+	// pure pursuit
 	private int stateCounter = 1;
 	private double[][] waypoints = new double[2][Constants.PARTITIONS + 1];
 	private int target = -1;
@@ -53,12 +53,12 @@ public class FSMSystem {
 	private int pointNum = 0;
 	private boolean firstRun = true;
 
-	//go to pos
+	// go to pos
 	private boolean turning = true;
 	private boolean moving = true;
 	private boolean complete = false;
 
-	//turn state
+	// turn state
 	boolean finishedTurning = false;
 	double startAngle = 0;
 
@@ -287,7 +287,7 @@ public class FSMSystem {
 		// complete or not
 		if (((Math.abs(roboY) > Math.abs(y) + Math.abs(deltaX) / 2 || Math.abs(roboX) > Math.abs(x) + Math.abs(deltaY) / 2)) && !complete) {
 			moving = false;
-			//System.out.println("HERE");
+			// System.out.println("HERE");
 		} else if (!(turnAmount >= -Constants.TURN_THRESHOLD && turnAmount <= Constants.TURN_THRESHOLD)) {
 			complete = false;
 		} else if (dist > Constants.MOVE_THRESHOLD) {
@@ -425,10 +425,10 @@ public class FSMSystem {
 		System.out.println("radius: " + radius);
 		double arcRatio;
 		if (radius > 0) {
-			direction = -1; //left
+			direction = -1; // left
 			arcRatio = (radius - Constants.ROBOT_WIDTH)/(radius + Constants.ROBOT_WIDTH); // ratio of inner and outer arc lengths
 		} else {
-			direction = 1; //right
+			direction = 1; // right
 			arcRatio = (radius + Constants.ROBOT_WIDTH)/(radius - Constants.ROBOT_WIDTH);
 		}
 		double innerVelocity = outerVelocity * (arcRatio); // (ensures that inner velcoity must be <= outer velocity)
@@ -531,7 +531,7 @@ public class FSMSystem {
 		if (state == 0) {
 			leftMotor.set(-Constants.MOVE_POWER);
 			rightMotor.set(Constants.MOVE_POWER);
-			if (Math.abs(roboX - 30.8) <= Constants.MOVE_THRESHOLD) {
+			if (Math.abs(roboX - Constants.P1X1) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				state++;
@@ -540,7 +540,7 @@ public class FSMSystem {
 			System.out.println("entered 1");
 			leftMotor.set(Constants.MOVE_POWER);
 			rightMotor.set(-Constants.MOVE_POWER);
-			if (Math.abs(roboX + 105.6) <= Constants.MOVE_THRESHOLD) {
+			if (Math.abs(roboX - Constants.P1X2) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				state++;
@@ -548,11 +548,11 @@ public class FSMSystem {
 		} else if (state == 2) {
 			leftMotor.set(-Constants.MOVE_POWER);
 			rightMotor.set(Constants.MOVE_POWER);
-			if (Math.abs(roboX + 50.1) <= Constants.MOVE_THRESHOLD) {
+			if (Math.abs(roboX - Constants.P1X3) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				System.out.println("end");
-				//state++;
+				// state++;
 			}
 		}
 	}
@@ -565,13 +565,12 @@ public class FSMSystem {
 		double roboY = roboYPos;
 		System.out.println("x: " + roboX);
 		System.out.println("y: " + roboY);
-		//System.out.println("state: " + state);
+		// System.out.println("state: " + state);
 		System.out.println("dist " + Math.abs(roboX - 49.4));
 		if (state == 0) {
 			leftMotor.set(-Constants.MOVE_POWER);
 			rightMotor.set(Constants.MOVE_POWER);
-			
-			if (Math.abs(roboX - 49.4) <= Constants.MOVE_THRESHOLD) {
+			if (Math.abs(roboX - Constants.P2X1) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				state++;
@@ -580,12 +579,11 @@ public class FSMSystem {
 			System.out.println("entered 1");
 			leftMotor.set(Constants.MOVE_POWER);
 			rightMotor.set(-Constants.MOVE_POWER);
-			System.out.println("dist " + Math.abs(roboX + 47.7));
-			if (Math.abs(roboX + 47.7) <= Constants.MOVE_THRESHOLD) {
+			if (Math.abs(roboX + Constants.P2X2) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
 				System.out.println("end");
-				//state++;
+				// state++;
 			}
 		}
 	}
@@ -601,10 +599,6 @@ public class FSMSystem {
 		System.out.println(gyro.getAngle());
 	
 		if (state == 0) {
-			handleTurnState(input, (63.9));
-			if (finishedTurning) state--;
-		}
-		else if (state == 0) {
 			leftMotor.set(Constants.MOVE_POWER);
 			rightMotor.set(-Constants.MOVE_POWER);		
 			if (Math.abs(roboX + 191) <= Constants.MOVE_THRESHOLD) {
@@ -630,8 +624,8 @@ public class FSMSystem {
 				rightMotor.set(0);
 				state++;
 			}
-		} else if (state == 3) { //turning right
-			handleTurnState(input, 243.9);
+		} else if (state == 3) { // turning right
+			handleTurnState(input, -Constants.P3TURN_AMT);
 			if (finishedTurning) state++;
 		} else if (state == 4) {
 			leftMotor.set(Constants.MOVE_POWER);
@@ -641,8 +635,8 @@ public class FSMSystem {
 				rightMotor.set(0);
 				state++;
 			}
-		} else if (state == 5) { //turning left
-			handleTurnState(input, 63.9);
+		} else if (state == 5) { // turning left
+			handleTurnState(input, Constants.P3TURN_AMT);
 			if (finishedTurning) {
 				state++;
 			}
@@ -652,7 +646,7 @@ public class FSMSystem {
 			if (Math.abs(roboX + 83.9) <= 5 && Math.abs(roboY - 66.1) <= Constants.MOVE_THRESHOLD) {
 				leftMotor.set(0);
 				rightMotor.set(0);
-					//state++;
+					// state++;
 			}
 		}
 	}
