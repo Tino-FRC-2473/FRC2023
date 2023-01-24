@@ -25,11 +25,19 @@ public class Constants {
 	public static final double MOVE_THRESHOLD = 1.5;
 	public static final double ROBOT_WIDTH = 20;
 	public static final double PURE_PURSUIT_VELOCITY_CONSTANT = 7.95867322835;
+	public static final int PARTITIONS = 8;
+	public static final int LOOK_DISTANCE = 10;
+	public static final double OUTER_VELOCITY = 10;
 	public static final double HALF_CIRCLE = 180;
 	public static final double FULL_CIRCLE = 360;
 	public static final double QUARTER_CIRCLE = 90;
 	public static final double THREE_QUARTER_CIRCLE = 270;
-
+	public static final double P1X1 = 30.8;
+	public static final double P1X2 = -105.6;
+	public static final double P1X3 = -50.1;
+	public static final double P2X1 = 49.4;
+	public static final double P2X2 = -47.7;
+	public static final double P3TURN_AMT = 63.9;
 
 	// PFC Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
