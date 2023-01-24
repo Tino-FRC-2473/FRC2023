@@ -229,7 +229,7 @@ public class DriveFSMSystem {
 			currentEncoderPos = ((leftMotor.getEncoder().getPosition()
 				- rightMotor.getEncoder().getPosition()) / 2.0);
 
-			// updateLineOdometryTele(gyroAngleForOdo);
+			updateLineOdometryTele(gyroAngleForOdo);
 
 			double steerAngle = input.getSteerAngle();
 			double currentLeftPower = leftMotor.get();
@@ -262,6 +262,9 @@ public class DriveFSMSystem {
 
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
+
+			System.out.println("X: " + roboXPos);
+			System.out.println("Y: " + roboYPos);
 
 			rightMotor.set(rightPower);
 			leftMotor.set(leftPower);
