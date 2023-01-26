@@ -22,7 +22,8 @@ public class ArmFSM {
 		ARM_MOVEMENT,
 		SHOOT_HIGH,
 		SHOOT_MID,
-		SHOOT_LOW_FORWARD
+		SHOOT_LOW_FORWARD,
+		SUBSTATION_PICKUP
 	}
 
 	private static final float TELEARM_MOTOR_POWER = 0.1f;
@@ -31,10 +32,14 @@ public class ArmFSM {
 	private static final double ARM_ENCODER_HIGH_BACKWARD = 40;
 	private static final double ARM_ENCODER_MID_FORWARD = 10;
 	private static final double ARM_ENCODER_MID_BACKWARD = 10;
+	private static final double ARM_ENCODER_SUBSTATION_FORWARD = 10;
+	private static final double ARM_ENCODER_SUBSTATION_BACKWARD = 10;
 	private static final double ARM_ENCODER_LOW = 10;
 	private static final double SHOOT_ANGLE_ENCODER_FORWARD = 10;
 	private static final double SHOOT_ANGLE_ENCODER_BACKWARD = 30;
 	private static final double SHOOT_LOW_ANGLE_ENCODER = 5;
+	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD = 30;
+	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD = 50;
 	private static final double BALANCE_ANGLE_ENCODER = 5;
 	private static final double GRABBER_ANGLE_ENCODER = -5;
 	private static final double ARM_ENCODER_GRAB = 10;
@@ -130,6 +135,9 @@ public class ArmFSM {
 			case SHOOT_LOW_FORWARD:
 				handleShootLowState(input);
 				break;
+			case SUBSTATION_PICKUP:
+				handleSubstationPickupState(input);
+				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -185,6 +193,11 @@ public class ArmFSM {
 			case SHOOT_LOW_FORWARD:
 				if (input.isShootLowButtonPressed()) {
 					return FSMState.SHOOT_LOW_FORWARD;
+				}
+				return FSMState.IDLE;
+			case SUBSTATION_PICKUP:
+				if (input.isSubstationPickupButtonPressed()) {
+					return FSMState.SUBSTATION_PICKUP;
 				}
 				return FSMState.IDLE;
 			default :
@@ -396,6 +409,76 @@ public class ArmFSM {
 				teleArmMotor.set(TELEARM_MOTOR_POWER);
 			} else {
 				teleArmMotor.set(0);
+			}
+		} else {
+			teleArmMotor.set(0);
+			pivotMotor.set(0);
+		}
+	}
+
+
+	private void handleSubstationPickupState(TeleopInput input) {
+		if (input != null) {
+			if (input.isThrottleForward()) {
+				if (withinError(pivotMotor.getEncoder().getPosition(),
+					SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD)) {
+					pivotMotor.set(0);
+				} else if (pivotMotor.getEncoder().getPosition()
+							< SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD) {
+					//pivotMotor.set(PIVOT_MOTOR_POWER);
+					double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+								PIVOT_MOTOR_POWER);
+					if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+						return;
+					}
+					pivotMotor.set(pow);
+				} else if (pivotMotor.getEncoder().getPosition()
+							> SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD) {
+					//pivotMotor.set(-PIVOT_MOTOR_POWER);
+					double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+								-PIVOT_MOTOR_POWER);
+					if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+						return;
+					}
+					pivotMotor.set(pow);
+				} else {
+					pivotMotor.set(0);
+				}
+				if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_SUBSTATION_FORWARD) {
+					teleArmMotor.set(TELEARM_MOTOR_POWER);
+				} else {
+					teleArmMotor.set(0);
+				}
+			} else { //throttle is backward/false
+				if (withinError(pivotMotor.getEncoder().getPosition(),
+					SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD)) {
+					pivotMotor.set(0);
+				} else if (pivotMotor.getEncoder().getPosition()
+					< SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD) {
+					//pivotMotor.set(PIVOT_MOTOR_POWER);
+					double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+								PIVOT_MOTOR_POWER);
+					if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+						return;
+					}
+					pivotMotor.set(pow);
+				} else if (pivotMotor.getEncoder().getPosition()
+						> SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD) {
+					//pivotMotor.set(-PIVOT_MOTOR_POWER);
+					double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+								-PIVOT_MOTOR_POWER);
+					if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+						return;
+					}
+					pivotMotor.set(pow);
+				} else {
+					pivotMotor.set(0);
+				}
+				if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_SUBSTATION_BACKWARD) {
+					teleArmMotor.set(TELEARM_MOTOR_POWER);
+				} else {
+					teleArmMotor.set(0);
+				}
 			}
 		} else {
 			teleArmMotor.set(0);
