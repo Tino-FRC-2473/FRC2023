@@ -122,6 +122,15 @@ public class TeleopInput {
 		return mechJoystick.getRawButton(AIM_LOW_BUTTON);
 	}
 
+	/**
+	 * Get the boolean value of the Throttle button.
+	 * @return True if button is pressed
+	 */
+	public boolean isThrottleForward() {
+		return mechJoystick.getThrottle() <= 0 ? false : true;
+	}
+
+
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
 	 * Get X axis of Right Joystick.
