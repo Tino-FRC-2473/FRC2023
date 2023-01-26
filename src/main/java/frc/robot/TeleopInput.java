@@ -27,6 +27,7 @@ public class TeleopInput {
 	private static final int AIM_MID_BUTTON = 9;
 	private static final int BALANCE_BUTTON = 2;
 	private static final int AIM_LOW_BUTTON = 11;
+	private static final int SUBSTATION_PICKUP_BUTTON = 8;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -120,6 +121,14 @@ public class TeleopInput {
 	 */
 	public boolean isShootLowButtonPressed() {
 		return mechJoystick.getRawButton(AIM_LOW_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Substation Pickup button.
+	 * @return True if button is pressed
+	 */
+	public boolean isSubstationPickupButtonPressed() {
+		return mechJoystick.getRawButton(SUBSTATION_PICKUP_BUTTON);
 	}
 
 	/**
