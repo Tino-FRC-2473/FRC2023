@@ -63,7 +63,7 @@ public class TeleopInput {
 		return mechJoystick.getY();
 	}
 	/**
-	 * Get the value of the throttle
+	 * Get the value of the throttle.
 	 * @return True if button is pressed
 	 */
 	public double getThrottle() {
@@ -140,10 +140,6 @@ public class TeleopInput {
 	public boolean isReleaseButtonPressed() {
 		return mechJoystick.getTrigger();
 	}
-	/**
-	 * Get the value of release button released.
-	 * @return True if button released
-	 */
 	/**
 	 * Get trigger button is pressed of left joystick.
 	 * @return Axis value
