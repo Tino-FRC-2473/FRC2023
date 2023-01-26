@@ -16,7 +16,7 @@ public class TeleopInput {
 	private static final int DRIVE_JOYSTICK_PORT = 1;
 	private static final int STEERING_WHEEL_PORT = 3;
 
-	private static final int RELEASE_BUTTON = 8;
+	//private static final int RELEASE_BUTTON = 8;
 	private static final int PIVOT_INCREASE_BUTTON = 5;
 	private static final int PIVOT_DECREASE_BUTTON = 3;
 	private static final int EXTEND_BUTTON = 6;
@@ -62,6 +62,14 @@ public class TeleopInput {
 	public double getmechJoystickY() {
 		return mechJoystick.getY();
 	}
+	/**
+	 * Get the value of the throttle
+	 * @return True if button is pressed
+	 */
+	public double getThrottle() {
+		return mechJoystick.getThrottle();
+	}
+
 	/**
 	 * Get the value of the Pivot Increase button.
 	 * @return True if button is pressed
@@ -130,15 +138,12 @@ public class TeleopInput {
 	 * @return True if button pressed
 	 */
 	public boolean isReleaseButtonPressed() {
-		return mechJoystick.getRawButton(RELEASE_BUTTON);
+		return mechJoystick.getTrigger();
 	}
 	/**
 	 * Get the value of release button released.
 	 * @return True if button released
 	 */
-	public boolean isReleaseButtonReleased() {
-		return mechJoystick.getRawButtonReleased(RELEASE_BUTTON);
-	}
 	/**
 	 * Get trigger button is pressed of left joystick.
 	 * @return Axis value
