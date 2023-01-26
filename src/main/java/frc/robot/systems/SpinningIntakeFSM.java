@@ -28,6 +28,8 @@ public class SpinningIntakeFSM {
 	private static final double INTAKE_SPEED = 0.1;
 	private static final double RELEASE_SPEED = -0.1;
 	private static final int COLOR_PROXIMITY_THRESHOLD = 100;
+	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
+	private static int itemType = 0;
 
 	//CUBE RGB THRESHOLD VALUES
 	private static final double RED_AVG = 65 / 256f;
@@ -124,24 +126,29 @@ public class SpinningIntakeFSM {
 		}
 
 		currentState = nextState(input);
+		System.out.println(getObjectType());
 	}
 
 	/*-------------------------NON HANDLER METHODS ------------------------- */
+	/**
+	 * Returns the type of object currently in the grabber.
+	 * @return int 0 1 or 2 for nothing, cone, cube
+	 */
+	public static int getObjectType() {
+		return itemType;
+	}
 	private boolean isCubeDetected() {
 		boolean objectDetected = colorSensorCube.getProximity() > COLOR_PROXIMITY_THRESHOLD;
 		double r =  colorSensorCube.getColor().red;
 		double g =  colorSensorCube.getColor().green;
 		double b =  colorSensorCube.getColor().blue;
 
-		System.out.println(r + " " + g + " " + b);
-
-		if (objectDetected && withinRange(r, RED_AVG)
-			&& withinRange(g, GREEN_AVG) && withinRange(b, BLUE_AVG)) {
-			System.out.println("THIS IS A CUBE");
-		} else if (objectDetected) {
-			System.out.println("THIS IS A CONE");
+		//System.out.println(r + " " + g + " " + b + " " + colorSensorCube.getProximity());
+		if ((objectDetected && withinRange(r, RED_AVG)
+			&& withinRange(g, GREEN_AVG) && withinRange(b, BLUE_AVG))) {
+			itemType = 2;
+			return true;
 		}
-
 		return false;
 		//return !isCone && objectDetected;
 	}
@@ -150,7 +157,11 @@ public class SpinningIntakeFSM {
 		return Math.abs(a - b) <= TOLERANCE;
 	}
 	private boolean isLimitSwitchConeActivated() {
-		return limitSwitchCone.get();
+		if (limitSwitchCone.get()) {
+			itemType = 1;
+			return true;
+		}
+		return false;
 	}
 
 	/* ======================== Private methods ======================== */
@@ -171,6 +182,9 @@ public class SpinningIntakeFSM {
 			case START_STATE:
 				return FSMState.IDLE_SPINNING;
 			case IDLE_SPINNING:
+				if (input.isReleaseButtonPressed()) {
+					return FSMState.RELEASE;
+				}
 				if (isCubeDetected() || isLimitSwitchConeActivated()) {
 					return FSMState.IDLE_STOP;
 				}
@@ -181,7 +195,7 @@ public class SpinningIntakeFSM {
 				}
 				return FSMState.IDLE_STOP;
 			case RELEASE:
-				if (input.isReleaseButtonReleased()) {
+				if (!input.isReleaseButtonPressed()) {
 					return FSMState.IDLE_SPINNING;
 				}
 				return FSMState.RELEASE;
@@ -203,6 +217,7 @@ public class SpinningIntakeFSM {
 		spinnerMotor.set(0);
 	}
 	private void handleReleaseState() {
+		itemType = 0;
 		spinnerMotor.set(RELEASE_SPEED);
 	}
 }
