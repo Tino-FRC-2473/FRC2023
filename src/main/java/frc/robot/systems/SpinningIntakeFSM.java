@@ -37,16 +37,6 @@ public class SpinningIntakeFSM {
 	private static final double BLUE_AVG = 92 / 256f;
 	private static final double TOLERANCE = 15 / 256f;
 
-
-	private static final int HEX_BASE = 16;
-	private static final int RED_START = 1;
-	private static final int RED_END = 3;
-	private static final int GREEN_START = 3;
-	private static final int GREEN_END = 5;
-	private static final int BLUE_START = 5;
-	private static final int BLUE_END = 7;
-
-
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 

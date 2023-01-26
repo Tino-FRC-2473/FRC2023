@@ -32,43 +32,39 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 
 		// Instantiate all systems here
-		//armSystem = new ArmFSM();
-		//driveSystem = new DriveFSMSystem();
+		armSystem = new ArmFSM();
+		driveSystem = new DriveFSMSystem();
 		spinningIntakeFSM = new SpinningIntakeFSM();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		//armSystem.reset();
-		//driveSystem.resetAutonomous();
+		armSystem.reset();
+		driveSystem.resetAutonomous();
 		spinningIntakeFSM.reset();
-		//armFSMSystem.reset();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		//armSystem.update(null);
-		//driveSystem.update(null);
+		armSystem.update(null);
+		driveSystem.update(null);
 		spinningIntakeFSM.update(null);
-		//armFSMSystem.update(null);
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		//armSystem.reset();
-		//driveSystem.resetTeleop();
+		armSystem.reset();
+		driveSystem.resetTeleop();
 		spinningIntakeFSM.reset();
-		//armFSMSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		//armSystem.update(input);
-		//driveSystem.update(input);
+		armSystem.update(input);
+		driveSystem.update(input);
 		spinningIntakeFSM.update(input);
-		//armFSMSystem.update(input);
 	}
 
 	@Override
