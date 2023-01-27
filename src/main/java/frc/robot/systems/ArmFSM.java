@@ -18,6 +18,7 @@ public class ArmFSM {
 	// FSM state definitions
 	public enum FSMState {
 		IDLE,
+		HOMING_STATE,
 		ARM_MOVEMENT,
 		SHOOT_HIGH,
 		SHOOT_MID,
@@ -94,7 +95,7 @@ public class ArmFSM {
 	 * On robot start set the start to IDLE state. Resets robot to original state.
 	 */
 	public void reset() {
-		currentState = FSMState.IDLE;
+		currentState = FSMState.HOMING_STATE;
 		pivotMotor.getEncoder().setPosition(0);
 		teleArmMotor.getEncoder().setPosition(0);
 
@@ -114,6 +115,9 @@ public class ArmFSM {
 		switch (currentState) {
 			case IDLE:
 				handleIdleState(input);
+				break;
+			case HOMING_STATE:
+				handleHomingState(input);
 				break;
 			case ARM_MOVEMENT:
 				handleArmMechState(input);
@@ -161,6 +165,12 @@ public class ArmFSM {
 					return FSMState.SHOOT_MID;
 				}
 				return FSMState.IDLE;
+			case HOMING_STATE:
+				if (isMinHeight()) {
+					return FSMState.IDLE;
+				} else {
+					return FSMState.HOMING_STATE;
+				}
 			case ARM_MOVEMENT:
 				if (input.isShootHighButtonPressed()) {
 					return FSMState.SHOOT_HIGH;
@@ -223,6 +233,14 @@ public class ArmFSM {
 	}
 
 
+	private void handleHomingState(TeleopInput input) {
+		double pow = pidController.calculate(pivotMotor.getEncoder().getVelocity(),
+							-PIVOT_MOTOR_POWER);
+		if (pow > PID_MAX_POWER || pow < -PID_MAX_POWER) {
+			return;
+		}
+		pivotMotor.set(pow);
+	}
 	/*
 	 * What to do when in the ARM_MOVEMENT state
 	 */
