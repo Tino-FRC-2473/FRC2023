@@ -41,13 +41,15 @@ public class Constants {
 	static class VisionConstants {
 		static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
 		static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(0);
-		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(14.5);
+		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(21);
 		static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
+		static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
+		static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
 	}
 	static class AprilTagConstants {
 		static final double APRILTAG_1_X_METERS = Units.inchesToMeters(0);
 		static final double APRILTAG_1_Y_METERS = Units.inchesToMeters(0);
-		static final double APRILTAG_1_HEIGHT_METERS = Units.inchesToMeters(12);
+		static final double APRILTAG_1_HEIGHT_METERS = Units.inchesToMeters(17.5);
 		static final double APRILTAG_1_ANGLE_RADIANS = Units.degreesToRadians(180);
 	}
 }

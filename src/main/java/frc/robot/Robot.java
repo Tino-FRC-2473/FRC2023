@@ -47,11 +47,14 @@ public class Robot extends TimedRobot {
 	public void autonomousPeriodic() {
 		//armSystem.update(null);
 		//driveSystem.update(null);
-		Optional<EstimatedRobotPose> pose = pcw.getEstimatedGlobalPose();
-		if (!pose.isEmpty()) {
-			System.out.println("X: " + pose.get().estimatedPose.getX());
-			System.out.println("Y: " + pose.get().estimatedPose.getY());
+		 Optional<EstimatedRobotPose> pose = pcw.getEstimatedGlobalPose();
+		 if (!pose.isEmpty()) {
+		 	System.out.println("X: " + pose.get().estimatedPose.getX() * 39.37);
+		 	System.out.println("Y: " + pose.get().estimatedPose.getY() * 39.37);
+			System.out.println(Math.pow(Math.pow(pose.get().estimatedPose.getX() * 39.37, 2)+Math.pow(pose.get().estimatedPose.getY() * 39.37, 2), 0.5));
 		}
+		//System.out.println(pcw.getDistanceToCone());
+		//System.out.println(pcw.getDistanceToCube() * 39.37);
 	}
 
 	@Override

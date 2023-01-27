@@ -65,7 +65,16 @@ public class PhotonCameraWrapper {
 	 */
 	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
 		photonCamera.setPipelineIndex(0); //Aprill Tag pipeline
-		return robotPoseEstimator.update();
+		if (photonCamera.getLatestResult().getBestTarget() == null) {
+			return robotPoseEstimator.update();
+		}
+		Transform3d robotPose = photonCamera.getLatestResult().getBestTarget().getBestCameraToTarget();
+		Optional<EstimatedRobotPose> rpe = robotPoseEstimator.update();
+		if (rpe.isEmpty()) {
+			return rpe;
+		}
+		EstimatedRobotPose erp = new EstimatedRobotPose(new Pose3d(robotPose.getTranslation(), robotPose.getRotation()), rpe.get().timestampSeconds);
+		return Optional.of(erp);
 	}
 	/** @return Returns a distance in meters from the closest cone and -1 if there are no cones.*/
 	public double getDistanceToCone() {
@@ -73,7 +82,7 @@ public class PhotonCameraWrapper {
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return PhotonUtils.calculateDistanceToTargetMeters(
-				VisionConstants.CAM_HEIGHT_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
+				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CONE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
 					result.getBestTarget().getPitch()));
 		}
@@ -85,7 +94,7 @@ public class PhotonCameraWrapper {
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return PhotonUtils.calculateDistanceToTargetMeters(
-				VisionConstants.CAM_HEIGHT_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
+				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CUBE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
 					result.getBestTarget().getPitch()));
 		}
