@@ -5,21 +5,22 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-
+import org.photonvision.EstimatedRobotPose;
+import java.util.Optional;
 // Systems
-import frc.robot.systems.ArmFSM;
-import frc.robot.systems.DriveFSMSystem;
+//import frc.robot.systems.ArmFSM;
+//import frc.robot.systems.DriveFSMSystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation.
  */
 public class Robot extends TimedRobot {
-	private TeleopInput input;
-
+	//private TeleopInput input;
+	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 	// Systems
-	private ArmFSM armSystem;
-	private DriveFSMSystem driveSystem;
+	//private ArmFSM armSystem;
+	//private DriveFSMSystem driveSystem;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -28,37 +29,42 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		System.out.println("robotInit");
-		input = new TeleopInput();
+		//input = new TeleopInput();
 
 		// Instantiate all systems here
-		armSystem = new ArmFSM();
-		driveSystem = new DriveFSMSystem();
+		//armSystem = new ArmFSM();
+		//driveSystem = new DriveFSMSystem();
 	}
 
 	@Override
 	public void autonomousInit() {
-		System.out.println("-------- Autonomous Init --------");
-		armSystem.reset();
-		driveSystem.resetAutonomous();
+		//System.out.println("-------- Autonomous Init --------");
+		//armSystem.reset();
+		//driveSystem.resetAutonomous();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		armSystem.update(null);
-		driveSystem.update(null);
+		//armSystem.update(null);
+		//driveSystem.update(null);
+		Optional<EstimatedRobotPose> pose = pcw.getEstimatedGlobalPose();
+		if (!pose.isEmpty()) {
+			System.out.println("X: " + pose.get().estimatedPose.getX());
+			System.out.println("Y: " + pose.get().estimatedPose.getY());
+		}
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		armSystem.reset();
-		driveSystem.resetTeleop();
+		//armSystem.reset();
+		//driveSystem.resetTeleop();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		armSystem.update(input);
-		driveSystem.update(input);
+		//armSystem.update(input);
+		//driveSystem.update(input);
 	}
 
 	@Override
