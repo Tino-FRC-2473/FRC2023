@@ -16,9 +16,7 @@ public class TeleopInput {
 	private static final int DRIVE_JOYSTICK_PORT = 1;
 	private static final int STEERING_WHEEL_PORT = 3;
 
-	private static final int OPEN_BUTTON = 8;
-	private static final int CUBE_BUTTON = 10;
-	private static final int CONE_BUTTON = 12;
+	//private static final int RELEASE_BUTTON = 8;
 	private static final int PIVOT_INCREASE_BUTTON = 5;
 	private static final int PIVOT_DECREASE_BUTTON = 3;
 	private static final int EXTEND_BUTTON = 6;
@@ -66,6 +64,14 @@ public class TeleopInput {
 	public double getmechJoystickY() {
 		return mechJoystick.getY();
 	}
+	/**
+	 * Get the value of the throttle.
+	 * @return True if button is pressed
+	 */
+	public double getThrottle() {
+		return mechJoystick.getThrottle();
+	}
+
 	/**
 	 * Get the value of the Pivot Increase button.
 	 * @return True if button is pressed
@@ -138,25 +144,11 @@ public class TeleopInput {
 		return driveJoystick.getY();
 	}
 	/**
-	 * Get Button to pick up cube.
-	 * @return Axis value
+	 * Get the value of release button.
+	 * @return True if button pressed
 	 */
-	public boolean getCubeButton() {
-		return mechJoystick.getRawButton(CUBE_BUTTON);
-	}
-	/**
-	 * Get Button to pick up cone.
-	 * @return Axis value
-	 */
-	public boolean getConeButton() {
-		return mechJoystick.getRawButton(CONE_BUTTON);
-	}
-	/**
-	 * Get Button to release.
-	 * @return Axis value
-	 */
-	public boolean getOpenButton() {
-		return mechJoystick.getRawButton(OPEN_BUTTON);
+	public boolean isReleaseButtonPressed() {
+		return mechJoystick.getTrigger();
 	}
 	/**
 	 * Get trigger button is pressed of left joystick.
