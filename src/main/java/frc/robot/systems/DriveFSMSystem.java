@@ -186,7 +186,7 @@ public class DriveFSMSystem {
 		switch (currentState) {
 
 			case TELE_STATE_2_MOTOR_DRIVE:
-				if (input.isDriveJoystickEngageButtonPressedRaw()) {
+				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
 					return FSMState.TELE_STATE_BALANCE;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
@@ -226,7 +226,7 @@ public class DriveFSMSystem {
 			currentEncoderPos = ((leftMotor.getEncoder().getPosition()
 				- rightMotor.getEncoder().getPosition()) / 2.0);
 
-			// updateLineOdometryTele(gyroAngleForOdo);
+			updateLineOdometryTele(gyroAngleForOdo);
 
 			double steerAngle = input.getSteerAngle();
 			double currentLeftPower = leftMotor.get();
@@ -258,6 +258,10 @@ public class DriveFSMSystem {
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
 
+
+			System.out.println("X: " + roboXPos);
+			System.out.println("Y: " + roboYPos);
+
 			rightMotor.set(rightPower);
 			leftMotor.set(leftPower);
 
@@ -274,6 +278,8 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleTeleOpBalanceState(TeleopInput input) {
+
+		// if(roboXPos)
 		if (gyro.getPitch() >= -Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES
 			&& gyro.getPitch() <= Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES) {
 			leftPower = 0;
