@@ -64,17 +64,18 @@ public class PhotonCameraWrapper {
 	 *  on the field, and the time of the observation. Assumes a planar
 	 *  field and the robot is always firmly on the ground.
 	 */
-	public Pair<Pose3d, Double> getEstimatedGlobalPose() {
+	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
 		photonCamera.setPipelineIndex(0); //Aprill Tag pipeline
-		var result = photonCamera.getLatestResult();
-		double timestamp = result.getTimestampSeconds();
-		if (result.hasTargets()) {
-			var target = result.getBestTarget();
-			Transform3d camToTarget = target.getBestCameraToTarget();
-			Pose3d pose = (new Pose3d(new Translation3d(AprilTagConstants.APRILTAG_1_X_METERS, AprilTagConstants.APRILTAG_1_Y_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS), new Rotation3d(0,0,AprilTagConstants.APRILTAG_1_ANGLE_RADIANS))).transformBy(camToTarget.inverse());
-			return new Pair<Pose3d, Double>(pose, timestamp);
-		}
-		return null;
+		// var result = photonCamera.getLatestResult();
+		// double timestamp = result.getTimestampSeconds();
+		// if (result.hasTargets()) {
+		// 	var target = result.getBestTarget();
+		// 	Transform3d camToTarget = target.getBestCameraToTarget();
+		// 	Pose3d pose = (new Pose3d(new Translation3d(AprilTagConstants.APRILTAG_1_X_METERS, AprilTagConstants.APRILTAG_1_Y_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS), new Rotation3d(0,0,AprilTagConstants.APRILTAG_1_ANGLE_RADIANS))).transformBy(camToTarget.inverse());
+		// 	return new Pair<Pose3d, Double>(pose, timestamp);
+		// }
+		// return null;
+		return robotPoseEstimator.update();
 	}
 	/** @return Returns a distance in meters from the closest cone and -1 if there are no cones.*/
 	public double getDistanceToCone() {

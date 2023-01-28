@@ -148,7 +148,7 @@ public class DriveFSMSystem {
 		dpe.updatePose(gyro.getAngle(), leftMotor.getEncoder().getPosition(),
 			rightMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("X", dpe.getCurPose().getX());
-		SmartDashboard.putNumber("Y", dpe.getCurPose().getY());
+		SmartDashboard.putNumber("Y", dpe.getCurPose().getY());		
 		SmartDashboard.putNumber("Rotation", dpe.getCurPose().getRotation().getDegrees());
 		// gyroAngleForOdo = gyro.getAngle();
 
