@@ -30,16 +30,19 @@ public class ArmFSM {
 	private static final float TELEARM_MOTOR_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_POWER = 0.1f;
 	private static final double ARM_ENCODER_STARTING_ROTATIONS = 20;
-	private static final double ARM_ENCODER_HIGH_FORWARD_ROTATIONS = 20;
+	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 20;
+	private static final double ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS = 20;
 	private static final double ARM_ENCODER_HIGH_BACKWARD_ROTATIONS = 40;
 	private static final double ARM_ENCODER_MID_FORWARD_ROTATIONS = 10;
 	private static final double ARM_ENCODER_MID_BACKWARD_ROTATIONS = 10;
 	private static final double ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS = 10;
 	private static final double ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS = 10;
 	private static final double ARM_ENCODER_LOW_ROTATIONS = 10;
-	private static final double SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS = 10;
-	private static final double SHOOT_ANGLE_ENCODER_BACKWARD_ROTATIONS = 30;
-	private static final double SHOOT_LOW_ANGLE_ENCODER_ROTATIONS = 5;
+	private static final double SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS = 30;
+	private static final double SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS = 30;
+	private static final double SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS = 30;
+	private static final double SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS = 30;
+	private static final double SHOOT_LOW_ANGLE_ENCODER_ROTATIONS = -10;
 	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS = 30;
 	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS = 50;
 	private static final double BALANCE_ANGLE_ENCODER_ROTATIONS = 5;
@@ -248,7 +251,8 @@ public class ArmFSM {
 		} else if (!hasHitMinimum && isMinHeight()) {
 			pivotMotor.set(0);
 			hasHitMinimum = true;
-		} else if (hasHitMinimum && withinError(pivotMotor.getEncoder().getPosition(), ARM_ENCODER_STARTING_ROTATIONS)) {
+		} else if (withinError(pivotMotor.getEncoder().getPosition(),
+				ARM_ENCODER_STARTING_ROTATIONS)) {
 			pivotMotor.set(0);
 		} else {
 			pidController.setReference(PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
@@ -286,37 +290,38 @@ public class ArmFSM {
 		if (input != null) {
 			if (input.isThrottleForward()) {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
-					SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
+					SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 					pivotMotor.set(0);
 				} else if (pivotMotor.getEncoder().getPosition()
-						< SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS) {
+						< SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS) {
 					//pivotMotor.set(PIVOT_MOTOR_POWER);
 					pidController.setReference(PIVOT_MOTOR_POWER,
 											CANSparkMax.ControlType.kDutyCycle);
 				} else if (pivotMotor.getEncoder().getPosition()
-						> SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS) {
+						> SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS) {
 					//pivotMotor.set(-PIVOT_MOTOR_POWER);
 					pidController.setReference(-PIVOT_MOTOR_POWER,
 											CANSparkMax.ControlType.kDutyCycle);
 				} else {
 					pivotMotor.set(0);
 				}
-				if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH_FORWARD_ROTATIONS) {
+				if (teleArmMotor.getEncoder().getPosition()
+						< ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS) {
 					teleArmMotor.set(TELEARM_MOTOR_POWER);
 				} else {
 					teleArmMotor.set(0);
 				}
 			} else { //throttle is backward/false
 				if (withinError(pivotMotor.getEncoder().getPosition(),
-					SHOOT_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
+					SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
 					pivotMotor.set(0);
 				} else if (pivotMotor.getEncoder().getPosition()
-						< SHOOT_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
+						< SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
 					//pivotMotor.set(PIVOT_MOTOR_POWER);
 					pidController.setReference(PIVOT_MOTOR_POWER,
 											CANSparkMax.ControlType.kDutyCycle);
 				} else if (pivotMotor.getEncoder().getPosition()
-						> SHOOT_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
+						> SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
 					//pivotMotor.set(-PIVOT_MOTOR_POWER);
 					pidController.setReference(-PIVOT_MOTOR_POWER,
 											CANSparkMax.ControlType.kDutyCycle);
@@ -339,15 +344,15 @@ public class ArmFSM {
 		if (input != null) {
 			if (input.isThrottleForward()) {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
-					SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
+					SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 					pivotMotor.set(0);
 				} else if (pivotMotor.getEncoder().getPosition()
-					< SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS) {
+					< SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS) {
 					//pivotMotor.set(PIVOT_MOTOR_POWER);
 					pidController.setReference(PIVOT_MOTOR_POWER,
 											CANSparkMax.ControlType.kDutyCycle);
 				} else if (pivotMotor.getEncoder().getPosition()
-						> SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS) {
+						> SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS) {
 					//pivotMotor.set(-PIVOT_MOTOR_POWER);
 					pidController.setReference(-PIVOT_MOTOR_POWER,
 											CANSparkMax.ControlType.kDutyCycle);
@@ -361,15 +366,15 @@ public class ArmFSM {
 				}
 			} else { //throttle is backward/false
 				if (withinError(pivotMotor.getEncoder().getPosition(),
-					SHOOT_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
+					SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
 					pivotMotor.set(0);
 				} else if (pivotMotor.getEncoder().getPosition()
-					< SHOOT_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
+					< SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
 					//pivotMotor.set(PIVOT_MOTOR_POWER);
 					pidController.setReference(PIVOT_MOTOR_POWER,
 											CANSparkMax.ControlType.kDutyCycle);
 				} else if (pivotMotor.getEncoder().getPosition()
-						> SHOOT_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
+						> SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
 					//pivotMotor.set(-PIVOT_MOTOR_POWER);
 					pidController.setReference(-PIVOT_MOTOR_POWER,
 											CANSparkMax.ControlType.kDutyCycle);
@@ -473,21 +478,21 @@ public class ArmFSM {
 	 */
 	public void executeShootHigh() {
 		while (!withinError(pivotMotor.getEncoder().getPosition(),
-			SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS)
-			&& teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH_FORWARD_ROTATIONS) {
+			SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS)
+			&& teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS) {
 			if (withinError(pivotMotor.getEncoder().getPosition(),
-				SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
+				SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 				pivotMotor.set(0);
 			} else if (pivotMotor.getEncoder().getPosition()
-				< SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS) {
+				< SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS) {
 				pivotMotor.set(PIVOT_MOTOR_POWER);
 			} else if (pivotMotor.getEncoder().getPosition()
-				> SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS) {
+				> SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS) {
 				pivotMotor.set(-PIVOT_MOTOR_POWER);
 			} else {
 				pivotMotor.set(0);
 			}
-			if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH_FORWARD_ROTATIONS) {
+			if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS) {
 				teleArmMotor.set(TELEARM_MOTOR_POWER);
 			} else {
 				teleArmMotor.set(0);
@@ -502,16 +507,16 @@ public class ArmFSM {
 	 */
 	public void executeShootMid() {
 		while (!withinError(pivotMotor.getEncoder().getPosition(),
-			SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS)
+			SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS)
 			&& teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID_FORWARD_ROTATIONS) {
 			if (withinError(pivotMotor.getEncoder().getPosition(),
-				SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
+				SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 				pivotMotor.set(0);
 			} else if (pivotMotor.getEncoder().getPosition()
-				< SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS) {
+				< SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS) {
 				pivotMotor.set(PIVOT_MOTOR_POWER);
 			} else if (pivotMotor.getEncoder().getPosition()
-				> SHOOT_ANGLE_ENCODER_FORWARD_ROTATIONS) {
+				> SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS) {
 				pivotMotor.set(-PIVOT_MOTOR_POWER);
 			} else {
 				pivotMotor.set(0);
