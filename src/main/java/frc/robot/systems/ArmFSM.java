@@ -29,6 +29,7 @@ public class ArmFSM {
 
 	private static final float TELEARM_MOTOR_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_POWER = 0.1f;
+	private static final double ARM_ENCODER_STARTING_ROTATIONS = 20;
 	private static final double ARM_ENCODER_HIGH_FORWARD_ROTATIONS = 20;
 	private static final double ARM_ENCODER_HIGH_BACKWARD_ROTATIONS = 40;
 	private static final double ARM_ENCODER_MID_FORWARD_ROTATIONS = 10;
@@ -49,6 +50,7 @@ public class ArmFSM {
 	private static final double PID_CONSTANT_P = 0.00022f;
 	private static final double PID_CONSTANT_I = 0.000055f;
 	private static final double PID_CONSTANT_D = 0.000008f;
+	private static boolean hasHitMinimum = false;
 
 
 	/* ======================== Private variables ======================== */
@@ -241,10 +243,15 @@ public class ArmFSM {
 
 
 	private void handleHomingState(TeleopInput input) {
-		if (!isMinHeight()) {
+		if (!hasHitMinimum && !isMinHeight()) {
 			pidController.setReference(-PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
-		} else {
+		} else if (!hasHitMinimum && isMinHeight()) {
 			pivotMotor.set(0);
+			hasHitMinimum = true;
+		} else if (hasHitMinimum && withinError(pivotMotor.getEncoder().getPosition(), ARM_ENCODER_STARTING_ROTATIONS)) {
+			pivotMotor.set(0);
+		} else {
+			pidController.setReference(PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
 		}
 	}
 	/*
