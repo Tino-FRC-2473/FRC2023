@@ -53,6 +53,8 @@ public class DriveFSMSystem {
 	private AHRS gyro;
 	private double startAngle;
 
+	private double angleToTurnToFaceTag = 0;
+
 	private DrivePoseEstimator dpe = new DrivePoseEstimator();
 
 
@@ -171,7 +173,7 @@ public class DriveFSMSystem {
 				break;
 
 			case TURNING_STATE:
-				handleTurnState(input, 0);
+				handleTurnState(input, dpe.getCurPose().getRotation().getDegrees());
 				break;
 
 			default:
@@ -194,8 +196,8 @@ public class DriveFSMSystem {
 		switch (currentState) {
 
 			case TELE_STATE_2_MOTOR_DRIVE:
-				if (input.isDriveJoystickEngageButtonPressedRaw()) {
-					return FSMState.TELE_STATE_BALANCE;
+				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
+					return FSMState.TURNING_STATE;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 
@@ -266,6 +268,13 @@ public class DriveFSMSystem {
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
 
+			angleToTurnToFaceTag = Math.atan2(dpe.getCurPose().getY(), dpe.getCurPose().getX());
+			System.out.println(angleToTurnToFaceTag);
+
+			// if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
+			// 	handleTurnState(input, dpe.getCurPose().getRotation().getDegrees());
+			// }
+
 			System.out.println("X: " + roboXPos);
 			System.out.println("Y: " + roboYPos);
 
@@ -296,24 +305,28 @@ public class DriveFSMSystem {
 	}
 
 	/**
-	 * Handle behavior in TURNING_STATE.
+	 * Tracks the robo's position on the field.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
-	 * @param degrees How many degrees the robot is to turn
+	 * @param degrees amount of degrees to turn
 	 */
 	public void handleTurnState(TeleopInput input, double degrees) {
-		if (input != null) {
-			return;
-		}
-
-		degrees *= Constants.GYRO_TURN_MULTIPLER_BELOW_90;
-
+		System.out.println("inside");
+		// if (input != null) {
+		// 	return;
+		// }
+		finishedTurning = false;
 		System.out.println(getHeading());
 		double error = degrees - getHeading();
 		if (error > Constants.HALF_REVOLUTION_DEGREES) {
 			error -= Constants.ONE_REVOLUTION_DEGREES;
 		}
+		if (error < -Constants.HALF_REVOLUTION_DEGREES) {
+			error += Constants.ONE_REVOLUTION_DEGREES;
+		}
+		System.out.println("ERROR: " + error);
 		if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
+			System.out.println("DONE");
 			finishedTurning = true;
 			leftMotor.set(0);
 			rightMotor.set(0);
@@ -323,13 +336,12 @@ public class DriveFSMSystem {
 		if (power < Constants.MIN_TURN_POWER) {
 			power = Constants.MIN_TURN_POWER;
 		}
-
 		power *= (error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -1 : 1;
 
-		leftMotor.set(power);
-		rightMotor.set(power);
+		leftMotor.set(-power);
+		rightMotor.set(-power);
+		// turning right is positive and left is negative
 	}
-
 	/**
 	 * Handle behavior in IDlE State.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
