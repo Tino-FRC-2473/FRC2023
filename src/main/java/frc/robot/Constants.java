@@ -20,8 +20,8 @@ public class Constants {
 	public static final double TURN_ERROR_THRESHOLD_DEGREE = 1.0;
 	public static final double TURN_ERROR_POWER_RATIO = 360;
 	public static final double TURN_POWER = 0.05;
-	public static final double MOVE_POWER = 0.1;
-	public static final double TURN_THRESHOLD = 5;
+	public static final double MOVE_POWER = 0.2;
+	public static final double TURN_THRESHOLD = 2;
 	public static final double MOVE_THRESHOLD = 1.5;
 	public static final double ROBOT_WIDTH = 20;
 	public static final double PURE_PURSUIT_VELOCITY_CONSTANT = 7.95867322835;
@@ -32,12 +32,20 @@ public class Constants {
 	public static final double FULL_CIRCLE = 360;
 	public static final double QUARTER_CIRCLE = 90;
 	public static final double THREE_QUARTER_CIRCLE = 270;
-	public static final double P1X1 = 30.8;
-	public static final double P1X2 = -105.6;
-	public static final double P1X3 = -50.1;
-	public static final double P2X1 = 49.4;
+	public static final double P1X1 = 28.271;
+	public static final double P1X2 = -108.947;
+	public static final double P1X3 = -53.342;
+	public static final double P2X1 = 42.751;
 	public static final double P2X2 = -47.7;
-	public static final double P3TURN_AMT = 63.9;
+	public static final double P3X1 = -186.645;
+	public static final double P3X2 = -9;
+	public static final double P3X3 = -33.5;
+	public static final double P3Y3 = 65.37;
+	public static final double P3X4 = -81.047;
+	public static final double P3Y4 = 65.37;
+
+	public static final double P3TURN_AMT1 = 69.45; // 69.454
+	//public static final double P3TURN_AMT2 = 63.9;
 
 	// PFC Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
