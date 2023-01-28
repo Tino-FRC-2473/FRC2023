@@ -6,6 +6,7 @@ package frc.robot.systems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C.Port;
 
@@ -44,6 +45,7 @@ public class SpinningIntakeFSM {
 	private CANSparkMax spinnerMotor;
 	//private DigitalInput limitSwitchCone;
 	private AnalogInput distanceSensorObject;
+	private DigitalInput breakBeamObject;
 	private ColorSensorV3 colorSensorCube;
 
 	/* ======================== Constructor ======================== */
@@ -57,6 +59,7 @@ public class SpinningIntakeFSM {
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		distanceSensorObject = new AnalogInput(0);
+		breakBeamObject = new DigitalInput(1);
 		colorSensorCube = new ColorSensorV3(Port.kOnboard);
 
 		// Reset state machine
@@ -112,7 +115,6 @@ public class SpinningIntakeFSM {
 		}
 
 		currentState = nextState(input);
-		System.out.println(distanceSensorObject.getValue());
 	}
 
 	/*-------------------------NON HANDLER METHODS ------------------------- */
@@ -143,7 +145,8 @@ public class SpinningIntakeFSM {
 		return Math.abs(a - b) <= TOLERANCE;
 	}
 	private boolean isLimitSwitchConeActivated() {
-		if (distanceSensorObject.getValue() > DISTANCE_PROXIMITY_THRESHOLD) {
+		//if (distanceSensorObject.getValue() > DISTANCE_PROXIMITY_THRESHOLD) {
+		if (!breakBeamObject.get()) {
 			itemType = 1;
 			return true;
 		}
