@@ -26,7 +26,7 @@ public class SpinningIntakeFSM {
 	private static final double INTAKE_SPEED = 0.1;
 	private static final double RELEASE_SPEED = -0.1;
 	private static final int COLOR_PROXIMITY_THRESHOLD = 100;
-	private static final int DISTANCE_PROXIMITY_THRESHOLD = 1000000;
+	private static final int DISTANCE_PROXIMITY_THRESHOLD = 2500;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static int itemType = 0;
 
