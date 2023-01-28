@@ -3,7 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-	public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(20);
+	public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(19.5);
 	public static final double WHEEL_DIAMETER_INCHES = 4.0; //7.65
 	public static final double MAX_POWER = 1;
 	public static final double REDUCED_MAX_POWER = 0.5;
@@ -41,7 +41,7 @@ public class Constants {
 	static class VisionConstants {
 		static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
 		static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(0);
-		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(21);
+		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.25);
 		static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
 		static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
 		static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);

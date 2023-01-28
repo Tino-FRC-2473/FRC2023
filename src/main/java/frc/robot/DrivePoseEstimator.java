@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.Pair;
 
 public class DrivePoseEstimator {
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
@@ -25,11 +27,10 @@ public class DrivePoseEstimator {
 	public void updatePose(double gyroAngle, double leftEncoderPos, double rightEncoderPos) {
 		poseEstimator.update(new Rotation2d(Units.degreesToRadians(gyroAngle)),
 			leftEncoderPos, rightEncoderPos);
-		Optional<EstimatedRobotPose> result = pcw.getEstimatedGlobalPose();
-		if (!result.isEmpty()) {
-			EstimatedRobotPose camPose = result.get();
+		Pair<Pose3d, Double> result = pcw.getEstimatedGlobalPose();
+		if (result!=null) {
 			poseEstimator.addVisionMeasurement(
-					camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
+					result.getFirst().toPose2d(), result.getSecond());
 		}
 
 	}
