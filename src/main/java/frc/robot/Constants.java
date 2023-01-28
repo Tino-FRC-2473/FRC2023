@@ -1,6 +1,5 @@
 package frc.robot;
 
-
 public class Constants {
 	//Drive Constants
 	public static final double WHEEL_DIAMETER_INCHES = 4.0; //7.65
@@ -25,6 +24,8 @@ public class Constants {
 	public static final double MOVE_THRESHOLD = 1.5;
 	public static final double ROBOT_WIDTH = 20;
 	public static final double PURE_PURSUIT_VELOCITY_CONSTANT = 7.95867322835;
+	public static final double ODOMETRY_DX_CONSTANT = 0.8880486672;
+	public static final double ODOMETRY_DY_CONSTANT = 1.1742067733;
 	public static final int PARTITIONS = 8;
 	public static final int LOOK_DISTANCE = 10;
 	public static final double OUTER_VELOCITY = 10;
@@ -43,9 +44,12 @@ public class Constants {
 	public static final double P3Y3 = 65.37;
 	public static final double P3X4 = -81.047;
 	public static final double P3Y4 = 65.37;
-
-	public static final double P3TURN_AMT1 = 69.454; // 69.454
-	//public static final double P3TURN_AMT2 = 63.9;
+	public static final double P3TURN_AMT1 = 69.454 * 0.8807; // 69.454
+	public static final double P3TURN_AMT2 = 9; // 0
+	public static final int S3 = 3;
+	public static final int S4 = 4;
+	public static final int S5 = 5;
+	public static final int S6 = 6;
 
 	// PFC Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
