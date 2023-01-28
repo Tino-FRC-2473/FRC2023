@@ -472,6 +472,8 @@ public class ArmFSM {
 			teleArmMotor.set(0);
 			pivotMotor.set(0);
 		}
+		pivotMotor.set(0);
+		teleArmMotor.set(0);
 	}
 	/**
 	 * Method to adjust the arm to go shoot on high height to use in autonomous.
