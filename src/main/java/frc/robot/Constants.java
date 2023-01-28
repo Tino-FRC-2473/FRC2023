@@ -44,7 +44,7 @@ public class Constants {
 	public static final double P3X4 = -81.047;
 	public static final double P3Y4 = 65.37;
 
-	public static final double P3TURN_AMT1 = 69.45; // 69.454
+	public static final double P3TURN_AMT1 = 69.454; // 69.454
 	//public static final double P3TURN_AMT2 = 63.9;
 
 	// PFC Constants

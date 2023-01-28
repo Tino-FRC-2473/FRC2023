@@ -15,7 +15,6 @@ import frc.robot.Constants;
 
 public class FSMSystem {
 
-
 	// FSM state definitions
 	public enum FSMState {
 		path1,
@@ -59,8 +58,7 @@ public class FSMSystem {
 	private boolean complete = false;
 
 	// turn state
-	boolean finishedTurning = false;
-	double startAngle = 0;
+	private boolean finishedTurning = false;
 
 
 	/* ======================== Constructor ======================== */
@@ -270,7 +268,7 @@ public class FSMSystem {
 				leftMotor.set(-Constants.TURN_POWER);
 				rightMotor.set(-Constants.TURN_POWER);
 			}
-		} else  if (dist > Constants.MOVE_THRESHOLD && !complete && moving) { 
+		} else  if (dist > Constants.MOVE_THRESHOLD && !complete && moving) {
 			System.out.println("moving");
 			leftMotor.set(-Constants.MOVE_POWER);
 			rightMotor.set(Constants.MOVE_POWER);
@@ -499,6 +497,7 @@ public class FSMSystem {
 			power = Constants.MIN_TURN_POWER;
 		}
 		power *= (error < 0 && error > -Constants.HALF_CIRCLE) ? -1 : 1;
+
 		leftMotor.set(-power);
 		rightMotor.set(-power);
 		// turning right is positive and left is negative
@@ -597,15 +596,13 @@ public class FSMSystem {
 		System.out.println("state: " + state);
 		System.out.println("angle: " + gyro.getAngle());
 	
-		if (state == 0) {
-			handleTurnState(input, (360 - 60));
-			if (finishedTurning) {
-				System.out.println("exit");
-				leftMotor.set(0);
-				rightMotor.set(0);
-				state--;
-			}
-		}
+
+		// if (state == 0) { // turning right
+		// 	handleTurnState(input, Constants.P3TURN_AMT1 * 0.913);
+		// 	if (finishedTurning) {
+		// 		state--;
+		// 	}
+		// }
 
 		if (state == 0) {
 			leftMotor.set(Constants.MOVE_POWER);
@@ -632,7 +629,7 @@ public class FSMSystem {
 				state++;
 			}
 		} else if (state == 3) { // turning right
-			handleTurnState(input, Constants.P3TURN_AMT1);
+			handleTurnState(input, Constants.P3TURN_AMT1 * 0.8807);
 			if (finishedTurning) state++;
 		} else if (state == 4) {
 			leftMotor.set(Constants.MOVE_POWER);
@@ -643,7 +640,7 @@ public class FSMSystem {
 				state++;
 			}
 		} else if (state == 5) { // turning left
-			handleTurnState(input, 0);
+			handleTurnState(input, 9);
 			if (finishedTurning) {
 				state++;
 			}
