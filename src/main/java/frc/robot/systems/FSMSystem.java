@@ -45,6 +45,7 @@ public class FSMSystem {
 	private double prevEncoderPos = 0;
 	private double gyroAngleForOdo = 0;
 	private AHRS gyro;
+	private boolean finishedTurning;
 
 	/* ======================== Constructor ======================== */
 	/**
