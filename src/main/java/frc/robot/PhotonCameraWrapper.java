@@ -44,6 +44,10 @@ public class PhotonCameraWrapper {
 		atList.add(new AprilTag(2, new Pose3d(AprilTagConstants.APRILTAG_1_X_METERS,
 				AprilTagConstants.APRILTAG_1_Y_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
 				new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE_RADIANS))));
+		// double substation test
+		atList.add(new AprilTag(5, new Pose3d(AprilTagConstants.APRILTAG_1_X_METERS,
+				AprilTagConstants.APRILTAG_1_Y_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
+				new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE_RADIANS))));
 
 		AprilTagFieldLayout atfl = new AprilTagFieldLayout(atList,
 				FIELD_LENGTH_METERS,

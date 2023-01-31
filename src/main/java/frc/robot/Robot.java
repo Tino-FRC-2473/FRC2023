@@ -55,7 +55,15 @@ public class Robot extends TimedRobot {
 		// armSystem.update(null);
 		driveSystem.update(null);
 		Optional<EstimatedRobotPose> pauli = photoncam.getEstimatedGlobalPose();
-		if (!pauli.isEmpty()) {
+		// double substation error correction
+		if (!pauli.isEmpty() && pauli.get().estimatedPose.getZ() > 0.63) {
+			// correcting for a +2.91% error in X yields +0.09% precision
+			System.out.println("X: " + pauli.get().estimatedPose.getX()*0.9709);
+			// still have to collect data for y
+			System.out.println("Y: " + pauli.get().estimatedPose.getY());
+		}
+		
+		else if (!pauli.isEmpty()) {
 			System.out.println("X: " + pauli.get().estimatedPose.getX());
 			System.out.println("Y: " + pauli.get().estimatedPose.getY());
 			System.out.println("R: " + pauli.get().estimatedPose.getRotation().getAngle() * (180 / Math.PI));
