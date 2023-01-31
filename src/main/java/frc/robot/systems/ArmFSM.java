@@ -20,6 +20,7 @@ public class ArmFSM {
 	public enum FSMState {
 		IDLE,
 		HOMING_STATE,
+		MOVING_TO_START_STATE,
 		ARM_MOVEMENT,
 		SHOOT_HIGH,
 		SHOOT_MID,
@@ -29,7 +30,7 @@ public class ArmFSM {
 
 	private static final float TELEARM_MOTOR_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_POWER = 0.1f;
-	private static final double ARM_ENCODER_STARTING_ROTATIONS = 20;
+	private static final double ARM_ENCODER_STARTING_ANGLE_ROTATIONS = 20;
 	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 20;
 	private static final double ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS = 20;
 	private static final double ARM_ENCODER_HIGH_BACKWARD_ROTATIONS = 40;
@@ -53,7 +54,6 @@ public class ArmFSM {
 	private static final double PID_CONSTANT_P = 0.00022f;
 	private static final double PID_CONSTANT_I = 0.000055f;
 	private static final double PID_CONSTANT_D = 0.000008f;
-	private static boolean hasHitMinimum = false;
 
 
 	/* ======================== Private variables ======================== */
@@ -131,6 +131,9 @@ public class ArmFSM {
 			case HOMING_STATE:
 				handleHomingState(input);
 				break;
+			case MOVING_TO_START_STATE:
+				handleMovingToStartState(input);
+				break;
 			case ARM_MOVEMENT:
 				handleArmMechState(input);
 				break;
@@ -181,11 +184,17 @@ public class ArmFSM {
 				}
 				return FSMState.IDLE;
 			case HOMING_STATE:
-				if (hasHitMinimum && withinError(pivotMotor.getEncoder().getPosition(),
-					ARM_ENCODER_STARTING_ROTATIONS)) {
-					return FSMState.IDLE;
+				if (isMinHeight()) {
+					return FSMState.MOVING_TO_START_STATE;
 				} else {
 					return FSMState.HOMING_STATE;
+				}
+			case MOVING_TO_START_STATE:
+				if (withinError(pivotMotor.getEncoder().getPosition(),
+					ARM_ENCODER_STARTING_ANGLE_ROTATIONS)) {
+					return FSMState.IDLE;
+				} else {
+					return FSMState.MOVING_TO_START_STATE;
 				}
 			case ARM_MOVEMENT:
 				if (input.isShootHighButtonPressed()) {
@@ -250,17 +259,19 @@ public class ArmFSM {
 
 
 	private void handleHomingState(TeleopInput input) {
-		if (!hasHitMinimum && !isMinHeight()) {
-			pidController.setReference(-PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
-		} else if (!hasHitMinimum && isMinHeight()) {
-			pivotMotor.set(0);
-			pivotMotor.getEncoder().setPosition(0);
-			hasHitMinimum = true;
-		} else if (withinError(pivotMotor.getEncoder().getPosition(),
-				ARM_ENCODER_STARTING_ROTATIONS)) {
+		if (isMinHeight()) {
 			pivotMotor.set(0);
 		} else {
-			pidController.setReference(ARM_ENCODER_STARTING_ROTATIONS,
+			pivotMotor.set(-PIVOT_MOTOR_POWER);
+		}
+	}
+
+	private void handleMovingToStartState(TeleopInput input) {
+		if (withinError(pivotMotor.getEncoder().getPosition(),
+			ARM_ENCODER_STARTING_ANGLE_ROTATIONS)) {
+			pivotMotor.set(0);
+		} else {
+			pidController.setReference(ARM_ENCODER_STARTING_ANGLE_ROTATIONS,
 				CANSparkMax.ControlType.kPosition);
 		}
 	}
