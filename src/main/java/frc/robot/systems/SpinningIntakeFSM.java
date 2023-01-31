@@ -58,8 +58,8 @@ public class SpinningIntakeFSM {
 		// Perform hardware init
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
-		distanceSensorObject = new AnalogInput(0);
-		breakBeamObject = new DigitalInput(1);
+		distanceSensorObject = new AnalogInput(HardwareMap.ID_DISTANCE_SENSOR);
+		breakBeamObject = new DigitalInput(HardwareMap.ID_BREAK_BEAM);
 		colorSensorCube = new ColorSensorV3(Port.kOnboard);
 
 		// Reset state machine
