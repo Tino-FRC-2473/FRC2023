@@ -255,7 +255,8 @@ public class ArmFSM {
 				ARM_ENCODER_STARTING_ROTATIONS)) {
 			pivotMotor.set(0);
 		} else {
-			pidController.setReference(PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
+			pidController.setReference(ARM_ENCODER_STARTING_ROTATIONS,
+				CANSparkMax.ControlType.kPosition);
 		}
 	}
 	/*
@@ -292,18 +293,9 @@ public class ArmFSM {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 					pivotMotor.set(0);
-				} else if (pivotMotor.getEncoder().getPosition()
-						< SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS) {
-					//pivotMotor.set(PIVOT_MOTOR_POWER);
-					pidController.setReference(PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
-				} else if (pivotMotor.getEncoder().getPosition()
-						> SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS) {
-					//pivotMotor.set(-PIVOT_MOTOR_POWER);
-					pidController.setReference(-PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
 				} else {
-					pivotMotor.set(0);
+					pidController.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
 				}
 				if (teleArmMotor.getEncoder().getPosition()
 						< ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS) {
@@ -315,18 +307,9 @@ public class ArmFSM {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
 					pivotMotor.set(0);
-				} else if (pivotMotor.getEncoder().getPosition()
-						< SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
-					//pivotMotor.set(PIVOT_MOTOR_POWER);
-					pidController.setReference(PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
-				} else if (pivotMotor.getEncoder().getPosition()
-						> SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
-					//pivotMotor.set(-PIVOT_MOTOR_POWER);
-					pidController.setReference(-PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
 				} else {
-					pivotMotor.set(0);
+					pidController.setReference(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
 				}
 				if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH_BACKWARD_ROTATIONS) {
 					teleArmMotor.set(TELEARM_MOTOR_POWER);
@@ -346,18 +329,9 @@ public class ArmFSM {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 					pivotMotor.set(0);
-				} else if (pivotMotor.getEncoder().getPosition()
-					< SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS) {
-					//pivotMotor.set(PIVOT_MOTOR_POWER);
-					pidController.setReference(PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
-				} else if (pivotMotor.getEncoder().getPosition()
-						> SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS) {
-					//pivotMotor.set(-PIVOT_MOTOR_POWER);
-					pidController.setReference(-PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
 				} else {
-					pivotMotor.set(0);
+					pidController.setReference(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
 				}
 				if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID_FORWARD_ROTATIONS) {
 					teleArmMotor.set(TELEARM_MOTOR_POWER);
@@ -368,18 +342,9 @@ public class ArmFSM {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
 					pivotMotor.set(0);
-				} else if (pivotMotor.getEncoder().getPosition()
-					< SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
-					//pivotMotor.set(PIVOT_MOTOR_POWER);
-					pidController.setReference(PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
-				} else if (pivotMotor.getEncoder().getPosition()
-						> SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
-					//pivotMotor.set(-PIVOT_MOTOR_POWER);
-					pidController.setReference(-PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
 				} else {
-					pivotMotor.set(0);
+					pidController.setReference(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
 				}
 				if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID_BACKWARD_ROTATIONS) {
 					teleArmMotor.set(TELEARM_MOTOR_POWER);
@@ -398,14 +363,9 @@ public class ArmFSM {
 			if (withinError(pivotMotor.getEncoder().getPosition(),
 				SHOOT_LOW_ANGLE_ENCODER_ROTATIONS)) {
 				pivotMotor.set(0);
-			} else if (pivotMotor.getEncoder().getPosition() < SHOOT_LOW_ANGLE_ENCODER_ROTATIONS) {
-				//pivotMotor.set(PIVOT_MOTOR_POWER);
-				pidController.setReference(PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
-			} else if (pivotMotor.getEncoder().getPosition() > SHOOT_LOW_ANGLE_ENCODER_ROTATIONS) {
-				//pivotMotor.set(-PIVOT_MOTOR_POWER);
-				pidController.setReference(-PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
 			} else {
-				pivotMotor.set(0);
+				pidController.setReference(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS,
+					CANSparkMax.ControlType.kPosition);
 			}
 			if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_LOW_ROTATIONS) {
 				teleArmMotor.set(TELEARM_MOTOR_POWER);
@@ -425,18 +385,9 @@ public class ArmFSM {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 					pivotMotor.set(0);
-				} else if (pivotMotor.getEncoder().getPosition()
-							< SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS) {
-					//pivotMotor.set(PIVOT_MOTOR_POWER);
-					pidController.setReference(PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
-				} else if (pivotMotor.getEncoder().getPosition()
-							> SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS) {
-					//pivotMotor.set(-PIVOT_MOTOR_POWER);
-					pidController.setReference(-PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
 				} else {
-					pivotMotor.set(0);
+					pidController.setReference(SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
 				}
 				if (teleArmMotor.getEncoder().getPosition()
 					< ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS) {
@@ -448,18 +399,9 @@ public class ArmFSM {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
 					pivotMotor.set(0);
-				} else if (pivotMotor.getEncoder().getPosition()
-					< SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
-					//pivotMotor.set(PIVOT_MOTOR_POWER);
-					pidController.setReference(PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
-				} else if (pivotMotor.getEncoder().getPosition()
-						> SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS) {
-					//pivotMotor.set(-PIVOT_MOTOR_POWER);
-					pidController.setReference(-PIVOT_MOTOR_POWER,
-											CANSparkMax.ControlType.kDutyCycle);
 				} else {
-					pivotMotor.set(0);
+					pidController.setReference(SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
 				}
 				if (teleArmMotor.getEncoder().getPosition()
 					< ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS) {
