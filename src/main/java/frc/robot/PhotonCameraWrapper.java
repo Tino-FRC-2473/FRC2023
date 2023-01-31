@@ -38,7 +38,7 @@ public class PhotonCameraWrapper {
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
 		ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
-		atList.add(new AprilTag(1, new Pose3d(AprilTagConstants.APRILTAG_1_X_METERS,
+		atList.add(new AprilTag(2, new Pose3d(AprilTagConstants.APRILTAG_1_X_METERS,
 			AprilTagConstants.APRILTAG_1_Y_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE_RADIANS))));
 
