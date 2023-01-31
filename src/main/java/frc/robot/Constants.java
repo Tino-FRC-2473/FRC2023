@@ -40,16 +40,12 @@ public class Constants {
 	public static final double P2X2 = -47.7;
 	public static final double P3X1 = -186.645;
 	public static final double P3X2 = -9;
-	public static final double P3X3 = -33.5;
-	public static final double P3Y3 = 65.37;
-	public static final double P3X4 = -81.047;
+	public static final double P3X4 = -33.5;
 	public static final double P3Y4 = 65.37;
-	public static final double P3TURN_AMT1 = 69.454 * 0.8807; // 69.454
-	public static final double P3TURN_AMT2 = 9; // 0
-	public static final int S3 = 3;
-	public static final int S4 = 4;
-	public static final int S5 = 5;
-	public static final int S6 = 6;
+	public static final double P3X6 = -81.047;
+	public static final double P3Y6 = 65.37;
+	public static final double P3A3 = 69.454 * 0.8807; // 69.454
+	public static final double P3A5 = 9; // 0
 
 	// PFC Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
