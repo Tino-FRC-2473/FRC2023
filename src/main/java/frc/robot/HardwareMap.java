@@ -10,13 +10,6 @@ public final class HardwareMap {
 	// ID numbers for devices on the CAN bus
 	public static final int CAN_ID_SPARK_DRIVE_RIGHT1 = 5;
 	public static final int CAN_ID_SPARK_DRIVE_LEFT1 = 6;
-	public static final int CAN_ID_SPARK_DRIVE_RIGHT2 = 2;
-	public static final int CAN_ID_SPARK_DRIVE_LEFT2 = 4;
-	public static final int CAN_ID_SPARK_SHOOTER = 5;
-
-	// Pneumatics channel numbers
-	public static final int PCM_CHANNEL_INTAKE_CYLINDER_FORWARD = 1;
-	public static final int PCM_CHANNEL_INTAKE_CYLINDER_REVERSE = 2;
 
 	// Place jumper from DIO pin 9 to GND to indicate this is a test setup
 	private static final int DIO_TEST_SETUP_CHANNEL = 9;
