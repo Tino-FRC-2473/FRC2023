@@ -15,9 +15,20 @@ public class FSMSystem {
 
 	// FSM state definitions
 	public enum FSMState {
-		path1,
-		path2,
-		path3,
+		P1N1,
+		P1N2,
+		P1N3,
+
+		P2N1,
+		P2N2,
+
+		P3N1,
+		P3N2,
+		P3N3,
+		P3N4,
+		P3N5,
+		P3N6
+
 	}
 
 	/* ======================== Private variables ======================== */
@@ -34,12 +45,6 @@ public class FSMSystem {
 	private double prevEncoderPos = 0;
 	private double gyroAngleForOdo = 0;
 	private AHRS gyro;
-
-
-
-	// turn state
-	private boolean finishedTurning = false;
-
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -86,7 +91,7 @@ public class FSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.path3;
+		currentState = FSMState.P1N1;
 
 		roboXPos = 0;
 		roboYPos = 0;
@@ -114,16 +119,55 @@ public class FSMSystem {
 		// System.out.println("yPos: " + roboYPos);
 
 		switch (currentState) {
-			case path1:
-				path1(input);
+
+		// path 1
+
+			case P1N1:
+				moveState(input, true, Constants.P1X1, 0);
 				break;
 
-			case path2:
-				path2(input);
+			case P1N2:
+				moveState(input, false, Constants.P1X2, 0);
 				break;
 
-			case path3:
-				path3(input);
+			case P1N3:
+				moveState(input, true, Constants.P1X3, 0);
+				break;
+
+			// path 2
+
+			case P2N1:
+				moveState(input, true, Constants.P2X1, 0);
+				break;
+
+			case P2N2:
+				moveState(input, false, Constants.P2X2, 0);
+				break;
+
+			// path 3
+
+			case P3N1:
+				moveState(input, true, Constants.P3X1, 0);
+				break;
+
+			case P3N2:
+				moveState(input, false, Constants.P3X2, 0);
+				break;
+
+			case P3N3:
+				handleTurnState(input, Constants.P3A3);
+				break;
+
+			case P3N4:
+				moveState(input, true, Constants.P3X4, Constants.P3Y4);
+				break;
+
+			case P3N5:
+				handleTurnState(input, Constants.P3A5);
+				break;
+
+			case P3N6:
+				moveState(input, true, Constants.P3X6, Constants.P3Y6);
 				break;
 
 			default:
@@ -143,16 +187,101 @@ public class FSMSystem {
 	 * @return FSM state for the next iteration
 	 */
 	private FSMState nextState(TeleopInput input) {
+		double roboX = -roboXPos;
+		double roboY = roboYPos;
+
 		switch (currentState) {
 
-			case path1:
-				return FSMState.path1;
+		// path 1
+			case P1N1:
+				if (Math.abs(roboX - Constants.P1X1) <= Constants.MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.MOVE_THRESHOLD) {
+					return FSMState.P1N2;
+				} else {
+					return FSMState.P1N1;
+				}
 
-			case path2:
-				return FSMState.path2;
+			case P1N2:
+				if (Math.abs(roboX - Constants.P1X2) <= Constants.MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.MOVE_THRESHOLD) {
+					return FSMState.P1N3;
+				} else {
+					return FSMState.P1N2;
+				}
 
-			case path3:
-				return FSMState.path3;
+			case P1N3:
+				if (Math.abs(roboX - Constants.P1X3) <= Constants.MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.MOVE_THRESHOLD) {
+					return null;
+				} else {
+					return FSMState.P1N3;
+				}
+
+			// path 2
+
+			case P2N1:
+				if (Math.abs(roboX - Constants.P2X1) <= Constants.MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.MOVE_THRESHOLD) {
+					return FSMState.P2N2;
+				} else {
+					return FSMState.P2N1;
+				}
+
+			case P2N2:
+				if (Math.abs(roboX - Constants.P2X2) <= Constants.MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.MOVE_THRESHOLD) {
+					return null;
+				} else {
+					return FSMState.P2N2;
+				}
+
+			// path 3
+
+			case P3N1:
+				if (Math.abs(roboX - Constants.P3X1) <= Constants.MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.MOVE_THRESHOLD) {
+					return FSMState.P3N2;
+				} else {
+					return FSMState.P3N1;
+				}
+
+			case P3N2:
+				if (Math.abs(roboX - Constants.P3X2) <= Constants.MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.MOVE_THRESHOLD) {
+					return FSMState.P3N3;
+				} else {
+					return FSMState.P3N2;
+				}
+
+			case P3N3:
+				if (finishedTurning) {
+					return FSMState.P3N4;
+				} else {
+					return FSMState.P3N3;
+				}
+
+			case P3N4:
+				if (Math.abs(roboX - Constants.P3X4) <= Constants.MOVE_THRESHOLD
+					&& Math.abs(roboY - Constants.P3Y4) <= Constants.MOVE_THRESHOLD) {
+					return FSMState.P3N5;
+				} else {
+					return FSMState.P3N4;
+				}
+
+			case P3N5:
+				if (finishedTurning) {
+					return FSMState.P3N6;
+				} else {
+					return FSMState.P3N5;
+				}
+
+			case P3N6:
+				if (Math.abs(roboX - Constants.P3X6) <= Constants.MOVE_THRESHOLD
+					&& Math.abs(roboY - Constants.P3Y6) <= Constants.MOVE_THRESHOLD) {
+					return null;
+				} else {
+					return FSMState.P3N6;
+				}
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -184,7 +313,7 @@ public class FSMSystem {
 	}
 
 	/**
-	 * Tracks the robo's position on the field.
+	 * Turns the robot to a fixed angle.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 * @param degrees amount of degrees to turn
@@ -234,13 +363,15 @@ public class FSMSystem {
 		// angle will be between 0 - 360
 	}
 
-	private int state = 0;
 	/**
-	 * Autonomus path 1.
+	 * .
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
+	 * @param forwards whether the robot is moving forwards or backwards
+	 * @param x x position of goal point
+	 * @param y y position of goal point
 	 */
-	public void path1(TeleopInput input) {
+	public void moveState(TeleopInput input, boolean forwards, double x, double y) {
 		if (input != null) {
 			return;
 		}
@@ -248,146 +379,18 @@ public class FSMSystem {
 		double roboY = roboYPos;
 		System.out.println("x: " + roboX);
 		System.out.println("y: " + roboY);
-		System.out.println("state: " + state);
-		if (state == 0) {
+
+		if (forwards) {
 			leftMotor.set(-Constants.MOVE_POWER);
 			rightMotor.set(Constants.MOVE_POWER);
-			if (Math.abs(roboX - Constants.P1X1) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				state++;
-			}
-		} else if (state == 1) {
-			System.out.println("entered 1");
+		} else {
 			leftMotor.set(Constants.MOVE_POWER);
 			rightMotor.set(-Constants.MOVE_POWER);
-			if (Math.abs(roboX - Constants.P1X2) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				state++;
-			}
-		} else if (state == 2) {
-			leftMotor.set(-Constants.MOVE_POWER);
-			rightMotor.set(Constants.MOVE_POWER);
-			if (Math.abs(roboX - Constants.P1X3) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				System.out.println("end");
-				// state++;
-			}
 		}
-	}
-
-	/**
-	 * Autonomus path 2.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 */
-	public void path2(TeleopInput input) {
-		if (input != null) {
-			return;
-		}
-		double roboX = -roboXPos;
-		double roboY = roboYPos;
-		System.out.println("x: " + roboX);
-		System.out.println("y: " + roboY);
-		System.out.println("state: " + state);
-		if (state == 0) {
-			leftMotor.set(-Constants.MOVE_POWER);
-			rightMotor.set(Constants.MOVE_POWER);
-			if (Math.abs(roboX - Constants.P2X1) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				state++;
-			}
-		} else if (state == 1) {
-			System.out.println("entered 1");
-			leftMotor.set(Constants.MOVE_POWER);
-			rightMotor.set(-Constants.MOVE_POWER);
-			if (Math.abs(roboX + Constants.P2X2) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				System.out.println("end");
-				// state++;
-			}
-		}
-	}
-
-	/**
-	 * Autonomus path 3.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 */
-	public void path3(TeleopInput input) {
-		if (input != null) {
-			return;
-		}
-		double roboX = -roboXPos;
-		double roboY = roboYPos;
-		System.out.println("x: " + roboX);
-		System.out.println("y: " + roboY);
-		System.out.println("state: " + state);
-		System.out.println("angle: " + gyro.getAngle());
-
-		// if (state == 0) { // turning right
-		// 	handleTurnState(input, Constants.P3TURN_AMT1 * 0.913);
-		// 	if (finishedTurning) {
-		// 		state--;
-		// 	}
-		// }
-
-		if (state == 0) {
-			leftMotor.set(Constants.MOVE_POWER);
-			rightMotor.set(-Constants.MOVE_POWER);
-			if (Math.abs(roboX - Constants.P3X1) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				state++;
-			}
-		} else if (state == 1) {
-			leftMotor.set(-Constants.MOVE_POWER);
-			rightMotor.set(Constants.MOVE_POWER);
-			if (Math.abs(roboX) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				state++;
-			}
-		} else if (state == 2) {
-			leftMotor.set(Constants.MOVE_POWER);
-			rightMotor.set(-Constants.MOVE_POWER);
-			if (Math.abs(roboX - Constants.P3X2) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				state++;
-			}
-		} else if (state == Constants.S3) {
-			handleTurnState(input, Constants.P3TURN_AMT1);
-			if (finishedTurning) {
-				state++;
-			}
-		} else if (state == Constants.S4) {
-			leftMotor.set(Constants.MOVE_POWER);
-			rightMotor.set(-Constants.MOVE_POWER);
-			if (Math.abs(roboX - Constants.P3X3) <= Constants.MOVE_THRESHOLD
-				&& Math.abs(roboY - Constants.P3Y3) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				state++;
-			}
-		} else if (state == Constants.S5) { // turning left
-			handleTurnState(input, Constants.P3TURN_AMT2);
-			if (finishedTurning) {
-				state++;
-			}
-		} else if (state == Constants.S6) {
-			leftMotor.set(Constants.MOVE_POWER);
-			rightMotor.set(-Constants.MOVE_POWER);
-			if (Math.abs(roboX - Constants.P3X4) <=  Constants.MOVE_THRESHOLD
-				&& Math.abs(roboY - Constants.P3Y4) <= Constants.MOVE_THRESHOLD) {
-				leftMotor.set(0);
-				rightMotor.set(0);
-				// state++;
-			}
+		if (Math.abs(roboX - x) <= Constants.MOVE_THRESHOLD
+			&& Math.abs(roboY - y) <= Constants.MOVE_THRESHOLD) {
+			leftMotor.set(0);
+			rightMotor.set(0);
 		}
 	}
 }
