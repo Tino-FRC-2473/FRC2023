@@ -7,13 +7,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C.Port;
 
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
-import com.revrobotics.ColorMatch;
-import edu.wpi.first.wpilibj.util.Color;
 
 public class SpinningIntakeFSM {
 	/* ======================== Constants ======================== */
@@ -28,6 +27,7 @@ public class SpinningIntakeFSM {
 	private static final double INTAKE_SPEED = 0.1;
 	private static final double RELEASE_SPEED = -0.1;
 	private static final int COLOR_PROXIMITY_THRESHOLD = 100;
+	private static final int DISTANCE_PROXIMITY_THRESHOLD = 2500;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static int itemType = 0;
 
@@ -43,9 +43,10 @@ public class SpinningIntakeFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotor;
-	private DigitalInput limitSwitchCone;
+	//private DigitalInput limitSwitchCone;
+	private AnalogInput distanceSensorObject;
+	private DigitalInput breakBeamObject;
 	private ColorSensorV3 colorSensorCube;
-	private ColorMatch colorMatch;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -57,11 +58,9 @@ public class SpinningIntakeFSM {
 		// Perform hardware init
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
-		limitSwitchCone = new DigitalInput(0);
+		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
+		breakBeamObject = new DigitalInput(HardwareMap.DIO_ID_BREAK_BEAM);
 		colorSensorCube = new ColorSensorV3(Port.kOnboard);
-		colorMatch = new ColorMatch();
-		colorMatch.addColorMatch(Color.kPurple);
-		colorMatch.addColorMatch(Color.kYellow);
 
 		// Reset state machine
 		reset();
@@ -116,7 +115,6 @@ public class SpinningIntakeFSM {
 		}
 
 		currentState = nextState(input);
-		System.out.println(getObjectType());
 	}
 
 	/*-------------------------NON HANDLER METHODS ------------------------- */
@@ -147,7 +145,8 @@ public class SpinningIntakeFSM {
 		return Math.abs(a - b) <= TOLERANCE;
 	}
 	private boolean isLimitSwitchConeActivated() {
-		if (limitSwitchCone.get()) {
+		//if (distanceSensorObject.getValue() > DISTANCE_PROXIMITY_THRESHOLD) {
+		if (!breakBeamObject.get()) {
 			itemType = 1;
 			return true;
 		}
