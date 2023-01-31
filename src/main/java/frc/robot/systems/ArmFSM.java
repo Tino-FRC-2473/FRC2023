@@ -250,6 +250,7 @@ public class ArmFSM {
 			pidController.setReference(-PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
 		} else if (!hasHitMinimum && isMinHeight()) {
 			pivotMotor.set(0);
+			pivotMotor.getEncoder().setPosition(0);
 			hasHitMinimum = true;
 		} else if (withinError(pivotMotor.getEncoder().getPosition(),
 				ARM_ENCODER_STARTING_ROTATIONS)) {
