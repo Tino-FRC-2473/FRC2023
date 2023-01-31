@@ -25,6 +25,8 @@ public class TeleopInput {
 	private static final int AIM_MID_BUTTON = 9;
 	private static final int BALANCE_BUTTON = 2;
 	private static final int AIM_LOW_BUTTON = 11;
+	private static final int SUBSTATION_PICKUP_BUTTON = 8;
+	private static final int HOMING_BUTTON = 10;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -126,6 +128,30 @@ public class TeleopInput {
 	 */
 	public boolean isShootLowButtonPressed() {
 		return mechJoystick.getRawButton(AIM_LOW_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Substation Pickup button.
+	 * @return True if button is pressed
+	 */
+	public boolean isSubstationPickupButtonPressed() {
+		return mechJoystick.getRawButton(SUBSTATION_PICKUP_BUTTON);
+	}
+
+	/**
+	 * Get the boolean value of the Throttle button.
+	 * @return True if button is pressed
+	 */
+	public boolean isThrottleForward() {
+		return mechJoystick.getThrottle() <= 0 ? false : true;
+	}
+
+	/**
+	 * Get the value of the Homing button.
+	 * @return True if button is pressed
+	 */
+	public boolean isHomingButtonPressed() {
+		return mechJoystick.getRawButton(HOMING_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
