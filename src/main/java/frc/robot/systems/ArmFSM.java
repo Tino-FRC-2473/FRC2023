@@ -107,7 +107,7 @@ public class ArmFSM {
 	 * On robot start set the start to IDLE state. Resets robot to original state.
 	 */
 	public void reset() {
-		currentState = FSMState.HOMING_STATE;
+		currentState = FSMState.IDLE;
 		pivotMotor.getEncoder().setPosition(0);
 		teleArmMotor.getEncoder().setPosition(0);
 
@@ -169,16 +169,20 @@ public class ArmFSM {
 			case IDLE:
 				if ((input.isExtendButtonPressed() || input.isRetractButtonPressed()
 					|| input.isPivotIncreaseButtonPressed() || input.isPivotDecreaseButtonPressed())
-					&& !input.isShootHighButtonPressed() && !input.isShootMidButtonPressed()) {
+					&& !input.isShootHighButtonPressed() && !input.isShootMidButtonPressed()
+					&& !input.isHomingButtonPressed()) {
 					return FSMState.ARM_MOVEMENT;
 				} else if (input.isShootHighButtonPressed()) {
 					return FSMState.SHOOT_HIGH;
 				} else if (input.isShootMidButtonPressed()) {
 					return FSMState.SHOOT_MID;
+				} else if (input.isHomingButtonPressed()) {
+					return FSMState.HOMING_STATE;
 				}
 				return FSMState.IDLE;
 			case HOMING_STATE:
-				if (isMinHeight()) {
+				if (hasHitMinimum && withinError(pivotMotor.getEncoder().getPosition(),
+					ARM_ENCODER_STARTING_ROTATIONS)) {
 					return FSMState.IDLE;
 				} else {
 					return FSMState.HOMING_STATE;
