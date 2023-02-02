@@ -122,6 +122,22 @@ public class PhotonCameraWrapper {
 	}
 
 	/**
+	 * @return Returns a distance in meters from the closest reflective tape and -1 if there
+	 *         are no cubes.
+	 */
+	public double getDistanceToTape() {
+		photonCamera.setPipelineIndex(3); // Tape pipeline
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			return PhotonUtils.calculateDistanceToTargetMeters(
+					VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CUBE_HEIGHT_METERS,
+					VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
+							result.getBestTarget().getPitch()));
+		}
+		return -1;
+	}
+
+	/**
 	 * @return Returns the angle needed to turn for aligning the robot to the cone
 	 *         and 360 if there are no cones.
 	 */
