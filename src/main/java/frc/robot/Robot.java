@@ -24,7 +24,7 @@ public class Robot extends TimedRobot {
 
 	// Systems
 	// private ArmFSM armSystem;
-	private DriveFSMSystem driveSystem;
+	// private DriveFSMSystem driveSystem;
 	private PhotonCameraWrapper photoncam;
 	
 	/**
@@ -40,20 +40,20 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		// armSystem = new ArmFSM();
 		photoncam = new PhotonCameraWrapper();
-		driveSystem = new DriveFSMSystem();
+		//driveSystem = new DriveFSMSystem();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		// armSystem.reset();
-		driveSystem.resetAutonomous();
+		//driveSystem.resetAutonomous();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 		// armSystem.update(null);
-		driveSystem.update(null);
+		//driveSystem.update(null);
 		Optional<EstimatedRobotPose> pauli = photoncam.getEstimatedGlobalPose();
 		// double substation error correction
 		if (!pauli.isEmpty() && pauli.get().estimatedPose.getZ() > 0.63) {
@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		// armSystem.update(input)
-		driveSystem.update(input);
+		// driveSystem.update(input);
 	}
 
 	@Override
