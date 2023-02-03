@@ -6,7 +6,6 @@ package frc.robot.systems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C.Port;
 
@@ -26,8 +25,11 @@ public class SpinningIntakeFSM {
 	//FIX VALUES
 	private static final double INTAKE_SPEED = 0.1;
 	private static final double RELEASE_SPEED = -0.1;
-	private static final int COLOR_PROXIMITY_THRESHOLD = 100;
-	private static final int DISTANCE_PROXIMITY_THRESHOLD = 2500;
+	//arbitrary constants for cube and cone
+	private static final int MIN_CONE_DISTANCE = 2300;
+	private static final int MIN_CUBE_DISTANCE = 1300;
+	private static final int MAX_COLOR_MEASURE = 800;
+	private static final int MIN_COLOR_MEASURE = 600;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static int itemType = 0;
 
@@ -45,7 +47,6 @@ public class SpinningIntakeFSM {
 	private CANSparkMax spinnerMotor;
 	//private DigitalInput limitSwitchCone;
 	private AnalogInput distanceSensorObject;
-	private DigitalInput breakBeamObject;
 	private ColorSensorV3 colorSensorCube;
 
 	/* ======================== Constructor ======================== */
@@ -59,7 +60,6 @@ public class SpinningIntakeFSM {
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
-		breakBeamObject = new DigitalInput(HardwareMap.DIO_ID_BREAK_BEAM);
 		colorSensorCube = new ColorSensorV3(Port.kOnboard);
 
 		// Reset state machine
@@ -94,6 +94,8 @@ public class SpinningIntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+		//System.out.println(itemType);
+		System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		if (input == null) {
 			return;
 		}
@@ -113,8 +115,11 @@ public class SpinningIntakeFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-
+		FSMState previousState = currentState;
 		currentState = nextState(input);
+		if (previousState != currentState) {
+			System.out.println(currentState);
+		}
 	}
 
 	/*-------------------------NON HANDLER METHODS ------------------------- */
@@ -125,32 +130,24 @@ public class SpinningIntakeFSM {
 	public static int getObjectType() {
 		return itemType;
 	}
-	private boolean isCubeDetected() {
-		boolean objectDetected = colorSensorCube.getProximity() > COLOR_PROXIMITY_THRESHOLD;
+	private boolean updateItem() {
 		double r =  colorSensorCube.getColor().red;
 		double g =  colorSensorCube.getColor().green;
 		double b =  colorSensorCube.getColor().blue;
 
 		//System.out.println(r + " " + g + " " + b + " " + colorSensorCube.getProximity());
-		if ((objectDetected && withinRange(r, RED_AVG)
+		if ((withinRange(r, RED_AVG)
 			&& withinRange(g, GREEN_AVG) && withinRange(b, BLUE_AVG))) {
 			itemType = 2;
 			return true;
 		}
+		itemType = 1;
 		return false;
 		//return !isCone && objectDetected;
 	}
 
 	private boolean withinRange(double a, double b) {
 		return Math.abs(a - b) <= TOLERANCE;
-	}
-	private boolean isLimitSwitchConeActivated() {
-		//if (distanceSensorObject.getValue() > DISTANCE_PROXIMITY_THRESHOLD) {
-		if (!breakBeamObject.get()) {
-			itemType = 1;
-			return true;
-		}
-		return false;
 	}
 
 	/* ======================== Private methods ======================== */
@@ -174,7 +171,8 @@ public class SpinningIntakeFSM {
 				if (input.isReleaseButtonPressed()) {
 					return FSMState.RELEASE;
 				}
-				if (isCubeDetected() || isLimitSwitchConeActivated()) {
+				if ((itemType == 2 && distanceSensorObject.getValue() > MIN_CUBE_DISTANCE)
+					|| itemType == 1 && distanceSensorObject.getValue() > MIN_CONE_DISTANCE) {
 					return FSMState.IDLE_STOP;
 				}
 				return FSMState.IDLE_SPINNING;
@@ -200,6 +198,10 @@ public class SpinningIntakeFSM {
 	private void handleStartState() {
 	}
 	private void handleIdleSpinningState() {
+		if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
+			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE) {
+			updateItem();
+		}
 		spinnerMotor.set(INTAKE_SPEED);
 	}
 	private void handleIdleStopState() {
