@@ -27,7 +27,21 @@ public class DriveFSMSystem {
 		TELE_STATE_MECANUM,
 		PURE_PURSUIT,
 		TURNING_STATE,
-		IDLE
+		IDLE,
+
+		P1N1,
+		P1N2,
+		P1N3,
+
+		P2N1,
+		P2N2,
+
+		P3N1,
+		P3N2,
+		P3N3,
+		P3N4,
+		P3N5,
+		P3N6
 	}
 
 	/* ======================== Private variables ======================== */
@@ -174,6 +188,56 @@ public class DriveFSMSystem {
 				handleTurnState(input, 0);
 				break;
 
+			// path 1
+
+			case P1N1:
+				moveState(input, true, Constants.P1X1, 0);
+				break;
+
+			case P1N2:
+				moveState(input, false, Constants.P1X2, 0);
+				break;
+
+			case P1N3:
+				moveState(input, true, Constants.P1X3, 0);
+				break;
+
+			// path 2
+
+			case P2N1:
+				moveState(input, true, Constants.P2X1, 0);
+				break;
+
+			case P2N2:
+				moveState(input, false, Constants.P2X2, 0);
+				break;
+
+			// path 3
+
+			case P3N1:
+				moveState(input, true, Constants.P3X1, 0);
+				break;
+
+			case P3N2:
+				moveState(input, false, Constants.P3X2, 0);
+				break;
+
+			case P3N3:
+				handleTurnState(input, Constants.P3A3);
+				break;
+
+			case P3N4:
+				moveState(input, true, Constants.P3X4, Constants.P3Y4);
+				break;
+
+			case P3N5:
+				handleTurnState(input, Constants.P3A5);
+				break;
+
+			case P3N6:
+				moveState(input, true, Constants.P3X6, Constants.P3Y6);
+				break;
+
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -191,6 +255,9 @@ public class DriveFSMSystem {
 	 * @return FSM state for the next iteration
 	 */
 	private FSMState nextState(TeleopInput input) {
+		double roboX = -roboXPos;
+		double roboY = roboYPos;
+
 		switch (currentState) {
 
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -212,6 +279,97 @@ public class DriveFSMSystem {
 
 			case IDLE:
 				return FSMState.IDLE;
+
+			// path 1
+			case P1N1:
+				if (Math.abs(roboX - Constants.P1X1) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return FSMState.P1N2;
+				} else {
+					return FSMState.P1N1;
+				}
+
+			case P1N2:
+				if (Math.abs(roboX - Constants.P1X2) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return FSMState.P1N3;
+				} else {
+					return FSMState.P1N2;
+				}
+
+			case P1N3:
+				if (Math.abs(roboX - Constants.P1X3) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return null;
+				} else {
+					return FSMState.P1N3;
+				}
+
+			// path 2
+
+			case P2N1:
+				if (Math.abs(roboX - Constants.P2X1) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return FSMState.P2N2;
+				} else {
+					return FSMState.P2N1;
+				}
+
+			case P2N2:
+				if (Math.abs(roboX - Constants.P2X2) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return null;
+				} else {
+					return FSMState.P2N2;
+				}
+
+			// path 3
+
+			case P3N1:
+				if (Math.abs(roboX - Constants.P3X1) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return FSMState.P3N2;
+				} else {
+					return FSMState.P3N1;
+				}
+
+			case P3N2:
+				if (Math.abs(roboX - Constants.P3X2) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return FSMState.P3N3;
+				} else {
+					return FSMState.P3N2;
+				}
+
+			case P3N3:
+				if (finishedTurning) {
+					return FSMState.P3N4;
+				} else {
+					return FSMState.P3N3;
+				}
+
+			case P3N4:
+				if (Math.abs(roboX - Constants.P3X4) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY - Constants.P3Y4) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return FSMState.P3N5;
+				} else {
+					return FSMState.P3N4;
+				}
+
+			case P3N5:
+				if (finishedTurning) {
+					return FSMState.P3N6;
+				} else {
+					return FSMState.P3N5;
+				}
+
+			case P3N6:
+				if (Math.abs(roboX - Constants.P3X6) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY - Constants.P3Y6) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return null;
+				} else {
+					return FSMState.P3N6;
+				}
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -380,5 +538,35 @@ public class DriveFSMSystem {
 
 	}
 
+	/**
+	 * .
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 * @param forwards whether the robot is moving forwards or backwards
+	 * @param x x position of goal point
+	 * @param y y position of goal point
+	 */
+	public void moveState(TeleopInput input, boolean forwards, double x, double y) {
+		if (input != null) {
+			return;
+		}
+		double roboX = -roboXPos;
+		double roboY = roboYPos;
+		System.out.println("x: " + roboX);
+		System.out.println("y: " + roboY);
+
+		if (forwards) {
+			leftMotor.set(-Constants.AUTONOMUS_MOVE_POWER);
+			rightMotor.set(Constants.AUTONOMUS_MOVE_POWER);
+		} else {
+			leftMotor.set(Constants.AUTONOMUS_MOVE_POWER);
+			rightMotor.set(-Constants.AUTONOMUS_MOVE_POWER);
+		}
+		if (Math.abs(roboX - x) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+			leftMotor.set(0);
+			rightMotor.set(0);
+		}
+	}
 
 }
