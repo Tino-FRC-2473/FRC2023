@@ -26,9 +26,12 @@ public class DrivePoseEstimator {
 	 * */
 	public void updatePose(double gyroAngle, double leftEncoderPos, double rightEncoderPos) {
 		poseEstimator.update(new Rotation2d(Units.degreesToRadians(gyroAngle)),
-			leftEncoderPos, rightEncoderPos);
+			leftEncoderPos / 23.1889, -rightEncoderPos / 23.1889);
 		Optional<EstimatedRobotPose> result = pcw.getEstimatedGlobalPose();
 		if (!result.isEmpty()) {
+			// System.out.println("VisionX" + pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
+			// System.out.println("VisionY" +  pcw.getEstimatedGlobalPose().get().estimatedPose.getY());
+			// System.out.println("VisionAngle" + pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle());
 			poseEstimator.addVisionMeasurement(
 					result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
 		}

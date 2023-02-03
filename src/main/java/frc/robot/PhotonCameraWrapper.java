@@ -38,9 +38,9 @@ public class PhotonCameraWrapper {
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
 		ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
-		atList.add(new AprilTag(1, new Pose3d(AprilTagConstants.APRILTAG_1_X_METERS,
-			AprilTagConstants.APRILTAG_1_Y_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
-			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE_RADIANS))));
+		atList.add(new AprilTag(2, new Pose3d(AprilTagConstants.APRILTAG_2_X_METERS,
+			AprilTagConstants.APRILTAG_2_Y_METERS, AprilTagConstants.APRILTAG_2_HEIGHT_METERS,
+			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_2_ANGLE_RADIANS))));
 
 		AprilTagFieldLayout atfl =
 				new AprilTagFieldLayout(atList,
@@ -75,6 +75,7 @@ public class PhotonCameraWrapper {
 		// 	return new Pair<Pose3d, Double>(pose, timestamp);
 		// }
 		// return null;
+		
 		return robotPoseEstimator.update();
 	}
 	/** @return Returns a distance in meters from the closest cone and -1 if there are no cones.*/
