@@ -64,7 +64,8 @@ public class ArmFSM {
 	private CANSparkMax teleArmMotor;
 	private SparkMaxLimitSwitch pivotLimitSwitchHigh;
 	private SparkMaxLimitSwitch pivotLimitSwitchLow;
-	private SparkMaxPIDController pidController;
+	private SparkMaxPIDController pidControllerPivot;
+	private SparkMaxPIDController pidControllerTeleArm;
 	/*
 	 * Hardware Map each of the motors
 	 *
@@ -84,13 +85,20 @@ public class ArmFSM {
 		pivotLimitSwitchLow.enableLimitSwitch(true);
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
-		pidController = pivotMotor.getPIDController();
-		pidController.setP(PID_CONSTANT_P);
-		pidController.setI(PID_CONSTANT_I);
-		pidController.setD(PID_CONSTANT_D);
-		pidController.setIZone(0);
-		pidController.setFF(0);
-		pidController.setOutputRange(-PID_MAX_POWER, PID_MAX_POWER);
+		pidControllerPivot = pivotMotor.getPIDController();
+		pidControllerPivot.setP(PID_CONSTANT_P);
+		pidControllerPivot.setI(PID_CONSTANT_I);
+		pidControllerPivot.setD(PID_CONSTANT_D);
+		pidControllerPivot.setIZone(0);
+		pidControllerPivot.setFF(0);
+		pidControllerPivot.setOutputRange(-PID_MAX_POWER, PID_MAX_POWER);
+		pidControllerTeleArm = teleArmMotor.getPIDController();
+		pidControllerPivot.setP(PID_CONSTANT_P);
+		pidControllerPivot.setI(PID_CONSTANT_I);
+		pidControllerPivot.setD(PID_CONSTANT_D);
+		pidControllerPivot.setIZone(0);
+		pidControllerPivot.setFF(0);
+		pidControllerPivot.setOutputRange(-PID_MAX_POWER, PID_MAX_POWER);
 		// Reset state machine
 		reset();
 	}
@@ -283,7 +291,7 @@ public class ArmFSM {
 			ARM_ENCODER_STARTING_ANGLE_ROTATIONS)) {
 			pivotMotor.set(0);
 		} else {
-			pidController.setReference(ARM_ENCODER_STARTING_ANGLE_ROTATIONS,
+			pidControllerPivot.setReference(ARM_ENCODER_STARTING_ANGLE_ROTATIONS,
 				CANSparkMax.ControlType.kPosition);
 		}
 	}
@@ -324,28 +332,32 @@ public class ArmFSM {
 						SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 						pivotMotor.set(0);
 					} else {
-						pidController.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
+						pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 							CANSparkMax.ControlType.kPosition);
 					}
-					if (teleArmMotor.getEncoder().getPosition()
-							< ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS) {
-						teleArmMotor.set(TELEARM_MOTOR_POWER);
-					} else {
+					if (withinError(teleArmMotor.getEncoder().getPosition(),
+						ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
 						teleArmMotor.set(0);
+					} else {
+						//teleArmMotor.set(TELEARM_MOTOR_POWER);
+						pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
+							CANSparkMax.ControlType.kPosition);
 					}
 				} else {
 					if (withinError(pivotMotor.getEncoder().getPosition(),
 						SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 						pivotMotor.set(0);
 					} else {
-						pidController.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
+						pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 							CANSparkMax.ControlType.kPosition);
 					}
-					if (teleArmMotor.getEncoder().getPosition()
-							< ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS) {
-						teleArmMotor.set(TELEARM_MOTOR_POWER);
-					} else {
+					if (withinError(teleArmMotor.getEncoder().getPosition(),
+						ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS)) {
 						teleArmMotor.set(0);
+					} else {
+						//teleArmMotor.set(TELEARM_MOTOR_POWER);
+						pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS,
+							CANSparkMax.ControlType.kPosition);
 					}
 				}
 			} else { //throttle is backward/false
@@ -353,13 +365,16 @@ public class ArmFSM {
 					SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
 					pivotMotor.set(0);
 				} else {
-					pidController.setReference(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
+					pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
-				if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_HIGH_BACKWARD_ROTATIONS) {
-					teleArmMotor.set(TELEARM_MOTOR_POWER);
-				} else {
+				if (withinError(teleArmMotor.getEncoder().getPosition(),
+						ARM_ENCODER_HIGH_BACKWARD_ROTATIONS)) {
 					teleArmMotor.set(0);
+				} else {
+						//teleArmMotor.set(TELEARM_MOTOR_POWER);
+					pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_BACKWARD_ROTATIONS,
+							CANSparkMax.ControlType.kPosition);
 				}
 			}
 		} else {
@@ -375,26 +390,32 @@ public class ArmFSM {
 					SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 					pivotMotor.set(0);
 				} else {
-					pidController.setReference(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
+					pidControllerPivot.setReference(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
-				if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID_FORWARD_ROTATIONS) {
-					teleArmMotor.set(TELEARM_MOTOR_POWER);
-				} else {
+				if (withinError(teleArmMotor.getEncoder().getPosition(),
+						ARM_ENCODER_MID_FORWARD_ROTATIONS)) {
 					teleArmMotor.set(0);
+				} else {
+					//teleArmMotor.set(TELEARM_MOTOR_POWER);
+					pidControllerTeleArm.setReference(ARM_ENCODER_MID_FORWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
 				}
 			} else { //throttle is backward/false
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
 					pivotMotor.set(0);
 				} else {
-					pidController.setReference(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS,
+					pidControllerPivot.setReference(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
-				if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_MID_BACKWARD_ROTATIONS) {
-					teleArmMotor.set(TELEARM_MOTOR_POWER);
-				} else {
+				if (withinError(teleArmMotor.getEncoder().getPosition(),
+						ARM_ENCODER_MID_BACKWARD_ROTATIONS)) {
 					teleArmMotor.set(0);
+				} else {
+					//teleArmMotor.set(TELEARM_MOTOR_POWER);
+					pidControllerTeleArm.setReference(ARM_ENCODER_MID_BACKWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
 				}
 			}
 		} else {
@@ -409,13 +430,16 @@ public class ArmFSM {
 				SHOOT_LOW_ANGLE_ENCODER_ROTATIONS)) {
 				pivotMotor.set(0);
 			} else {
-				pidController.setReference(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS,
+				pidControllerPivot.setReference(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
-			if (teleArmMotor.getEncoder().getPosition() < ARM_ENCODER_LOW_ROTATIONS) {
-				teleArmMotor.set(TELEARM_MOTOR_POWER);
-			} else {
+			if (withinError(teleArmMotor.getEncoder().getPosition(),
+						ARM_ENCODER_LOW_ROTATIONS)) {
 				teleArmMotor.set(0);
+			} else {
+				//teleArmMotor.set(TELEARM_MOTOR_POWER);
+				pidControllerTeleArm.setReference(ARM_ENCODER_LOW_ROTATIONS,
+					CANSparkMax.ControlType.kPosition);
 			}
 		} else {
 			teleArmMotor.set(0);
@@ -431,28 +455,34 @@ public class ArmFSM {
 					SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 					pivotMotor.set(0);
 				} else {
-					pidController.setReference(SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS,
+					pidControllerPivot.setReference(
+						SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
-				if (teleArmMotor.getEncoder().getPosition()
-					< ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS) {
-					teleArmMotor.set(TELEARM_MOTOR_POWER);
-				} else {
+				if (withinError(teleArmMotor.getEncoder().getPosition(),
+						ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS)) {
 					teleArmMotor.set(0);
+				} else {
+					//teleArmMotor.set(TELEARM_MOTOR_POWER);
+					pidControllerTeleArm.setReference(ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
 				}
 			} else { //throttle is backward/false
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
 					pivotMotor.set(0);
 				} else {
-					pidController.setReference(SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS,
+					pidControllerPivot.setReference(
+						SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
-				if (teleArmMotor.getEncoder().getPosition()
-					< ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS) {
-					teleArmMotor.set(TELEARM_MOTOR_POWER);
-				} else {
+				if (withinError(teleArmMotor.getEncoder().getPosition(),
+					ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS)) {
 					teleArmMotor.set(0);
+				} else {
+					//teleArmMotor.set(TELEARM_MOTOR_POWER);
+					pidControllerTeleArm.setReference(ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
 				}
 			}
 		} else {
