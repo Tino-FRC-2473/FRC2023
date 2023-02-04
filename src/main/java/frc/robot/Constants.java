@@ -31,19 +31,19 @@ public class Constants {
 	public static final double AUTONOMUS_MOVE_THRESHOLD = 1.5;
 
 	// Path points added
-	public static final double P1X1 = 28.271 ;
-	public static final double P1X2 = -108.947 ;
-	public static final double P1X3 = -53.342 ;
-	public static final double P2X1 = 42.751 ;
-	public static final double P2X2 = -47.7 ;
-	public static final double P3X1 = -186.645 ;
-	public static final double P3X2 = -9 ;
-	public static final double P3X4 = -33.5 ;
-	public static final double P3Y4 = 65.37 ;
-	public static final double P3X6 = -81.047 ;
-	public static final double P3Y6 = 65.37 ;
-	public static final double P3A3 = 69.454 * 0.8807 ; // 69.454
-	public static final double P3A5 = 9 ; // 0
+	public static final double P1X1 = 28.271;
+	public static final double P1X2 = -108.947;
+	public static final double P1X3 = -53.342;
+	public static final double P2X1 = 42.751;
+	public static final double P2X2 = -47.7;
+	public static final double P3X1 = -186.645;
+	public static final double P3X2 = -9;
+	public static final double P3X4 = -33.5;
+	public static final double P3Y4 = 65.37;
+	public static final double P3X6 = -81.047;
+	public static final double P3Y6 = 65.37;
+	public static final double P3A3 = 69.454 * 0.8807; // 69.454
+	public static final double P3A5 = 9; // 0
 
 
 	// ODO Constants
