@@ -45,7 +45,6 @@ public class Constants {
 	public static final double P3A3 = 69.454 * 0.8807; // 69.454
 	public static final double P3A5 = 9; // 0
 
-
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
 	public static final double DY_INCHES_CONST = 1.1742067733;
