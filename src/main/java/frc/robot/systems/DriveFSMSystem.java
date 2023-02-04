@@ -308,8 +308,26 @@ public class DriveFSMSystem {
 			rightPower = power.getRightPower();
 
 			if (!pcw.getEstimatedGlobalPose().isEmpty()) {
-				angleToTurnToFaceTag = Math.toDegrees(Math.atan2(pcw.getEstimatedGlobalPose().get().estimatedPose.getY(), pcw.getEstimatedGlobalPose().get().estimatedPose.getX()));
-				System.out.println("angle to face: " + angleToTurnToFaceTag);
+				//if(pcw.getEstimatedGlobalPose().get().estimatedPose.getY() < 0) {
+					//angleToTurnToFaceTag = Math.toDegrees(pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle());
+				//} else {
+					//angleToTurnToFaceTag = -1 * (360 - Math.toDegrees(pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle()));
+				//}
+				//angleToTurnToFaceTag = 180 + angleToTurnToFaceTag - Math.toDegrees(Math.atan2(pcw.getEstimatedGlobalPose().get().estimatedPose.getY(), pcw.getEstimatedGlobalPose().get().estimatedPose.getX()));
+				
+				// left is negative right is positive
+				angleToTurnToFaceTag = -1 * (360 - Math.toDegrees(pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle()));
+				
+				if(pcw.getEstimatedGlobalPose().get().estimatedPose.getY() < 0) {
+					angleToTurnToFaceTag = -1 * (180 + angleToTurnToFaceTag + Math.toDegrees(Math.atan2(pcw.getEstimatedGlobalPose().get().estimatedPose.getY(), pcw.getEstimatedGlobalPose().get().estimatedPose.getX())));
+				} else {
+					angleToTurnToFaceTag = 180 + angleToTurnToFaceTag - Math.toDegrees(Math.atan2(pcw.getEstimatedGlobalPose().get().estimatedPose.getY(), pcw.getEstimatedGlobalPose().get().estimatedPose.getX()));
+				}
+				// angleToTurnToFaceTag = Math.toDegrees(Math.atan2(pcw.getEstimatedGlobalPose().get().estimatedPose.getY(), pcw.getEstimatedGlobalPose().get().estimatedPose.getX()));
+				// System.out.println("angle to face: " + angleToTurnToFaceTag);
+				SmartDashboard.putNumber("angle to face: ", angleToTurnToFaceTag);
+				SmartDashboard.putNumber("gyro: ", gyroAngleForOdo);
+
 
 			}
 			System.out.println("X: " + roboXPos);
@@ -441,9 +459,9 @@ public class DriveFSMSystem {
 
 		prevEncoderPos = this.currentEncoderPos;
 
-		System.out.println("X Pos: " + roboXPos);
-		System.out.println("Y Pos: " + roboYPos);
-		System.out.println("Gyro: " + gyroAngleForOdo);
+		// System.out.println("X Pos: " + roboXPos);
+		// System.out.println("Y Pos: " + roboYPos);
+		// System.out.println("Gyro: " + gyroAngleForOdo);
 
 	}
 
