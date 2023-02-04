@@ -129,6 +129,9 @@ public class ArmFSM {
 	 * @param input TeleopInput
 	 */
 	public void update(TeleopInput input) {
+		SmartDashboard.putString("Current State", " " + currentState);
+		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		if (input == null) {
 			handleIdleState(input);
 			return;
