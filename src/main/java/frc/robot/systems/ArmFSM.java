@@ -4,6 +4,7 @@ package frc.robot.systems;
 
 // WPILib Imports
 //import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
@@ -120,6 +121,9 @@ public class ArmFSM {
 	 * @param input TeleopInput
 	 */
 	public void update(TeleopInput input) {
+		SmartDashboard.putString("Current State", " " + currentState);
+		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		if (input == null) {
 			handleIdleState(input);
 			return;
