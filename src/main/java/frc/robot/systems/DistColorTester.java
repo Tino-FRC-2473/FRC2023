@@ -8,38 +8,30 @@ import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 
-public class SpinningIntakeFSM {
+public class DistColorTester {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
 	public enum FSMState {
-		START_STATE,
-		IDLE_SPINNING,
-		IDLE_STOP,
-		RELEASE
+		TEST
 	}
 	//FIX VALUES
 	private static final double INTAKE_SPEED = 0.1;
 	private static final double RELEASE_SPEED = -0.1;
 	//arbitrary constants for cube and cone
-	//6 inches
-	private static final int MIN_CONE_DISTANCE = 1240;
-	//8 inches
-	private static final int MIN_CUBE_DISTANCE = 970;
-	//8.5 inches
-	private static final int MAX_COLOR_MEASURE = 915;
-	//9 inches
-	private static final int MIN_COLOR_MEASURE = 860;
+	private static final int MIN_CONE_DISTANCE = 2300;
+	private static final int MIN_CUBE_DISTANCE = 1300;
+	private static final int MAX_COLOR_MEASURE = 800;
+	private static final int MIN_COLOR_MEASURE = 600;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static int itemType = 0;
 
 	//CUBE RGB THRESHOLD VALUES
-	private static final double BLUE_THRESHOLD = 0.175;
+	private static final double RED_THRESHOLD = 0.33f;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -49,7 +41,7 @@ public class SpinningIntakeFSM {
 	private CANSparkMax spinnerMotor;
 	//private DigitalInput limitSwitchCone;
 	private AnalogInput distanceSensorObject;
-	private ColorSensorV3 colorSensor;
+	private ColorSensorV3 colorSensorCube;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -57,12 +49,12 @@ public class SpinningIntakeFSM {
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public SpinningIntakeFSM() {
+	public DistColorTester() {
 		// Perform hardware init
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
-		colorSensor = new ColorSensorV3(Port.kOnboard);
+		colorSensorCube = new ColorSensorV3(Port.kOnboard);
 
 		// Reset state machine
 		reset();
@@ -85,7 +77,7 @@ public class SpinningIntakeFSM {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		currentState = FSMState.START_STATE;
+		currentState = FSMState.TEST;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -97,27 +89,13 @@ public class SpinningIntakeFSM {
 	 */
 	public void update(TeleopInput input) {
 		//System.out.println(itemType);
-		SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
-		SmartDashboard.putNumber("r", colorSensor.getColor().red);
-		SmartDashboard.putNumber("g", colorSensor.getColor().green);
-		SmartDashboard.putNumber("b", colorSensor.getColor().blue);
-		SmartDashboard.putNumber("item type", itemType);
 		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		if (input == null) {
 			return;
 		}
 		switch (currentState) {
-			case START_STATE:
-				handleStartState();
-				break;
-			case IDLE_SPINNING:
-				handleIdleSpinningState();
-				break;
-			case IDLE_STOP:
-				handleIdleStopState();
-				break;
-			case RELEASE:
-				handleReleaseState();
+			case TEST:
+				handleTestState();
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -137,15 +115,15 @@ public class SpinningIntakeFSM {
 	public static int getObjectType() {
 		return itemType;
 	}
-	private void updateItem() {
-		double b =  colorSensor.getColor().blue;
+	private boolean updateItem() {
+		double r =  colorSensorCube.getColor().red;
 
 		//System.out.println(r + " " + g + " " + b + " " + colorSensorCube.getProximity());
-		if (b > BLUE_THRESHOLD) {
+		if (r > RED_THRESHOLD)
 			itemType = 2;
-		} else {
+		else
 			itemType = 1;
-		}
+		return false;
 		//return !isCone && objectDetected;
 	}
 
@@ -160,54 +138,19 @@ public class SpinningIntakeFSM {
 	 * @return FSM state for the next iteration
 	 */
 	private FSMState nextState(TeleopInput input) {
-		if (input == null) {
-			return FSMState.START_STATE;
-		}
-		switch (currentState) {
-			case START_STATE:
-				return FSMState.IDLE_SPINNING;
-			case IDLE_SPINNING:
-				if (input.isReleaseButtonPressed()) {
-					return FSMState.RELEASE;
-				}
-				if ((itemType == 2 && distanceSensorObject.getValue() > MIN_CUBE_DISTANCE)
-					|| distanceSensorObject.getValue() > MIN_CONE_DISTANCE) {
-					return FSMState.IDLE_STOP;
-				}
-				return FSMState.IDLE_SPINNING;
-			case IDLE_STOP:
-				if (input.isReleaseButtonPressed()) {
-					return FSMState.RELEASE;
-				}
-				return FSMState.IDLE_STOP;
-			case RELEASE:
-				if (!input.isReleaseButtonPressed()) {
-					return FSMState.IDLE_SPINNING;
-				}
-				return FSMState.RELEASE;
-			default:
-				throw new IllegalStateException("Invalid state: " + currentState.toString());
-		}
+		return FSMState.TEST;
 	}
 
 	/* ------------------------ FSM state handlers ------------------------ */
 	/**
 	 * Handle behavior in states.
 	 */
-	private void handleStartState() {
-	}
-	private void handleIdleSpinningState() {
-		if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
-			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE) {
-			updateItem();
-		}
-		spinnerMotor.set(INTAKE_SPEED);
-	}
-	private void handleIdleStopState() {
-		spinnerMotor.set(0);
-	}
-	private void handleReleaseState() {
-		itemType = 0;
-		spinnerMotor.set(RELEASE_SPEED);
+	private void handleTestState() {
+		//System.out.println(colorSensorCube.getColor().red + " "
+		//	+ colorSensorCube.getColor().green + " " + colorSensorCube.getColor().blue);
+		System.out.println(itemType);
+		updateItem();
+		//System.out.println(itemType);
+		//spinnerMotor.set(INTAKE_SPEED);
 	}
 }
