@@ -50,7 +50,7 @@ public class ArmFSM {
 	private static final double BALANCE_ANGLE_ENCODER_ROTATIONS = 5;
 	private static final double GRABBER_ANGLE_ENCODER_ROTATIONS = -5;
 	private static final double ARM_ENCODER_GRAB_ROTATIONS = 10;
-	private static final double PID_MAX_POWER = 0.3;
+	private static final double PID_MAX_POWER = 0.2;
 	private static final double PIVOT_ERROR_ARM = 0.3;
 	private static final double PID_CONSTANT_P = 0.00022f;
 	private static final double PID_CONSTANT_I = 0.000055f;
@@ -121,13 +121,17 @@ public class ArmFSM {
 	 * @param input TeleopInput
 	 */
 	public void update(TeleopInput input) {
-		SmartDashboard.putString("Current State", " " + currentState);
-		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
-		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		if (input == null) {
 			handleIdleState(input);
 			return;
 		}
+		SmartDashboard.putString("Current State", " " + currentState);
+		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
+		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
+		SmartDashboard.putBoolean("At Min Height", isMinHeight());
+		SmartDashboard.putBoolean("Is going Forward", input.isThrottleForward());
+		SmartDashboard.putNumber("Throttle Value", input.getThrottle());
 		switch (currentState) {
 			case IDLE:
 				handleIdleState(input);
@@ -183,6 +187,10 @@ public class ArmFSM {
 					return FSMState.SHOOT_HIGH;
 				} else if (input.isShootMidButtonPressed()) {
 					return FSMState.SHOOT_MID;
+				} else if (input.isShootLowButtonPressed()) {
+					return FSMState.SHOOT_LOW_FORWARD;
+				} else if (input.isSubstationPickupButtonPressed()) {
+					return FSMState.SUBSTATION_PICKUP;
 				} else if (input.isHomingButtonPressed()) {
 					return FSMState.HOMING_STATE;
 				}
@@ -285,11 +293,12 @@ public class ArmFSM {
 	private void handleArmMechState(TeleopInput input) {
 		if (input != null) {
 			if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-				//pivotMotor.set(PIVOT_MOTOR_POWER);
-				pidController.setReference(PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
+				pivotMotor.set(PIVOT_MOTOR_POWER);
+				//pidController.setReference(PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
 			} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-				//pivotMotor.set(-PIVOT_MOTOR_POWER);
-				pidController.setReference(-PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
+				pivotMotor.set(-PIVOT_MOTOR_POWER);
+				//pidController.setReference(-PIVOT_MOTOR_POWER,
+				//CANSparkMax.ControlType.kDutyCycle);
 			} else {
 				pivotMotor.set(0);
 			}

@@ -145,7 +145,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isThrottleForward() {
-		return mechJoystick.getThrottle() <= 0 ? false : true;
+		return mechJoystick.getThrottle() <= 0;
 	}
 
 	/**
