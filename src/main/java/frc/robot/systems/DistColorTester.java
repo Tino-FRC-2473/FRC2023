@@ -119,10 +119,11 @@ public class DistColorTester {
 		double r =  colorSensorCube.getColor().red;
 
 		//System.out.println(r + " " + g + " " + b + " " + colorSensorCube.getProximity());
-		if (r > RED_THRESHOLD)
+		if (r > RED_THRESHOLD) {
 			itemType = 2;
-		else
+		} else {
 			itemType = 1;
+		}
 		return false;
 		//return !isCone && objectDetected;
 	}
