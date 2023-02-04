@@ -306,18 +306,34 @@ public class ArmFSM {
 	private void handleShootHighState(TeleopInput input) {
 		if (input != null) {
 			if (input.isThrottleForward()) {
-				if (withinError(pivotMotor.getEncoder().getPosition(),
-					SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
-					pivotMotor.set(0);
+				if (SpinningIntakeFSM.getObjectType() != 1) {
+					if (withinError(pivotMotor.getEncoder().getPosition(),
+						SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
+						pivotMotor.set(0);
+					} else {
+						pidController.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
+							CANSparkMax.ControlType.kPosition);
+					}
+					if (teleArmMotor.getEncoder().getPosition()
+							< ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS) {
+						teleArmMotor.set(TELEARM_MOTOR_POWER);
+					} else {
+						teleArmMotor.set(0);
+					}
 				} else {
-					pidController.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
-						CANSparkMax.ControlType.kPosition);
-				}
-				if (teleArmMotor.getEncoder().getPosition()
-						< ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS) {
-					teleArmMotor.set(TELEARM_MOTOR_POWER);
-				} else {
-					teleArmMotor.set(0);
+					if (withinError(pivotMotor.getEncoder().getPosition(),
+						SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
+						pivotMotor.set(0);
+					} else {
+						pidController.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
+							CANSparkMax.ControlType.kPosition);
+					}
+					if (teleArmMotor.getEncoder().getPosition()
+							< ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS) {
+						teleArmMotor.set(TELEARM_MOTOR_POWER);
+					} else {
+						teleArmMotor.set(0);
+					}
 				}
 			} else { //throttle is backward/false
 				if (withinError(pivotMotor.getEncoder().getPosition(),
