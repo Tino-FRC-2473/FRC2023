@@ -41,7 +41,7 @@ public class Constants {
 	static class VisionConstants {
 		static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
 		static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(0);
-		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.00);
+		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.5);
 		static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
 		static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
 		static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
