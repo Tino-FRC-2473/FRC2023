@@ -41,7 +41,16 @@ public class DriveFSMSystem {
 		P3N3,
 		P3N4,
 		P3N5,
-		P3N6
+		P3N6,
+
+		P4N1,
+		P4N2,
+		P4N3,
+		P4N4,
+		P4N5,
+		P4N6,
+		P4N7,
+		P4N8,
 	}
 
 	/* ======================== Private variables ======================== */
@@ -65,7 +74,6 @@ public class DriveFSMSystem {
 	private double prevEncoderPos = 0;
 	private double gyroAngleForOdo = 0;
 	private AHRS gyro;
-	private double startAngle;
 
 	private DrivePoseEstimator dpe = new DrivePoseEstimator();
 
@@ -90,7 +98,6 @@ public class DriveFSMSystem {
 		finishedTurning = false;
 
 		gyro = new AHRS(SPI.Port.kMXP);
-		startAngle = 0;
 
 		// Reset state machine
 		resetAutonomous();
@@ -123,7 +130,7 @@ public class DriveFSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.TELE_STATE_2_MOTOR_DRIVE;
+		currentState = FSMState.P4N1;
 
 		roboXPos = 0;
 		roboYPos = 0;
@@ -164,12 +171,12 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("X", dpe.getCurPose().getX());
 		SmartDashboard.putNumber("Y", dpe.getCurPose().getY());
 		SmartDashboard.putNumber("Rotation", dpe.getCurPose().getRotation().getDegrees());
-		// gyroAngleForOdo = gyro.getAngle();
+		gyroAngleForOdo = gyro.getAngle();
 
 		currentEncoderPos = ((leftMotor.getEncoder().getPosition()
 			- rightMotor.getEncoder().getPosition()) / 2.0);
 
-		// updateLineOdometryTele(gyro.getAngle());
+		updateLineOdometryTele(gyro.getAngle());
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -215,11 +222,11 @@ public class DriveFSMSystem {
 			// path 3
 
 			case P3N1:
-				moveState(input, true, Constants.P3X1, 0);
+				moveState(input, false, Constants.P3X1, 0);
 				break;
 
 			case P3N2:
-				moveState(input, false, Constants.P3X2, 0);
+				moveState(input, true, Constants.P3X2, 0);
 				break;
 
 			case P3N3:
@@ -227,7 +234,7 @@ public class DriveFSMSystem {
 				break;
 
 			case P3N4:
-				moveState(input, true, Constants.P3X4, Constants.P3Y4);
+				moveState(input, false, Constants.P3X4, Constants.P3Y4);
 				break;
 
 			case P3N5:
@@ -235,7 +242,40 @@ public class DriveFSMSystem {
 				break;
 
 			case P3N6:
-				moveState(input, true, Constants.P3X6, Constants.P3Y6);
+				moveState(input, false, Constants.P3X6, Constants.P3Y6);
+				break;
+
+			// path 4
+			case P4N1:
+				handleTurnState(input, Constants.P4A1);
+				break;
+
+			case P4N2:
+				moveState(input, true, Constants.P4X2,  Constants.P4Y2);
+				break;
+
+			case P4N3:
+				handleTurnState(input, Constants.P4A3);
+				break;
+
+			case P4N4:
+				moveState(input, true, Constants.P4X4, Constants.P4Y4);
+				break;
+
+			case P4N5:
+				moveState(input, false, Constants.P4X5, Constants.P4Y5);
+				break;
+
+			case P4N6:
+				handleTurnState(input, Constants.P4A6);
+				break;
+
+			case P4N7:
+				moveState(input, true, 0, Constants.P4Y7);
+				break;
+
+			case P4N8:
+				handleTurnState(input, Constants.P4A6);
 				break;
 
 			default:
@@ -371,6 +411,68 @@ public class DriveFSMSystem {
 					return FSMState.P3N6;
 				}
 
+			// path 4
+
+			case P4N1:
+				if (finishedTurning) {
+					return FSMState.P4N2;
+				} else {
+					return FSMState.P4N1;
+				}
+
+			case P4N2:
+				if (Math.abs(roboX - Constants.P4X2) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY - Constants.P4Y2) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return FSMState.P4N3;
+				} else {
+					return FSMState.P4N2;
+				}
+
+			case P4N3:
+				if (finishedTurning) {
+					return FSMState.P4N4;
+				} else {
+					return FSMState.P4N3;
+				}
+
+			case P4N4:
+				if (Math.abs(roboX - Constants.P4X4) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY - Constants.P4Y4) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return FSMState.P4N5;
+				} else {
+					return FSMState.P4N4;
+				}
+
+			case P4N5:
+				if (Math.abs(roboX - Constants.P4X5) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY - Constants.P4Y5) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return FSMState.P4N6;
+				} else {
+					return FSMState.P4N5;
+				}
+
+			case P4N6:
+				if (finishedTurning) {
+					return FSMState.P4N7;
+				} else {
+					return FSMState.P3N6;
+				}
+
+			case P4N7:
+				if (Math.abs(roboX) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+					&& Math.abs(roboY - Constants.P4Y7) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					return FSMState.P4N8;
+				} else {
+					return FSMState.P4N7;
+				}
+
+			case P4N8:
+				if (finishedTurning) {
+					return null;
+				} else {
+					return FSMState.P4N8;
+				}
+
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -463,15 +565,18 @@ public class DriveFSMSystem {
 		if (input != null) {
 			return;
 		}
-
-		degrees *= Constants.GYRO_TURN_MULTIPLER_BELOW_90;
-
+		finishedTurning = false;
 		System.out.println(getHeading());
 		double error = degrees - getHeading();
 		if (error > Constants.HALF_REVOLUTION_DEGREES) {
 			error -= Constants.ONE_REVOLUTION_DEGREES;
 		}
+		if (error < -Constants.HALF_REVOLUTION_DEGREES) {
+			error += Constants.ONE_REVOLUTION_DEGREES;
+		}
+		System.out.println("ERROR: " + error);
 		if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
+			System.out.println("DONE");
 			finishedTurning = true;
 			leftMotor.set(0);
 			rightMotor.set(0);
@@ -481,11 +586,11 @@ public class DriveFSMSystem {
 		if (power < Constants.MIN_TURN_POWER) {
 			power = Constants.MIN_TURN_POWER;
 		}
-
 		power *= (error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -1 : 1;
 
-		leftMotor.set(power);
-		rightMotor.set(power);
+		leftMotor.set(-power);
+		rightMotor.set(-power);
+		// turning right is positive and left is negative
 	}
 
 	/**
@@ -503,15 +608,12 @@ public class DriveFSMSystem {
 	* @return the gyro heading
 	*/
 	public double getHeading() {
-		// double angle = startAngle - gyro.getYaw();
-		double angle = startAngle - gyro.getAngle();
+		double angle = gyro.getAngle() % Constants.ONE_REVOLUTION_DEGREES;
 		if (angle < 0) {
 			angle += Constants.ONE_REVOLUTION_DEGREES;
 		}
-		if (angle > Constants.ONE_REVOLUTION_DEGREES) {
-			angle -= Constants.ONE_REVOLUTION_DEGREES;
-		}
 		return angle;
+		// angle will be between 0 - 360
 	}
 
 	/**
@@ -532,8 +634,8 @@ public class DriveFSMSystem {
 
 		prevEncoderPos = this.currentEncoderPos;
 
-		System.out.println("X Pos: " + roboXPos);
-		System.out.println("Y Pos: " + roboYPos);
+		//System.out.println("X Pos: " + roboXPos);
+		//System.out.println("Y Pos: " + roboYPos);
 		System.out.println("Gyro: " + gyroAngleForOdo);
 
 	}

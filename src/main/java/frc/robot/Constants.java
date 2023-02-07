@@ -27,8 +27,8 @@ public class Constants {
 	public static final double GYRO_TURN_MULTIPLER_BELOW_90 = 0.987;
 	public static final double CHARGING_STATION_LEVELED_ERROR_DEGREES = 2;
 	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 200;
-	public static final double AUTONOMUS_MOVE_POWER = 0.3;
-	public static final double AUTONOMUS_MOVE_THRESHOLD = 1.5;
+	public static final double AUTONOMUS_MOVE_POWER = 0.2;
+	public static final double AUTONOMUS_MOVE_THRESHOLD = 5;
 
 	// Path points
 	public static final double P1X1 = 28.271;
@@ -44,6 +44,17 @@ public class Constants {
 	public static final double P3Y6 = 65.37;
 	public static final double P3A3 = 69.454 * 0.8807; // 69.454
 	public static final double P3A5 = 9; // 0
+	public static final double P4A1 = (360 - 6.235); // unchanged
+	public static final double P4X2 = 146.122;
+	public static final double P4Y2 = 15.768;
+	public static final double P4A3 = 0; // back to 0
+	public static final double P4X4 = 178.07;
+	public static final double P4Y4 = 15.768;
+	public static final double P4X5 = 146.122;
+	public static final double P4Y5 = 15.768;
+	public static final double P4A6 = (180 + 2.358); // unchanged
+	public static final double P4Y7 = 21.449;
+	public static final double P4A8 =  180;
 
 
 	// ODO Constants
