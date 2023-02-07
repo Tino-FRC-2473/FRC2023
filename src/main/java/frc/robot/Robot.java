@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
 import frc.robot.systems.ArmFSM;
-import frc.robot.systems.DistColorTester;
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.SpinningIntakeFSM;
 
@@ -22,7 +21,6 @@ public class Robot extends TimedRobot {
 	private ArmFSM armSystem;
 	private DriveFSMSystem driveSystem;
 	private SpinningIntakeFSM spinningIntakeFSM;
-	private DistColorTester distColorTester;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
