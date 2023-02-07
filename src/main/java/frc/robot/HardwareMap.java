@@ -19,13 +19,21 @@ public final class HardwareMap {
 	public static final int ANALOGIO_ID_DISTANCE_SENSOR = 0;
 
 	// Place jumper from DIO pin 9 to GND to indicate this is a test setup
-	private static final int DIO_TEST_SETUP_CHANNEL = 9;
-	private static DigitalInput testBoardPin = new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL);
+	private static final int DIO_TEST_SETUP_CHANNEL_ARM = 8;
+	private static final int DIO_TEST_SETUP_CHANNEL_GRABBER = 9;
+	private static DigitalInput testBoardPinArm = new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_ARM);
+	private static DigitalInput testBoardPinGrabber = new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_GRABBER);
+
 	/**
 	 * Check if the current RoboRIO is part of a test setup or real robot.
 	 * @return true if the current setup is a test setup
 	 */
-	public static boolean isTestBoard() {
-		return !HardwareMap.testBoardPin.get();
+	public static boolean isTestBoardArm() {
+		return !HardwareMap.testBoardPinArm.get();
 	}
+	public static boolean isTestBoardGrabber() {
+		return !HardwareMap.testBoardPinGrabber.get();
+	}
+	
+	
 }
