@@ -26,9 +26,9 @@ public class TeleopInput {
 	private static final int AIM_LOW_BUTTON = 11;
 	private static final int SUBSTATION_PICKUP_BUTTON = 8;
 	private static final int HOMING_BUTTON = 10;
-	private static final int CV_ALLIGN_BUTTON_LEFT_NODE = 4;
-	private static final int CV_ALLIGN_BUTTON_MIDDLE_NODE = 3;
-	private static final int CV_ALLIGN_BUTTON_RIGHT_NODE = 5;
+	private static final int CV_ALIGN_BUTTON_LEFT_NODE = 4;
+	private static final int CV_ALIGN_BUTTON_MIDDLE_NODE = 3;
+	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -195,27 +195,27 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get if cv allign button (4) is pressed.
-	 * @return true if button is pressed
-	 */
-	public boolean isDriveJoystickCVAllignLeftButtonPressedRaw() {
-		return driveJoystick.getRawButton(CV_ALLIGN_BUTTON_LEFT_NODE);
-	}
-
-	/**
-	 * Get if cv allign button (3) is pressed.
-	 * @return true if button is pressed
-	 */
-	public boolean isDriveJoystickCVAllignMiddleButtonPressedRaw() {
-		return driveJoystick.getRawButton(CV_ALLIGN_BUTTON_MIDDLE_NODE);
-	}
-
-	/**
-	 * Get if cv allign button (5) is pressed.
+	 * Get if cv align button (4) is pressed.
 	 * @return true if button is pressed
 	 */
 	public boolean isDriveJoystickCVAlignLeftButtonPressedRaw() {
-		return driveJoystick.getRawButton(CV_ALLIGN_BUTTON_RIGHT_NODE);
+		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_LEFT_NODE);
+	}
+
+	/**
+	 * Get if cv align button (3) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isDriveJoystickCVAlignMiddleButtonPressedRaw() {
+		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_MIDDLE_NODE);
+	}
+
+	/**
+	 * Get if cv align button (5) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isDriveJoystickCVAlignRightButtonPressedRaw() {
+		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_RIGHT_NODE);
 	}
 
 	/* ------------------------ Steering Wheel ------------------------ */
