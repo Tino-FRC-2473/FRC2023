@@ -3,6 +3,7 @@ package frc.robot.systems;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,7 +29,7 @@ public class DriveFSMSystem {
 	public enum FSMState {
 		TELE_STATE_2_MOTOR_DRIVE,
 		TELE_STATE_BALANCE,
-		TELE_STATE_CV_ALLIGN,
+		TELE_STATE_CV_ALIGN,
 		TELE_STATE_MECANUM,
 		PURE_PURSUIT,
 		TURNING_STATE,
@@ -77,7 +78,7 @@ public class DriveFSMSystem {
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 	private double xToATag = 0;
 	private double yToATag = 0;
-	private boolean isAllignedToATag = false;
+	private boolean isAlignedToATag = false;
 
 
 	/* ======================== Constructor ======================== */
@@ -201,12 +202,8 @@ public class DriveFSMSystem {
 				handleTeleOpBalanceState(input);
 				break;
 
-			case TELE_STATE_CV_ALLIGN:
-				xToATag = pcw.getEstimatedGlobalPose().get().estimatedPose.getX()
-					* Constants.METERS_TO_INCHES_CONSTANT;
-				yToATag = pcw.getEstimatedGlobalPose().get().estimatedPose.getY()
-					* Constants.METERS_TO_INCHES_CONSTANT;
-				handleCVAllignState(input);
+			case TELE_STATE_CV_ALIGN:
+				handleCVAlignState(input);
 				break;
 
 			case IDLE:
@@ -292,11 +289,11 @@ public class DriveFSMSystem {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
 					return FSMState.TELE_STATE_BALANCE;
-				} else if (input != null && input.isDriveJoystickCVAllignLeftButtonPressedRaw()) {
-					// Allign to node left of april tag
-					return FSMState.TELE_STATE_CV_ALLIGN;
+				} else if (input != null && input.isDriveJoystickCVAlignLeftButtonPressedRaw()) {
+					// Align to node left of april tag
+					return FSMState.TELE_STATE_CV_ALIGN;
 				}
-				isAllignedToATag = false;
+				isAlignedToATag = false;
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 
 			case TELE_STATE_MECANUM:
@@ -310,11 +307,11 @@ public class DriveFSMSystem {
 					return FSMState.TURNING_STATE;
 				}
 
-			case TELE_STATE_CV_ALLIGN:
-				if (isAllignedToATag) {
+			case TELE_STATE_CV_ALIGN:
+				if (isAlignedToATag) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
-				return FSMState.TELE_STATE_CV_ALLIGN;
+				return FSMState.TELE_STATE_CV_ALIGN;
 
 			case IDLE:
 				return FSMState.IDLE;
@@ -426,6 +423,8 @@ public class DriveFSMSystem {
 			return;
 		}
 
+		Pose3d cvEstimatedPos = pcw.getEstimatedGlobalPose().get().estimatedPose;
+
 		if (isInArcadeDrive) {
 
 			currentEncoderPos = ((leftMotor.getEncoder().getPosition()
@@ -465,20 +464,16 @@ public class DriveFSMSystem {
 
 			if (!pcw.getEstimatedGlobalPose().isEmpty()) {
 				// left is negative right is positive
-				angleToTurnToFaceTag = -1 * (Constants.ONE_REVOLUTION_DEGREES - Math.toDegrees(
-					pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle()));
+				angleToTurnToFaceTag = Math.abs((Constants.HALF_REVOLUTION_DEGREES
+					+ Constants.ONE_REVOLUTION_DEGREES - Math.toDegrees(
+					cvEstimatedPos.getRotation().getAngle())) + Math.toDegrees(
+						Math.atan2(cvEstimatedPos.getY(),
+						cvEstimatedPos.getX())));
 
-				if (pcw.getEstimatedGlobalPose().get().estimatedPose.getY() < 0) {
-					angleToTurnToFaceTag = -1 * (Constants.HALF_REVOLUTION_DEGREES
-						+ angleToTurnToFaceTag + Math.toDegrees(
-						Math.atan2(pcw.getEstimatedGlobalPose().get().estimatedPose.getY(),
-						pcw.getEstimatedGlobalPose().get().estimatedPose.getX())));
-				} else {
-					angleToTurnToFaceTag = Constants.HALF_REVOLUTION_DEGREES
-						+ angleToTurnToFaceTag - Math.toDegrees(
-						Math.atan2(pcw.getEstimatedGlobalPose().get().estimatedPose.getY(),
-						pcw.getEstimatedGlobalPose().get().estimatedPose.getX()));
+				if (cvEstimatedPos.getY() >= 0) {
+					angleToTurnToFaceTag = -angleToTurnToFaceTag;
 				}
+
 				SmartDashboard.putNumber("angle to face: ", angleToTurnToFaceTag);
 				SmartDashboard.putNumber("gyro: ", gyroAngleForOdo);
 
@@ -514,14 +509,19 @@ public class DriveFSMSystem {
 	}
 
 	/**
-	 * Handle behavior in TELE_STATE_CV_ALLIGN.
+	 * Handle behavior in TELE_STATE_CV_ALIGN.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleCVAllignState(TeleopInput input) {
+	private void handleCVAlignState(TeleopInput input) {
+
+		xToATag = pcw.getEstimatedGlobalPose().get().estimatedPose.getX()
+			* Constants.METERS_TO_INCHES_CONSTANT;
+		yToATag = pcw.getEstimatedGlobalPose().get().estimatedPose.getY()
+			* Constants.METERS_TO_INCHES_CONSTANT;
 
 		System.out.println("angleToTurnToFaceTag: " + angleToTurnToFaceTag);
-		isAllignedToATag = true;
+		isAlignedToATag = true;
 
 		// handleTurnState(input, angleToTurnToFaceTag);
 		// double distToTravelToATag = Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) - 10;

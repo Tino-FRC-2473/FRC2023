@@ -214,7 +214,7 @@ public class TeleopInput {
 	 * Get if cv allign button (5) is pressed.
 	 * @return true if button is pressed
 	 */
-	public boolean isDriveJoystickCVAllignRightButtonPressedRaw() {
+	public boolean isDriveJoystickCVAlignLeftButtonPressedRaw() {
 		return driveJoystick.getRawButton(CV_ALLIGN_BUTTON_RIGHT_NODE);
 	}
 
