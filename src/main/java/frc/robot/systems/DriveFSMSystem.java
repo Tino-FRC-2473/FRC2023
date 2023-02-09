@@ -175,11 +175,9 @@ public class DriveFSMSystem {
 
 		if (!pcw.getEstimatedGlobalPose().isEmpty()) {
 			SmartDashboard.putNumber("X",
-				pcw.getEstimatedGlobalPose().get().estimatedPose.getX()
-					* Constants.METERS_TO_INCHES_CONSTANT);
+				Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX()));
 			SmartDashboard.putNumber("Y",
-				pcw.getEstimatedGlobalPose().get().estimatedPose.getY()
-				* Constants.METERS_TO_INCHES_CONSTANT);
+				Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getY()));
 			SmartDashboard.putNumber("Rotation", Constants.ONE_REVOLUTION_DEGREES
 				- Units.radiansToDegrees(
 				pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle()));
@@ -515,10 +513,8 @@ public class DriveFSMSystem {
 	 */
 	private void handleCVAlignState(TeleopInput input) {
 
-		xToATag = pcw.getEstimatedGlobalPose().get().estimatedPose.getX()
-			* Constants.METERS_TO_INCHES_CONSTANT;
-		yToATag = pcw.getEstimatedGlobalPose().get().estimatedPose.getY()
-			* Constants.METERS_TO_INCHES_CONSTANT;
+		xToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
+		yToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
 
 		System.out.println("angleToTurnToFaceTag: " + angleToTurnToFaceTag);
 		isAlignedToATag = true;
