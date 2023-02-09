@@ -53,7 +53,7 @@ public class Constants {
 	public static final double HUB_Y_COORDINATE = 0;
 
 	public static final double QUARTER_PI = Math.PI / 4;
-	public static final double METERS_TO_INCHES_CONSTANT = 39.3701;
+	public static final double METERS_TO_INCHES_CONSTANT = Units.inchesToMeters(1);
 	public static final double ENCODER_TICKS_TO_METERS_CONSTANT = 23.1889;
 
 	static class VisionConstants {
