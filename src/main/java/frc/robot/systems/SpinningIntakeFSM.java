@@ -23,6 +23,12 @@ public class SpinningIntakeFSM {
 		IDLE_STOP,
 		RELEASE
 	}
+	// Distance definitions
+	public enum ItemType {
+		CUBE,
+		CONE,
+		EMPTY
+	}
 	//FIX VALUES
 	private static final double INTAKE_SPEED = 0.1;
 	private static final double RELEASE_SPEED = -0.1;
@@ -36,7 +42,7 @@ public class SpinningIntakeFSM {
 	//9 inches
 	private static final int MIN_COLOR_MEASURE = 860;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
-	private static int itemType = 0;
+	private static ItemType itemType = ItemType.EMPTY;
 
 	//CUBE RGB THRESHOLD VALUES
 	private static final double BLUE_THRESHOLD = 0.175;
@@ -101,7 +107,7 @@ public class SpinningIntakeFSM {
 		SmartDashboard.putNumber("r", colorSensor.getColor().red);
 		SmartDashboard.putNumber("g", colorSensor.getColor().green);
 		SmartDashboard.putNumber("b", colorSensor.getColor().blue);
-		SmartDashboard.putNumber("item type", itemType);
+		SmartDashboard.putString("item type", itemType.toString());
 		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		if (input == null) {
 			return;
@@ -134,7 +140,7 @@ public class SpinningIntakeFSM {
 	 * Returns the type of object currently in the grabber.
 	 * @return int 0 1 or 2 for nothing, cone, cube
 	 */
-	public static int getObjectType() {
+	public static ItemType getObjectType() {
 		return itemType;
 	}
 	private void updateItem() {
@@ -142,11 +148,10 @@ public class SpinningIntakeFSM {
 
 		//System.out.println(r + " " + g + " " + b + " " + colorSensorCube.getProximity());
 		if (b > BLUE_THRESHOLD) {
-			itemType = 2;
+			itemType = ItemType.CUBE;
 		} else {
-			itemType = 1;
+			itemType = ItemType.CONE;
 		}
-		//return !isCone && objectDetected;
 	}
 
 	/* ======================== Private methods ======================== */
@@ -170,8 +175,8 @@ public class SpinningIntakeFSM {
 				if (input.isReleaseButtonPressed()) {
 					return FSMState.RELEASE;
 				}
-				if ((itemType == 2 && distanceSensorObject.getValue() > MIN_CUBE_DISTANCE)
-					|| distanceSensorObject.getValue() > MIN_CONE_DISTANCE) {
+				if ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
+					> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE) {
 					return FSMState.IDLE_STOP;
 				}
 				return FSMState.IDLE_SPINNING;
@@ -207,7 +212,7 @@ public class SpinningIntakeFSM {
 		spinnerMotor.set(0);
 	}
 	private void handleReleaseState() {
-		itemType = 0;
+		itemType = ItemType.EMPTY;
 		spinnerMotor.set(RELEASE_SPEED);
 	}
 }

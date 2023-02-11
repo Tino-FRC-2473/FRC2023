@@ -301,12 +301,13 @@ public class ArmFSM {
 	private void handleArmMechState(TeleopInput input) {
 		if (input != null) {
 			if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-				pivotMotor.set(PIVOT_MOTOR_POWER);
-				//pidController.setReference(PIVOT_MOTOR_POWER, CANSparkMax.ControlType.kDutyCycle);
+				//pivotMotor.set(PIVOT_MOTOR_POWER);
+				pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
+					CANSparkMax.ControlType.kDutyCycle);
 			} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-				pivotMotor.set(-PIVOT_MOTOR_POWER);
-				//pidController.setReference(-PIVOT_MOTOR_POWER,
-				//CANSparkMax.ControlType.kDutyCycle);
+				//pivotMotor.set(-PIVOT_MOTOR_POWER);
+				pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
+					CANSparkMax.ControlType.kDutyCycle);
 			} else {
 				pivotMotor.set(0);
 			}
@@ -327,7 +328,7 @@ public class ArmFSM {
 	private void handleShootHighState(TeleopInput input) {
 		if (input != null) {
 			if (input.isThrottleForward()) {
-				if (SpinningIntakeFSM.getObjectType() != 1) {
+				if (SpinningIntakeFSM.getObjectType() == SpinningIntakeFSM.ItemType.CUBE) {
 					if (withinError(pivotMotor.getEncoder().getPosition(),
 						SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 						pivotMotor.set(0);
