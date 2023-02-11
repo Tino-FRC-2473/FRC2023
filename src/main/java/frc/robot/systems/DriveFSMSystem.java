@@ -63,6 +63,7 @@ public class DriveFSMSystem {
 	private double startAngle;
 
 	private double angleToTurnToFaceTag = 0;
+	private double initialAngle = 0;
 
 	private DrivePoseEstimator dpe = new DrivePoseEstimator();
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
@@ -164,8 +165,8 @@ public class DriveFSMSystem {
 	 */
 	public void update(TeleopInput input) {
 		result = pcw.getEstimatedGlobalPose();
-		dpe.updatePose(gyro.getAngle(), leftMotor.getEncoder().getPosition(),
-			rightMotor.getEncoder().getPosition());
+		//dpe.updatePose(gyro.getAngle(), leftMotor.getEncoder().getPosition(),
+		//	rightMotor.getEncoder().getPosition());
 		// SmartDashboard.putNumber("X", dpe.getCurPose().getX());
 		// SmartDashboard.putNumber("Y", dpe.getCurPose().getY());
 		// SmartDashboard.putNumber("Rotation", dpe.getCurPose().getRotation().getDegrees());
@@ -196,6 +197,9 @@ public class DriveFSMSystem {
 			if (!result.isEmpty()) {
 				xToATag = result.get().estimatedPose.getX() * 39.3701;
 				yToATag = result.get().estimatedPose.getY() * 39.3701;
+				System.out.println("x to tag " + xToATag);
+				System.out.println("y to tag " + yToATag);
+
 				handleCVAllignState(input);
 			}
 				break;
@@ -233,6 +237,8 @@ public class DriveFSMSystem {
 				} else if (input != null && input.isDriveJoystickCVAllignLeftButtonPressedRaw()) { 
 					// Allign to node left of april tag
 					CVButtonPressed = true;
+					initialAngle = gyro.getAngle();
+					isAllignedToATag = false;
 					return FSMState.TELE_STATE_CV_ALLIGN;
 				}
 				// } else if (input != null && input.isDriveJoystickCVAllignMiddleButtonPressedRaw()) {
@@ -259,6 +265,7 @@ public class DriveFSMSystem {
 
 			case TELE_STATE_CV_ALLIGN:
 				if(isAllignedToATag) {
+					System.out.println("has alligned");
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.TELE_STATE_CV_ALLIGN;
@@ -341,15 +348,17 @@ public class DriveFSMSystem {
 					//System.out.println("angle to face: " + (180 + angleToTurnToFaceTag - Math.toDegrees(Math.atan2(result.get().estimatedPose.getY(), result.get().estimatedPose.getX()))));
 				}
 
-				angleToTurnToFaceTag = angleToTurnToFaceTag * -1;
+				//angleToTurnToFaceTag = angleToTurnToFaceTag * -1;
 				// angleToTurnToFaceTag = Math.toDegrees(Math.atan2(result.get().estimatedPose.getY(), result.get().estimatedPose.getX()));
 				SmartDashboard.putNumber("angle to face: ", angleToTurnToFaceTag);
 				SmartDashboard.putNumber("gyro: ", gyroAngleForOdo);
 
 
 			}
-			System.out.println("X: " + roboXPos);
-			System.out.println("Y: " + roboYPos);
+			// System.out.println("gyro " + gyro.getAngle());
+			// System.out.println("angle " + angleToTurnToFaceTag);
+			// System.out.println("X: " + roboXPos);
+			// System.out.println("Y: " + roboYPos);
 
 			rightMotor.set(rightPower);
 			leftMotor.set(leftPower);
@@ -385,9 +394,10 @@ public class DriveFSMSystem {
 	private void handleCVAllignState(TeleopInput input) {
 
 		System.out.println("angleToTurnToFaceTag: " + angleToTurnToFaceTag);
-		isAllignedToATag = true;
-
-		handleTurnState(input, angleToTurnToFaceTag);
+		handleTurnState(input, (angleToTurnToFaceTag + initialAngle)*.9);
+		if (finishedTurning) {
+			isAllignedToATag = true;
+		}
 		// double distToTravelToATag = Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) - 15;
 		// System.out.println("distToTravelToATag: " + distToTravelToATag);
 		// if (Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) < distToTravelToATag) {
@@ -421,16 +431,16 @@ public class DriveFSMSystem {
 		System.out.println("ERROR: " + error);
 		if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
 			System.out.println("DONE");
-			finishedTurning = true;
 			leftMotor.set(0);
 			rightMotor.set(0);
+			finishedTurning = true;
 			return;
 		}
 		double power = Math.abs(error) / Constants.TURN_ERROR_POWER_RATIO;
 		if (power < Constants.MIN_TURN_POWER) {
 			power = Constants.MIN_TURN_POWER;
 		}
-		power *= (error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -1 : 1;
+		power *= (error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -0.5 : 0.5;
 		// power *= power * 1.3;
 
 		leftMotor.set(-power);
