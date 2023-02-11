@@ -32,39 +32,80 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 
 		// Instantiate all systems here
-		armSystem = new ArmFSM();
-		driveSystem = new DriveFSMSystem();
-		spinningIntakeFSM = new SpinningIntakeFSM();
+		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()) {
+			driveSystem = new DriveFSMSystem();
+			armSystem = new ArmFSM();
+			spinningIntakeFSM = new SpinningIntakeFSM();
+		}
+		if (HardwareMap.isTestBoardArm()) {
+			armSystem = new ArmFSM();
+		}
+
+		if (HardwareMap.isTestBoardGrabber()) {
+			spinningIntakeFSM = new SpinningIntakeFSM();
+		}
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		armSystem.reset();
-		driveSystem.resetAutonomous();
-		spinningIntakeFSM.reset();
+		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()) {
+			armSystem.reset();
+			driveSystem.resetAutonomous();
+			spinningIntakeFSM.reset();
+		}
+		if (HardwareMap.isTestBoardArm()) {
+			armSystem.reset();
+		}
+		if (HardwareMap.isTestBoardGrabber()) {
+			spinningIntakeFSM.reset();
+		}
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		armSystem.update(null);
-		driveSystem.update(null);
-		spinningIntakeFSM.update(null);
+		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()) {
+			armSystem.update(null);
+			driveSystem.update(null);
+			spinningIntakeFSM.update(null);
+		}
+		if (HardwareMap.isTestBoardArm()) {
+			armSystem.update(null);
+		}
+		if (HardwareMap.isTestBoardGrabber()) {
+			spinningIntakeFSM.update(null);
+		}
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		armSystem.reset();
-		driveSystem.resetTeleop();
-		spinningIntakeFSM.reset();
+		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()) {
+			armSystem.reset();
+			driveSystem.resetTeleop();
+			spinningIntakeFSM.reset();
+		}
+		if (HardwareMap.isTestBoardArm()) {
+			armSystem.reset();
+		}
+		if (HardwareMap.isTestBoardGrabber()) {
+			spinningIntakeFSM.reset();
+		}
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		armSystem.update(input);
-		driveSystem.update(input);
-		spinningIntakeFSM.update(input);
+		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()) {
+			armSystem.update(input);
+			driveSystem.update(input);
+			spinningIntakeFSM.update(input);
+		}
+		if (HardwareMap.isTestBoardArm()) {
+			armSystem.update(input);
+		}
+		if (HardwareMap.isTestBoardGrabber()) {
+			spinningIntakeFSM.update(input);
+		}
 	}
 
 	@Override

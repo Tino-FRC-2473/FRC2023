@@ -3,7 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-	public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(20);
+	public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(19.5);
 	public static final double WHEEL_DIAMETER_INCHES = 4.0; //7.65
 	public static final double MAX_POWER = 1;
 	public static final double REDUCED_MAX_POWER = 0.5;
@@ -30,7 +30,7 @@ public class Constants {
 	public static final double AUTONOMUS_MOVE_POWER = 0.3;
 	public static final double AUTONOMUS_MOVE_THRESHOLD = 1.5;
 
-	// Path points
+	// Path points added
 	public static final double P1X1 = 28.271;
 	public static final double P1X2 = -108.947;
 	public static final double P1X3 = -53.342;
@@ -45,7 +45,6 @@ public class Constants {
 	public static final double P3A3 = 69.454 * 0.8807; // 69.454
 	public static final double P3A5 = 9; // 0
 
-
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
 	public static final double DY_INCHES_CONST = 1.1742067733;
@@ -54,17 +53,25 @@ public class Constants {
 	public static final double HUB_Y_COORDINATE = 0;
 
 	public static final double QUARTER_PI = Math.PI / 4;
+	public static final double ENCODER_TICKS_TO_METERS_CONSTANT = 23.1889;
 
 	static class VisionConstants {
 		static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
 		static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(0);
-		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(14.5);
+		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.00);
 		static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
+		static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
+		static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
 	}
 	static class AprilTagConstants {
-		static final double APRILTAG_1_X_METERS = Units.inchesToMeters(0);
-		static final double APRILTAG_1_Y_METERS = Units.inchesToMeters(0);
-		static final double APRILTAG_1_HEIGHT_METERS = Units.inchesToMeters(12);
+		static final double APRILTAG_1_X_METERS = Units.inchesToMeters(610.77);
+		static final double APRILTAG_1_Y_METERS = Units.inchesToMeters(42.19);
+		static final double APRILTAG_1_HEIGHT_METERS = Units.inchesToMeters(17.5);
 		static final double APRILTAG_1_ANGLE_RADIANS = Units.degreesToRadians(180);
+
+		static final double APRILTAG_2_X_METERS = Units.inchesToMeters(0);
+		static final double APRILTAG_2_Y_METERS = Units.inchesToMeters(0);
+		static final double APRILTAG_2_HEIGHT_METERS = Units.inchesToMeters(17.5);
+		static final double APRILTAG_2_ANGLE_RADIANS = Units.degreesToRadians(180);
 	}
 }
