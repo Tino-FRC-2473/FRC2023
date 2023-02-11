@@ -37,9 +37,9 @@ public class PhotonCameraWrapper {
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
 		ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
-		atList.add(new AprilTag(1, new Pose3d(AprilTagConstants.APRILTAG_1_X_METERS,
-			AprilTagConstants.APRILTAG_1_Y_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
-			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE_RADIANS))));
+		atList.add(new AprilTag(2, new Pose3d(AprilTagConstants.APRILTAG_2_X_METERS,
+			AprilTagConstants.APRILTAG_2_Y_METERS, AprilTagConstants.APRILTAG_2_HEIGHT_METERS,
+			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_2_ANGLE_RADIANS))));
 
 		AprilTagFieldLayout atfl =
 				new AprilTagFieldLayout(atList,
@@ -73,7 +73,7 @@ public class PhotonCameraWrapper {
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return PhotonUtils.calculateDistanceToTargetMeters(
-				VisionConstants.CAM_HEIGHT_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
+				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CONE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
 					result.getBestTarget().getPitch()));
 		}
@@ -85,7 +85,7 @@ public class PhotonCameraWrapper {
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return PhotonUtils.calculateDistanceToTargetMeters(
-				VisionConstants.CAM_HEIGHT_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
+				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CUBE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
 					result.getBestTarget().getPitch()));
 		}
