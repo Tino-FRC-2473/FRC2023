@@ -54,8 +54,10 @@ public class DriveFSMSystem {
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax leftMotor;
-	private CANSparkMax rightMotor;
+	private CANSparkMax leftMotor1;
+	private CANSparkMax rightMotor1;
+	private CANSparkMax leftMotor2;
+	private CANSparkMax rightMotor2;
 
 	private double leftPower;
 	private double rightPower;
@@ -89,10 +91,19 @@ public class DriveFSMSystem {
 	 */
 	public DriveFSMSystem() {
 		// Perform hardware init
-		leftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_DRIVE_LEFT,
+		leftMotor1 = new CANSparkMax(HardwareMap.CAN_ID_SPARK_DRIVE_LEFT1,
 										CANSparkMax.MotorType.kBrushless);
-		rightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_DRIVE_RIGHT,
+		rightMotor1 = new CANSparkMax(HardwareMap.CAN_ID_SPARK_DRIVE_RIGHT1,
 										CANSparkMax.MotorType.kBrushless);
+		leftMotor2 = new CANSparkMax(HardwareMap.CAN_ID_SPARK_DRIVE_LEFT2,
+										CANSparkMax.MotorType.kBrushless);
+		rightMotor2 = new CANSparkMax(HardwareMap.CAN_ID_SPARK_DRIVE_RIGHT2,
+										CANSparkMax.MotorType.kBrushless);
+
+		rightMotor1.getEncoder().setPosition(0);
+		leftMotor1.getEncoder().setPosition(0);
+		rightMotor2.getEncoder().setPosition(0);
+		leftMotor2.getEncoder().setPosition(0);
 
 		leftPower = 0;
 		rightPower = 0;
@@ -127,8 +138,10 @@ public class DriveFSMSystem {
 	 */
 	public void resetAutonomous() {
 
-		rightMotor.getEncoder().setPosition(0);
-		leftMotor.getEncoder().setPosition(0);
+		rightMotor1.getEncoder().setPosition(0);
+		leftMotor1.getEncoder().setPosition(0);
+		rightMotor2.getEncoder().setPosition(0);
+		leftMotor2.getEncoder().setPosition(0);
 
 		gyro.reset();
 		gyro.zeroYaw();
@@ -147,17 +160,22 @@ public class DriveFSMSystem {
 	 */
 	public void resetTeleop() {
 
-		rightMotor.getEncoder().setPosition(0);
-		leftMotor.getEncoder().setPosition(0);
+		rightMotor1.getEncoder().setPosition(0);
+		leftMotor1.getEncoder().setPosition(0);
+		rightMotor2.getEncoder().setPosition(0);
+		leftMotor2.getEncoder().setPosition(0);
 
 		gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.TELE_STATE_2_MOTOR_DRIVE;
+		currentState = FSMState.TURNING_STATE;
 
 		roboXPos = 0;
 		roboYPos = 0;
+
+		System.out.println("X: " + roboXPos);
+		System.out.println("Y: " + roboYPos);
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -170,26 +188,28 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		dpe.updatePose(gyro.getAngle(), leftMotor.getEncoder().getPosition(),
-			rightMotor.getEncoder().getPosition());
+		// dpe.updatePose(gyro.getAngle(), leftMotor1.getEncoder().getPosition(),
+		// 	rightMotor1.getEncoder().getPosition());
 
-		if (!pcw.getEstimatedGlobalPose().isEmpty()) {
-			SmartDashboard.putNumber("X",
-				Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX()));
-			SmartDashboard.putNumber("Y",
-				Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getY()));
-			SmartDashboard.putNumber("Rotation", Constants.ONE_REVOLUTION_DEGREES
-				- Units.radiansToDegrees(
-				pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle()));
-			SmartDashboard.putNumber("Rotation2",
-				pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle());
-		}
-		gyroAngleForOdo = gyro.getAngle();
+		// if (!pcw.getEstimatedGlobalPose().isEmpty()) {
+		// 	SmartDashboard.putNumber("X",
+		// 		Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX()));
+		// 	SmartDashboard.putNumber("Y",
+		// 		Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getY()));
+		// 	SmartDashboard.putNumber("Rotation", Constants.ONE_REVOLUTION_DEGREES
+		// 		- Units.radiansToDegrees(
+		// 		pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle()));
+		// 	SmartDashboard.putNumber("Rotation2",
+		// 		pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle());
+		// }
+		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
 
-		currentEncoderPos = ((leftMotor.getEncoder().getPosition()
-			- rightMotor.getEncoder().getPosition()) / 2.0);
+		currentEncoderPos = ((leftMotor1.getEncoder().getPosition()
+			- rightMotor1.getEncoder().getPosition()) / 2.0);
 
-		updateLineOdometryTele(gyro.getAngle());
+		updateLineOdometryTele(gyroAngleForOdo);
+
+		System.out.println(gyroAngleForOdo);
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -209,7 +229,7 @@ public class DriveFSMSystem {
 				break;
 
 			case TURNING_STATE:
-				handleTurnState(input, angleToTurnToFaceTag);
+				handleTurnState(input, 90);
 				break;
 
 			// path 1
@@ -421,18 +441,18 @@ public class DriveFSMSystem {
 			return;
 		}
 
-		Pose3d cvEstimatedPos = pcw.getEstimatedGlobalPose().get().estimatedPose;
+		// Pose3d cvEstimatedPos = pcw.getEstimatedGlobalPose().get().estimatedPose;
 
 		if (isInArcadeDrive) {
 
-			currentEncoderPos = ((leftMotor.getEncoder().getPosition()
-				- rightMotor.getEncoder().getPosition()) / 2.0);
+			currentEncoderPos = ((leftMotor1.getEncoder().getPosition()
+				- rightMotor1.getEncoder().getPosition()) / 2.0);
 
-			updateLineOdometryTele(gyroAngleForOdo);
+			// updateLineOdometryTele(gyroAngleForOdo);
 
 			double steerAngle = input.getSteerAngle();
-			double currentLeftPower = leftMotor.get();
-			double currentRightPower = rightMotor.get();
+			double currentLeftPower = leftMotor1.get();
+			double currentRightPower = rightMotor1.get();
 
 
 			DrivePower targetPower = DriveModes.arcadeDrive(input.getdriveJoystickY(),
@@ -460,32 +480,36 @@ public class DriveFSMSystem {
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
 
-			if (!pcw.getEstimatedGlobalPose().isEmpty()) {
-				// left is negative right is positive
-				angleToTurnToFaceTag = Math.abs((Constants.HALF_REVOLUTION_DEGREES
-					+ Constants.ONE_REVOLUTION_DEGREES - Math.toDegrees(
-					cvEstimatedPos.getRotation().getAngle())) + Math.toDegrees(
-						Math.atan2(cvEstimatedPos.getY(),
-						cvEstimatedPos.getX())));
+			// if (!pcw.getEstimatedGlobalPose().isEmpty()) {
+			// 	// left is negative right is positive
+			// 	angleToTurnToFaceTag = Math.abs((Constants.HALF_REVOLUTION_DEGREES
+			// 		+ Constants.ONE_REVOLUTION_DEGREES - Math.toDegrees(
+			// 		cvEstimatedPos.getRotation().getAngle())) + Math.toDegrees(
+			// 			Math.atan2(cvEstimatedPos.getY(),
+			// 			cvEstimatedPos.getX())));
 
-				if (cvEstimatedPos.getY() >= 0) {
-					angleToTurnToFaceTag = -angleToTurnToFaceTag;
-				}
+			// 	if (cvEstimatedPos.getY() >= 0) {
+			// 		angleToTurnToFaceTag = -angleToTurnToFaceTag;
+			// 	}
 
-				SmartDashboard.putNumber("angle to face: ", angleToTurnToFaceTag);
-				SmartDashboard.putNumber("gyro: ", gyroAngleForOdo);
+			// 	SmartDashboard.putNumber("angle to face: ", angleToTurnToFaceTag);
+			// 	SmartDashboard.putNumber("gyro: ", gyroAngleForOdo);
 
 
-			}
+			// }
 			System.out.println("X: " + roboXPos);
 			System.out.println("Y: " + roboYPos);
 
-			rightMotor.set(rightPower);
-			leftMotor.set(leftPower);
+			leftMotor1.set(leftPower);
+			rightMotor1.set(rightPower);
+			leftMotor2.set(leftPower);
+			rightMotor2.set(rightPower);
 
 		} else {
-			leftMotor.set((input.getdriveJoystickY()));
-			rightMotor.set(-(input.getmechJoystickY()));
+			leftMotor1.set((input.getdriveJoystickY()));
+			rightMotor1.set(-(input.getmechJoystickY()));
+			leftMotor2.set((input.getdriveJoystickY()));
+			rightMotor2.set(-(input.getmechJoystickY()));
 		}
 
 	}
@@ -513,13 +537,13 @@ public class DriveFSMSystem {
 	 */
 	private void handleCVAlignState(TeleopInput input) {
 
-		xToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
-		yToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
+		// xToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
+		// yToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
 
-		System.out.println("angleToTurnToFaceTag: " + angleToTurnToFaceTag);
-		isAlignedToATag = true;
-
-		// handleTurnState(input, angleToTurnToFaceTag);
+		// System.out.println("angleToTurnToFaceTag: " + angleToTurnToFaceTag);
+		// System.out.println("in method");
+		// isAlignedToATag = true;
+		handleTurnState(input, 90);
 		// double distToTravelToATag = Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) - 10;
 		// System.out.println("distToTravelToATag: " + distToTravelToATag);
 		// if (Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) < distToTravelToATag) {
@@ -537,33 +561,87 @@ public class DriveFSMSystem {
 	 * @param degrees How many degrees the robot is to turn
 	 */
 	public void handleTurnState(TeleopInput input, double degrees) {
-		if (input != null) {
-			return;
-		}
-
-		degrees *= Constants.GYRO_TURN_MULTIPLER_BELOW_90;
-
+		// if (input != null) {
+		// 	return;
+		// }
+		finishedTurning = false;
 		System.out.println(getHeading());
 		double error = degrees - getHeading();
+		// if (error > Constants.HALF_REVOLUTION_DEGREES) {
+		// 	error -= Constants.ONE_REVOLUTION_DEGREES;
+		// }
+		// if (error < -Constants.HALF_REVOLUTION_DEGREES) {
+		// 	error += Constants.ONE_REVOLUTION_DEGREES;
+		// }
+
 		if (error > Constants.HALF_REVOLUTION_DEGREES) {
 			error -= Constants.ONE_REVOLUTION_DEGREES;
 		}
+		if (error < -Constants.HALF_REVOLUTION_DEGREES) {
+			error += Constants.ONE_REVOLUTION_DEGREES;
+		}
+		System.out.println("ERROR: " + error);
 		if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
+			System.out.println("DONE");
 			finishedTurning = true;
-			leftMotor.set(0);
-			rightMotor.set(0);
+			leftMotor1.set(0);
+			rightMotor2.set(0);
+			leftMotor2.set(0);
+			rightMotor2.set(0);
 			return;
 		}
 		double power = Math.abs(error) / Constants.TURN_ERROR_POWER_RATIO;
 		if (power < Constants.MIN_TURN_POWER) {
 			power = Constants.MIN_TURN_POWER;
 		}
+		power *= ((error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -1 : 1);
+		power = -power / 4;
 
-		power *= (error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -1 : 1;
-
-		leftMotor.set(power);
-		rightMotor.set(power);
+		leftMotor1.set(-power);
+		rightMotor2.set(-power);
+		leftMotor2.set(-power);
+		rightMotor2.set(-power);
+		// turning right is positive and left is negative
 	}
+
+	// /**
+	//  * Handle behavior in TURNING_STATE.
+	//  * @param input Global TeleopInput if robot in teleop mode or null if
+	//  *        the robot is in autonomous mode.
+	//  * @param degrees How many degrees the robot is to turn
+	//  */
+	// public void handleTurnState(TeleopInput input, double degrees) {
+	// 	// if (input != null) {
+	// 	// 	return;
+	// 	// }
+
+	// 	degrees *= Constants.GYRO_TURN_MULTIPLER_BELOW_90;
+
+	// 	System.out.println("get heading: " + getHeading());
+	// 	double error = degrees - getHeading();
+	// 	if (error > Constants.HALF_REVOLUTION_DEGREES) {
+	// 		error -= Constants.ONE_REVOLUTION_DEGREES;
+	// 	}
+	// 	if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
+	// 		finishedTurning = true;
+	// 		leftMotor1.set(0);
+	// 		rightMotor2.set(0);
+	// 		leftMotor2.set(0);
+	// 		rightMotor2.set(0);
+	// 		return;
+	// 	}
+	// 	double power = Math.abs(error) / Constants.TURN_ERROR_POWER_RATIO;
+	// 	if (power < Constants.MIN_TURN_POWER) {
+	// 		power = Constants.MIN_TURN_POWER;
+	// 	}
+
+	// 	power *= ((error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -1 : 1) / 2;
+
+	// 	leftMotor1.set(-power);
+	// 	rightMotor2.set(-power);
+	// 	leftMotor2.set(-power);
+	// 	rightMotor2.set(-power);
+	// }
 
 	/**
 	 * Handle behavior in IDlE State.
@@ -571,24 +649,39 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleIdleState(TeleopInput input) {
-		leftMotor.set(0);
-		rightMotor.set(0);
+		leftMotor1.set(0);
+		rightMotor2.set(0);
+		leftMotor2.set(0);
+		rightMotor2.set(0);
 	}
+
+	// /**
+	// * Gets the heading from the gyro.
+	// * @return the gyro heading
+	// */
+	// public double getHeading() {
+	// 	// double angle = startAngle - gyro.getYaw();
+	// 	double angle = startAngle - gyro.getAngle();
+	// 	if (angle < 0) {
+	// 		angle += Constants.ONE_REVOLUTION_DEGREES;
+	// 	}
+	// 	if (angle > Constants.ONE_REVOLUTION_DEGREES) {
+	// 		angle -= Constants.ONE_REVOLUTION_DEGREES;
+	// 	}
+	// 	return angle;
+	// }
 
 	/**
 	* Gets the heading from the gyro.
 	* @return the gyro heading
 	*/
 	public double getHeading() {
-		// double angle = startAngle - gyro.getYaw();
-		double angle = startAngle - gyro.getAngle();
+		double angle = gyro.getAngle() % Constants.ONE_REVOLUTION_DEGREES;
 		if (angle < 0) {
 			angle += Constants.ONE_REVOLUTION_DEGREES;
 		}
-		if (angle > Constants.ONE_REVOLUTION_DEGREES) {
-			angle -= Constants.ONE_REVOLUTION_DEGREES;
-		}
 		return angle;
+		// angle will be between 0 - 360
 	}
 
 	/**
@@ -608,18 +701,24 @@ public class DriveFSMSystem {
 		System.out.println("x: " + roboX);
 		System.out.println("y: " + roboY);
 
-		if (forwards) {
-			leftMotor.set(-Constants.AUTONOMUS_MOVE_POWER);
-			rightMotor.set(Constants.AUTONOMUS_MOVE_POWER);
-		} else {
-			leftMotor.set(Constants.AUTONOMUS_MOVE_POWER);
-			rightMotor.set(-Constants.AUTONOMUS_MOVE_POWER);
-		}
-		if (Math.abs(roboX - x) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-			leftMotor.set(0);
-			rightMotor.set(0);
-		}
+		// if (forwards) {
+		// 	leftMotor1.set(-Constants.AUTONOMUS_MOVE_POWER);
+		// 	rightMotor2.set(Constants.AUTONOMUS_MOVE_POWER);
+		// 	leftMotor2.set(-Constants.AUTONOMUS_MOVE_POWER);
+		// 	rightMotor2.set(Constants.AUTONOMUS_MOVE_POWER);
+		// } else {
+		// 	leftMotor1.set(Constants.AUTONOMUS_MOVE_POWER);
+		// 	rightMotor2.set(-Constants.AUTONOMUS_MOVE_POWER);
+		// 	leftMotor2.set(Constants.AUTONOMUS_MOVE_POWER);
+		// 	rightMotor2.set(-Constants.AUTONOMUS_MOVE_POWER);
+		// }
+		// if (Math.abs(roboX - x) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+		// 	&& Math.abs(roboY - y) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+		// 	leftMotor1.set(0);
+		// 	rightMotor2.set(0);
+		// 	leftMotor2.set(0);
+		// 	rightMotor2.set(0);
+		// }
 	}
 
 
