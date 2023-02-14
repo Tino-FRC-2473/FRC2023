@@ -22,6 +22,9 @@ public final class HardwareMap {
 	//arm robot constants
 	public static final int CAN_ID_SPARK_PIVOT = -1;
 	public static final int CAN_ID_SPARK_TELEARM = -1;
+	//ground mount constants
+	public static final int CAN_ID_TEST_GROUND_MOUNT = 5;
+	public static final int CAN_ID_GROUND_MOUNT = -1;
 	// Place jumper from DIO pin 9 to GND to indicate this is a test setup
 	private static final int DIO_TEST_SETUP_CHANNEL_ARM = 8;
 	private static final int DIO_TEST_SETUP_CHANNEL_GRABBER = 9;
