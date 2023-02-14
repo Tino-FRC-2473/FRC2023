@@ -19,7 +19,7 @@ public class GroundMountFSM {
 		LOWER_STATE,
 		DONE
 	}
-	//arbitrary constant
+	//arbitrary constants, must test all of these
 	private static final double LOWER_ANGLE_ENCODER_FORWARD_ROTATIONS = 30;
 	private static final double PIVOT_ERROR_GROUND_MOUNT = 0.3;
 	private static final double PID_MAX_POWER = 0.2;
@@ -42,7 +42,7 @@ public class GroundMountFSM {
 	 */
 	public GroundMountFSM() {
 		// Perform hardware init
-		if (HardwareMap.isTestBoardArm()) {
+		if (HardwareMap.isTestBoardGroundMount()) {
 			pivotArmMotor = new CANSparkMax(HardwareMap.CAN_ID_TEST_GROUND_MOUNT,
 										CANSparkMax.MotorType.kBrushless);
 		} else {
@@ -78,6 +78,7 @@ public class GroundMountFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.START_STATE;
+		pivotArmMotor.getEncoder().setPosition(0);
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -91,6 +92,7 @@ public class GroundMountFSM {
 		//System.out.println(itemType);
 		SmartDashboard.putNumber("encoder", pivotArmMotor.getEncoder().getPosition());
 		SmartDashboard.putString("state", currentState.toString());
+		SmartDashboard.putNumber("power", pivotArmMotor.get());
 		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		if (input == null) {
 			return;
@@ -154,6 +156,7 @@ public class GroundMountFSM {
 	private void handleLowerState() {
 		pidControllerPivotArm.setReference(LOWER_ANGLE_ENCODER_FORWARD_ROTATIONS,
 							CANSparkMax.ControlType.kPosition);
+		//pivotArmMotor.set(0.1);
 	}
 	private void handleDoneState() {
 		pivotArmMotor.set(0);
