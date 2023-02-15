@@ -64,8 +64,14 @@ public class PhotonCameraWrapper {
 	 *  on the field, and the time of the observation. Assumes a planar
 	 *  field and the robot is always firmly on the ground.
 	 */
-	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+	public double getEstimatedGlobalPose() {
 		photonCamera.setPipelineIndex(0); //Aprill Tag pipeline
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			double angle = result.getBestTarget().getYaw();
+			return angle;
+		}
+		return -1;
 		// var result = photonCamera.getLatestResult();
 		// double timestamp = result.getTimestampSeconds();
 		// if (result.hasTargets()) {
@@ -76,7 +82,7 @@ public class PhotonCameraWrapper {
 		// }
 		// return null;
 		
-		return robotPoseEstimator.update();
+		//return robotPoseEstimator.update();
 	}
 	/** @return Returns a distance in meters from the closest cone and -1 if there are no cones.*/
 	public double getDistanceToCone() {

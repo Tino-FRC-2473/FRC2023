@@ -73,6 +73,7 @@ public class DriveFSMSystem {
 	private boolean CVButtonPressed = false;
 
 	private Optional<EstimatedRobotPose> result;
+	boolean comp = false;
 
 
 	/* ======================== Constructor ======================== */
@@ -164,19 +165,19 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		result = pcw.getEstimatedGlobalPose();
+		//result = pcw.getEstimatedGlobalPose();
 		//dpe.updatePose(gyro.getAngle(), leftMotor.getEncoder().getPosition(),
 		//	rightMotor.getEncoder().getPosition());
 		// SmartDashboard.putNumber("X", dpe.getCurPose().getX());
 		// SmartDashboard.putNumber("Y", dpe.getCurPose().getY());
 		// SmartDashboard.putNumber("Rotation", dpe.getCurPose().getRotation().getDegrees());
 
-		if(!result.isEmpty()) {
-			SmartDashboard.putNumber("X", result.get().estimatedPose.getX() * 39.3701);
-			SmartDashboard.putNumber("Y", result.get().estimatedPose.getY() * 39.3701);
-			SmartDashboard.putNumber("Rotation", 360-Units.radiansToDegrees(result.get().estimatedPose.getRotation().getAngle()));
+		//if(!result.isEmpty()) {
+		//	SmartDashboard.putNumber("X", result.get().estimatedPose.getX() * 39.3701);
+		//	SmartDashboard.putNumber("Y", result.get().estimatedPose.getY() * 39.3701);
+		//	SmartDashboard.putNumber("Rotation", 360-Units.radiansToDegrees(result.get().estimatedPose.getRotation().getAngle()));
 			//SmartDashboard.putNumber("Rotation2", result.get().estimatedPose.getRotation().getAngle());
-		}
+		//}
 		gyroAngleForOdo = gyro.getAngle();
 
 		currentEncoderPos = ((leftMotor.getEncoder().getPosition()
@@ -194,14 +195,14 @@ public class DriveFSMSystem {
 				break;
 
 			case TELE_STATE_CV_ALLIGN:
-			if (!result.isEmpty()) {
-				xToATag = result.get().estimatedPose.getX() * 39.3701;
-				yToATag = result.get().estimatedPose.getY() * 39.3701;
-				System.out.println("x to tag " + xToATag);
-				System.out.println("y to tag " + yToATag);
+			//if (!result.isEmpty()) {
+			//	xToATag = result.get().estimatedPose.getX() * 39.3701;
+			//	yToATag = result.get().estimatedPose.getY() * 39.3701;
+			//	System.out.println("x to tag " + xToATag);
+			//	System.out.println("y to tag " + yToATag);
 
 				handleCVAllignState(input);
-			}
+			//}
 				break;
 
 			case IDLE:
@@ -237,6 +238,7 @@ public class DriveFSMSystem {
 				} else if (input != null && input.isDriveJoystickCVAllignLeftButtonPressedRaw()) { 
 					// Allign to node left of april tag
 					CVButtonPressed = true;
+					comp = false;
 					initialAngle = gyro.getAngle();
 					isAllignedToATag = false;
 					return FSMState.TELE_STATE_CV_ALLIGN;
@@ -325,8 +327,8 @@ public class DriveFSMSystem {
 
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
-			Optional<EstimatedRobotPose> result = pcw.getEstimatedGlobalPose();
-			if (!result.isEmpty() && !CVButtonPressed) {
+			double angle = pcw.getEstimatedGlobalPose();
+			if (angle!=-1 && !CVButtonPressed) {
 				//if(result.get().estimatedPose.getY() < 0) {
 					//angleToTurnToFaceTag = Math.toDegrees(result.get().estimatedPose.getRotation().getAngle());
 				//} else {
@@ -335,19 +337,8 @@ public class DriveFSMSystem {
 				//angleToTurnToFaceTag = 180 + angleToTurnToFaceTag - Math.toDegrees(Math.atan2(result.get().estimatedPose.getY(), result.get().estimatedPose.getX()));
 				
 				// left is negative right is positive
-				System.out.println(!result.isEmpty());
-				angleToTurnToFaceTag = -1 * (360 - Math.toDegrees(result.get().estimatedPose.getRotation().getAngle()));
+				angleToTurnToFaceTag = angle;
 				
-				if(result.get().estimatedPose.getY() < 0) {
-					// angleToTurnToFaceTag = -1 * (180 + angleToTurnToFaceTag + Math.toDegrees(Math.atan2(result.get().estimatedPose.getY(), result.get().estimatedPose.getX())));
-					angleToTurnToFaceTag = -1 * (180 + angleToTurnToFaceTag + Math.toDegrees(Math.atan2(result.get().estimatedPose.getY(), result.get().estimatedPose.getX())));
-
-					//System.out.println("angle to face: " + (-1 * (180 + angleToTurnToFaceTag + Math.toDegrees(Math.atan2(result.get().estimatedPose.getY(), result.get().estimatedPose.getX())))));
-				} else {
-					angleToTurnToFaceTag = 180 + angleToTurnToFaceTag - Math.toDegrees(Math.atan2(result.get().estimatedPose.getY(), result.get().estimatedPose.getX()));
-					//System.out.println("angle to face: " + (180 + angleToTurnToFaceTag - Math.toDegrees(Math.atan2(result.get().estimatedPose.getY(), result.get().estimatedPose.getX()))));
-				}
-
 				//angleToTurnToFaceTag = angleToTurnToFaceTag * -1;
 				// angleToTurnToFaceTag = Math.toDegrees(Math.atan2(result.get().estimatedPose.getY(), result.get().estimatedPose.getX()));
 				SmartDashboard.putNumber("angle to face: ", angleToTurnToFaceTag);
@@ -393,11 +384,27 @@ public class DriveFSMSystem {
 	 */
 	private void handleCVAllignState(TeleopInput input) {
 
-		System.out.println("angleToTurnToFaceTag: " + angleToTurnToFaceTag);
-		handleTurnState(input, (angleToTurnToFaceTag + initialAngle)*.9);
-		if (finishedTurning) {
-			isAllignedToATag = true;
+		//System.out.println("angleToTurnToFaceTag: " + angleToTurnToFaceTag);
+		//handleTurnState(input, (angleToTurnToFaceTag + initialAngle)*.9);
+		//if (finishedTurning) {
+		//	isAllignedToATag = true;
+		//}
+
+		double angle = pcw.getEstimatedGlobalPose();
+
+		System.out.println(angle);
+		
+		if (Math.abs(angle) <= 1) {
+			leftMotor.set(0);
+			rightMotor.set(0);
+		}else if (angle < -1) {
+			leftMotor.set(0.05);
+			rightMotor.set(0.05);
+		} else if (angle > 1) {		
+			leftMotor.set(-0.05);
+			rightMotor.set(-0.05);
 		}
+
 		// double distToTravelToATag = Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) - 15;
 		// System.out.println("distToTravelToATag: " + distToTravelToATag);
 		// if (Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) < distToTravelToATag) {
