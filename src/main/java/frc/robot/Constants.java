@@ -58,10 +58,14 @@ public class Constants {
 	static class VisionConstants {
 		static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
 		static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(0);
-		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.00);
+		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.5);
 		static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
 		static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
 		static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
+		static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
+		static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
+		static final double CAM_OFFSET_INCHES = 0;
+
 	}
 	static class AprilTagConstants {
 		static final double APRILTAG_1_X_METERS = Units.inchesToMeters(610.77);

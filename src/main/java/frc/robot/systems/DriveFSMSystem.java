@@ -80,7 +80,6 @@ public class DriveFSMSystem {
 	private double yToATag = 0;
 	private boolean isAlignedToATag = false;
 
-
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -421,7 +420,6 @@ public class DriveFSMSystem {
 			return;
 		}
 
-		Pose3d cvEstimatedPos = pcw.getEstimatedGlobalPose().get().estimatedPose;
 
 		if (isInArcadeDrive) {
 
@@ -462,6 +460,7 @@ public class DriveFSMSystem {
 
 			if (!pcw.getEstimatedGlobalPose().isEmpty()) {
 				// left is negative right is positive
+				Pose3d cvEstimatedPos = pcw.getEstimatedGlobalPose().get().estimatedPose;
 				angleToTurnToFaceTag = Math.abs((Constants.HALF_REVOLUTION_DEGREES
 					+ Constants.ONE_REVOLUTION_DEGREES - Math.toDegrees(
 					cvEstimatedPos.getRotation().getAngle())) + Math.toDegrees(
@@ -479,7 +478,7 @@ public class DriveFSMSystem {
 			}
 			System.out.println("X: " + roboXPos);
 			System.out.println("Y: " + roboYPos);
-
+			//System.out.println("Tape turn angle " + pcw.getTapeTurnAngle());
 			rightMotor.set(rightPower);
 			leftMotor.set(leftPower);
 
@@ -506,11 +505,59 @@ public class DriveFSMSystem {
 		}
 	}
 
-	/**
-	 * Handle behavior in TELE_STATE_CV_ALIGN.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 */
+//Aligns with reflective tape (higher or lower tape is dependent on boolean passed in) and drives within 42 inches (lower) or 65 inches (higher)
+	public void handleCVTapeAlignState(boolean lower) {
+		double angle;
+		boolean forward = false;
+		if (lower) {
+			angle = pcw.getLowerTapeTurnAngle();
+			forward =  pcw.getLowerTapeDistance() > 42;
+			//drives forward until within 42 inches of lower tape
+		} else {
+			angle = pcw.getHigherTapeTurnAngle();	
+			forward = pcw.getHigherTapeDistance() > 65;
+			//drives forward until within 65 inches of higher tape
+		}
+			if (angle > 4) {
+				leftMotor.set(-0.05);
+				rightMotor.set(-0.05);
+			} else if (angle  < -4) {
+				leftMotor.set(0.05);
+				rightMotor.set(0.05);
+			}else{
+				if (forward) {
+					leftMotor.set(-0.05);
+					rightMotor.set(0.05);
+				}else {
+					leftMotor.set(0);
+					rightMotor.set(0);
+				}
+			}
+
+	}
+	//Aligns to april tag and drives up to within 35 inches of it
+	public void handleCVTagAlignState() {
+		double angle = pcw.getTagTurnAngle();
+		boolean forward =  pcw.getTagDistance() > 35;
+		System.out.println("Angle" + angle);
+			if (angle > 4) {
+				leftMotor.set(-0.05);
+				rightMotor.set(-0.05);
+			} else if (angle  < -4) {
+				leftMotor.set(0.05);
+				rightMotor.set(0.05);
+			}else{
+				if (forward) {
+					leftMotor.set(-0.05);
+					rightMotor.set(0.05);
+				}else {
+					leftMotor.set(0);
+					rightMotor.set(0);
+				}
+			}
+
+	}
+	
 	private void handleCVAlignState(TeleopInput input) {
 
 		xToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());

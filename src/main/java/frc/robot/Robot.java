@@ -6,9 +6,9 @@ package frc.robot;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
-import frc.robot.systems.ArmFSM;
+//import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
-import frc.robot.systems.SpinningIntakeFSM;
+//import frc.robot.systems.SpinningIntakeFSM;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -16,11 +16,11 @@ import frc.robot.systems.SpinningIntakeFSM;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
-
+	PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 	// Systems
-	private ArmFSM armSystem;
+	//private ArmFSM armSystem;
 	private DriveFSMSystem driveSystem;
-	private SpinningIntakeFSM spinningIntakeFSM;
+	//private SpinningIntakeFSM spinningIntakeFSM;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -32,39 +32,41 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 
 		// Instantiate all systems here
-		armSystem = new ArmFSM();
+		//armSystem = new ArmFSM();
 		driveSystem = new DriveFSMSystem();
-		spinningIntakeFSM = new SpinningIntakeFSM();
+		//spinningIntakeFSM = new SpinningIntakeFSM();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		armSystem.reset();
-		driveSystem.resetAutonomous();
-		spinningIntakeFSM.reset();
+		//armSystem.reset();
+		//driveSystem.resetTeleop();
+		//spinningIntakeFSM.reset();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		armSystem.update(null);
-		driveSystem.update(null);
-		spinningIntakeFSM.update(null);
+		//armSystem.update(null);
+		//driveSystem.update(null);
+		//spinningIntakeFSM.update(null);
+		driveSystem.handleCVTapeAlignState(true);
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		armSystem.reset();
+		//armSystem.reset();
 		driveSystem.resetTeleop();
-		spinningIntakeFSM.reset();
+		//spinningIntakeFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		armSystem.update(input);
+		//armSystem.update(input);
 		driveSystem.update(input);
-		spinningIntakeFSM.update(input);
+		//spinningIntakeFSM.update(input);
+		
 	}
 
 	@Override
