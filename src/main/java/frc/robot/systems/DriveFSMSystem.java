@@ -75,7 +75,6 @@ public class DriveFSMSystem {
 	private double angleToTurnToFaceTag = 0;
 
 	private DrivePoseEstimator dpe = new DrivePoseEstimator();
-	private ArmFSM armFsm = new ArmFSM();
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 	private double xToATag = 0;
 	private double yToATag = 0;
@@ -218,9 +217,7 @@ public class DriveFSMSystem {
 			case P1N1:
 				moveState(input, true, Constants.P1X1, 0);
 				// set the grabber to be at the low state to drop off block
-				armFsm.executeShootLow();
 				// reset the arm to idle state
-				armFsm.reset();
 				break;
 
 			case P1N2:
@@ -236,9 +233,7 @@ public class DriveFSMSystem {
 			case P2N1:
 				moveState(input, true, Constants.P2X1, 0);
 				// set the grabber to be at the low state to drop off block
-				armFsm.executeShootLow();
 				// reset the arm to idle state
-				armFsm.reset();
 				break;
 
 			case P2N2:
@@ -250,13 +245,11 @@ public class DriveFSMSystem {
 			case P3N1:
 				moveState(input, true, Constants.P3X1, 0);
 				// set grabber at high height to drop off cube
-				armFsm.executeShootHigh(true);
 				break;
 
 			case P3N2:
 				moveState(input, false, Constants.P3X2, 0);
 				// set grabber at low height to pick up another cube
-				armFsm.executeShootLow();
 				break;
 
 			case P3N3:
