@@ -29,13 +29,15 @@ public final class HardwareMap {
 	private static final int DIO_TEST_SETUP_CHANNEL_ARM = 8;
 	private static final int DIO_TEST_SETUP_CHANNEL_GRABBER = 9;
 	private static final int DIO_TEST_SETUP_CHANNEL_GROUND_MOUNT = 7;
+	private static final int DIO_ROBOT_SETUP_CHANNEL_GROUND_MOUNT = 6;
 	private static DigitalInput testBoardPinArm =
 		new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_ARM);
 	private static DigitalInput testBoardPinGrabber =
 		new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_GRABBER);
 	private static DigitalInput testBoardPinGroundMount =
 		new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_GROUND_MOUNT);
-
+	private static DigitalInput robotBoardPinGroundMount =
+		new DigitalInput(HardwareMap.DIO_ROBOT_SETUP_CHANNEL_GROUND_MOUNT);
 	/**
 	 * Check if the current RoboRIO is part of a arm test setup or real robot.
 	 * @return true if the current setup is a test setup
@@ -57,5 +59,9 @@ public final class HardwareMap {
 	 */
 	public static boolean isTestBoardGroundMount() {
 		return !HardwareMap.testBoardPinGroundMount.get();
+	}
+
+	public static boolean isRobotGroundMount() {
+		return !HardwareMap.robotBoardPinGroundMount.get();
 	}
 }
