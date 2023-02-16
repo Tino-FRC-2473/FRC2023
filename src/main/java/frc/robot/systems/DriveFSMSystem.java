@@ -255,9 +255,7 @@ public class DriveFSMSystem {
 			case P3N3:
 				handleTurnState(input, Constants.P3A3);
 				// set grabnber at mid height to drop off cube
-				armFsm.executeShootMid(true);
 				// reset the arm to idle state
-				armFsm.reset();
 				break;
 
 			case P3N4:
