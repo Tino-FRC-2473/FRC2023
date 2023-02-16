@@ -41,6 +41,8 @@ public class SpinningIntakeFSM {
 	private static final int MAX_COLOR_MEASURE = 915;
 	//9 inches
 	private static final int MIN_COLOR_MEASURE = 860;
+	//? inches
+	private static final int MIN_RELEASE_DISTANCE = 800;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static ItemType itemType = ItemType.EMPTY;
 
@@ -137,6 +139,49 @@ public class SpinningIntakeFSM {
 		currentState = nextState(input);
 		if (previousState != currentState) {
 			System.out.println(currentState);
+		}
+	}
+	/**
+	 * Run given state and return if state is complete.
+	 * @param state FSMState state gives the state that the intakefsm is in
+	 * @return Boolean that returns if given state is complete
+	 */
+	public boolean updateAutonomous(FSMState state) {
+		//System.out.println(itemType);
+		SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
+		SmartDashboard.putNumber("r", colorSensor.getColor().red);
+		SmartDashboard.putNumber("g", colorSensor.getColor().green);
+		SmartDashboard.putNumber("b", colorSensor.getColor().blue);
+		SmartDashboard.putString("item type", itemType.toString());
+		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
+		switch (state) {
+			case START_STATE:
+				handleStartState();
+				break;
+			case IDLE_SPINNING:
+				handleIdleSpinningState();
+				break;
+			case IDLE_STOP:
+				handleIdleStopState();
+				break;
+			case RELEASE:
+				handleReleaseState();
+				break;
+			default:
+				throw new IllegalStateException("Invalid state: " + state.toString());
+		}
+		switch (state) {
+			case START_STATE:
+				return true;
+			case IDLE_SPINNING:
+				return ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
+					> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE);
+			case IDLE_STOP:
+				return true;
+			case RELEASE:
+				return distanceSensorObject.getValue() < MIN_RELEASE_DISTANCE;
+			default:
+				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 	}
 
