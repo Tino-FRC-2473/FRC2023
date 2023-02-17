@@ -50,7 +50,6 @@ public class Robot extends TimedRobot {
 		//armSystem.update(null);
 		//driveSystem.update(null);
 		//spinningIntakeFSM.update(null);
-		driveSystem.handleCVTapeAlignState(true);
 	}
 
 	@Override

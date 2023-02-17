@@ -49,6 +49,7 @@ public class PhotonCameraWrapper {
 
 		photonCamera =
 				new PhotonCamera("OV5647");
+		photonCamera.setDriverMode(true);
 		robotPoseEstimator = new PhotonPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY,
 		photonCamera, new Transform3d(
 			new Translation3d(VisionConstants.CAM_OFFSET_X_METERS,
