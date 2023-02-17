@@ -169,7 +169,7 @@ public class DriveFSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.TURNING_STATE;
+		currentState = FSMState.TELE_STATE_2_MOTOR_DRIVE;
 
 		roboXPos = 0;
 		roboYPos = 0;
@@ -701,24 +701,24 @@ public class DriveFSMSystem {
 		System.out.println("x: " + roboX);
 		System.out.println("y: " + roboY);
 
-		// if (forwards) {
-		// 	leftMotor1.set(-Constants.AUTONOMUS_MOVE_POWER);
-		// 	rightMotor2.set(Constants.AUTONOMUS_MOVE_POWER);
-		// 	leftMotor2.set(-Constants.AUTONOMUS_MOVE_POWER);
-		// 	rightMotor2.set(Constants.AUTONOMUS_MOVE_POWER);
-		// } else {
-		// 	leftMotor1.set(Constants.AUTONOMUS_MOVE_POWER);
-		// 	rightMotor2.set(-Constants.AUTONOMUS_MOVE_POWER);
-		// 	leftMotor2.set(Constants.AUTONOMUS_MOVE_POWER);
-		// 	rightMotor2.set(-Constants.AUTONOMUS_MOVE_POWER);
-		// }
-		// if (Math.abs(roboX - x) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-		// 	&& Math.abs(roboY - y) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-		// 	leftMotor1.set(0);
-		// 	rightMotor2.set(0);
-		// 	leftMotor2.set(0);
-		// 	rightMotor2.set(0);
-		// }
+		if (forwards) {
+			leftMotor1.set(-Constants.AUTONOMUS_MOVE_POWER);
+			rightMotor2.set(Constants.AUTONOMUS_MOVE_POWER);
+			leftMotor2.set(-Constants.AUTONOMUS_MOVE_POWER);
+			rightMotor1.set(Constants.AUTONOMUS_MOVE_POWER);
+		} else {
+			leftMotor1.set(Constants.AUTONOMUS_MOVE_POWER);
+			rightMotor2.set(-Constants.AUTONOMUS_MOVE_POWER);
+			leftMotor2.set(Constants.AUTONOMUS_MOVE_POWER);
+			rightMotor1.set(-Constants.AUTONOMUS_MOVE_POWER);
+		}
+		if (Math.abs(roboX - x) <= Constants.AUTONOMUS_MOVE_THRESHOLD
+			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+			leftMotor1.set(0);
+			rightMotor2.set(0);
+			leftMotor2.set(0);
+			rightMotor1.set(0);
+		}
 	}
 
 
