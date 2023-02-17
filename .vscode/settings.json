@@ -19,17 +19,19 @@
     {
       "name": "WPIlibUnitTests",
       "workingDirectory": "${workspaceFolder}/build/jni/release",
-      "vmargs": [ "-Djava.library.path=${workspaceFolder}/build/jni/release" ],
+      "vmargs": [
+        "-Djava.library.path=${workspaceFolder}/build/jni/release"
+      ],
       "env": {
-        "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release" ,
+        "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release",
         "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
       }
     },
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
-  "java.checkstyle.configuration": "${workspaceFolder}/checks.xml",
+  "java.checkstyle.configuration": "${workspaceFolder}\\checks.xml",
   "java.checkstyle.version": "9.1",
-    "java.checkstyle.properties": {
-        "basedir": "${workspaceFolder}/src/main/java/frc/robot"
-    }
+  "java.checkstyle.properties": {
+    "basedir": "${workspaceFolder}/src/main/java/frc/robot"
+  }
 }
