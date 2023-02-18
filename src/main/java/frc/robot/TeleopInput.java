@@ -145,7 +145,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isThrottleForward() {
-		return mechJoystick.getThrottle() <= 0;
+		return mechJoystick.getThrottle() <= 0 ? false : true;
 	}
 
 	/**
@@ -198,7 +198,7 @@ public class TeleopInput {
 	 * Get if cv align button (4) is pressed.
 	 * @return true if button is pressed
 	 */
-	public boolean isDriveJoystickCVAlignLeftButtonPressedRaw() {
+	public boolean isDriveJoystickCVHighTapeButtonPressedRaw() {
 		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_LEFT_NODE);
 	}
 
@@ -206,7 +206,7 @@ public class TeleopInput {
 	 * Get if cv align button (3) is pressed.
 	 * @return true if button is pressed
 	 */
-	public boolean isDriveJoystickCVAlignMiddleButtonPressedRaw() {
+	public boolean isDriveJoystickCVLowTapeButtonPressedRaw() {
 		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_MIDDLE_NODE);
 	}
 
@@ -214,7 +214,7 @@ public class TeleopInput {
 	 * Get if cv align button (5) is pressed.
 	 * @return true if button is pressed
 	 */
-	public boolean isDriveJoystickCVAlignRightButtonPressedRaw() {
+	public boolean isDriveJoystickCVTagButtonPressedRaw() {
 		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_RIGHT_NODE);
 	}
 
