@@ -8,8 +8,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
  */
 public final class HardwareMap {
 	// ID numbers for devices on the CAN bus
-	public static final int CAN_ID_SPARK_DRIVE_RIGHT = 5;
-	public static final int CAN_ID_SPARK_DRIVE_LEFT = 6;
+	public static final int CAN_ID_SPARK_DRIVE_LEFT1 = 31;
+	public static final int CAN_ID_SPARK_DRIVE_LEFT2 = 32;
+	public static final int CAN_ID_SPARK_DRIVE_RIGHT1 = 33;
+	public static final int CAN_ID_SPARK_DRIVE_RIGHT2 = 34;
 
 	//grabber constants
 	public static final int CAN_ID_SPINNER_MOTOR = 40;
@@ -33,13 +35,12 @@ public final class HardwareMap {
 		new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_GROUND_MOUNT);
 
 	/**
-	 * Check if the current RoboRIO is part of a arm test setup or real robot.
+	 * Check if the current RoboRIO is part of a ground mount test setup or real robot.
 	 * @return true if the current setup is a test setup
 	 */
 	public static boolean isTestBoardArm() {
 		return !HardwareMap.testBoardPinArm.get();
 	}
-
 	/**
 	 * Check if the current RoboRIO is part of a grabber test setup or real robot.
 	 * @return true if the current setup is a test setup
