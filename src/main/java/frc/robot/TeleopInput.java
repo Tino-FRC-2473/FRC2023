@@ -16,7 +16,6 @@ public class TeleopInput {
 	private static final int DRIVE_JOYSTICK_PORT = 1;
 	private static final int STEERING_WHEEL_PORT = 3;
 
-	//private static final int RELEASE_BUTTON = 8;
 	private static final int PIVOT_INCREASE_BUTTON = 5;
 	private static final int PIVOT_DECREASE_BUTTON = 3;
 	private static final int EXTEND_BUTTON = 6;
@@ -27,6 +26,9 @@ public class TeleopInput {
 	private static final int AIM_LOW_BUTTON = 11;
 	private static final int SUBSTATION_PICKUP_BUTTON = 8;
 	private static final int HOMING_BUTTON = 10;
+	private static final int CV_ALIGN_BUTTON_LEFT_NODE = 4;
+	private static final int CV_ALIGN_BUTTON_MIDDLE_NODE = 3;
+	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -190,6 +192,30 @@ public class TeleopInput {
 	 */
 	public boolean isDriveJoystickEngageButtonPressedRaw() {
 		return driveJoystick.getRawButton(BALANCE_BUTTON);
+	}
+
+	/**
+	 * Get if cv align button (4) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isDriveJoystickCVHighTapeButtonPressedRaw() {
+		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_LEFT_NODE);
+	}
+
+	/**
+	 * Get if cv align button (3) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isDriveJoystickCVLowTapeButtonPressedRaw() {
+		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_MIDDLE_NODE);
+	}
+
+	/**
+	 * Get if cv align button (5) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isDriveJoystickCVTagButtonPressedRaw() {
+		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_RIGHT_NODE);
 	}
 
 	/* ------------------------ Steering Wheel ------------------------ */

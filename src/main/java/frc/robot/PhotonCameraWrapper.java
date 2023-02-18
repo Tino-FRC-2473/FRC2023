@@ -49,7 +49,7 @@ public class PhotonCameraWrapper {
 
 		photonCamera =
 				new PhotonCamera("OV5647");
-		photonCamera.setDriverMode(true);
+		photonCamera.setDriverMode(false);
 		robotPoseEstimator = new PhotonPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY,
 		photonCamera, new Transform3d(
 			new Translation3d(VisionConstants.CAM_OFFSET_X_METERS,
@@ -119,8 +119,10 @@ public class PhotonCameraWrapper {
 	//inches
 	public double getHigherTapeDistance() {
 		photonCamera.setPipelineIndex(2); //Tape pipeline
+		System.out.println("index: " + photonCamera.getPipelineIndex());
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
+			System.out.println(PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS, VisionConstants.HIGH_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch())) * 39.37);
 			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS, VisionConstants.HIGH_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch())) * 39.37;
 		} else {
 			return -1;
