@@ -66,7 +66,7 @@ public class PhotonCameraWrapper {
 	 *  field and the robot is always firmly on the ground.
 	 */
 	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-		photonCamera.setPipelineIndex(0); //Aprill Tag pipeline
+		photonCamera.setPipelineIndex(0); //April Tag pipeline
 		return robotPoseEstimator.update();
 	}
 	//degrees

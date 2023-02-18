@@ -296,15 +296,15 @@ public class DriveFSMSystem {
 		switch (currentState) {
 
 			case TELE_STATE_2_MOTOR_DRIVE:
-				if (input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
+				if (input != null && input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
 					aligned = false;
 					forward = true;
 					return FSMState.CVLowTapeAlign;
-				}else if (input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
+				}else if (input != null && input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
 					aligned = false;
 					forward = true;
 					return FSMState.CVHighTapeAlign;
-				}else if (input.isDriveJoystickCVTagButtonPressedRaw()) {
+				}else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
 					aligned = false;
 					forward = true;
 					return FSMState.CVTagAlign;
@@ -553,8 +553,8 @@ public class DriveFSMSystem {
 			}else{
 				aligned = true;
 				if (forward) {
-					leftMotor.set(-0.05);
-					rightMotor.set(0.05);
+					leftMotor.set(-0.1);
+					rightMotor.set(0.1);
 				}else {
 					leftMotor.set(0);
 					rightMotor.set(0);

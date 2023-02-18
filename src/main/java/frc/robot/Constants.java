@@ -64,7 +64,7 @@ public class Constants {
 		static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
 		static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
 		static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
-		static final double CAM_OFFSET_INCHES = 3.5;
+		static final double CAM_OFFSET_INCHES = 0;
 
 	}
 	static class AprilTagConstants {
