@@ -27,7 +27,7 @@ public class Constants {
 	public static final double GYRO_TURN_MULTIPLER_BELOW_90 = 0.987;
 	public static final double CHARGING_STATION_LEVELED_ERROR_DEGREES = 2;
 	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 200;
-	public static final double AUTONOMUS_MOVE_POWER = 0.2;
+	public static final double AUTONOMUS_MOVE_POWER = 0.05;
 	public static final double AUTONOMUS_MOVE_THRESHOLD = 5;
 
 	// Path points
@@ -66,16 +66,28 @@ public class Constants {
 
 	public static final double QUARTER_PI = Math.PI / 4;
 
+	
 	static class VisionConstants {
 		static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
 		static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(0);
-		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(14.5);
+		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.5);
 		static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
+		static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
+		static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
+		static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
+		static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
+		static final double CAM_OFFSET_INCHES = 0;
+
 	}
 	static class AprilTagConstants {
-		static final double APRILTAG_1_X_METERS = Units.inchesToMeters(0);
-		static final double APRILTAG_1_Y_METERS = Units.inchesToMeters(0);
-		static final double APRILTAG_1_HEIGHT_METERS = Units.inchesToMeters(12);
+		static final double APRILTAG_1_X_METERS = Units.inchesToMeters(610.77);
+		static final double APRILTAG_1_Y_METERS = Units.inchesToMeters(42.19);
+		static final double APRILTAG_1_HEIGHT_METERS = Units.inchesToMeters(17.5);
 		static final double APRILTAG_1_ANGLE_RADIANS = Units.degreesToRadians(180);
+
+		static final double APRILTAG_2_X_METERS = Units.inchesToMeters(0);
+		static final double APRILTAG_2_Y_METERS = Units.inchesToMeters(0);
+		static final double APRILTAG_2_HEIGHT_METERS = Units.inchesToMeters(17.5);
+		static final double APRILTAG_2_ANGLE_RADIANS = Units.degreesToRadians(180);
 	}
 }

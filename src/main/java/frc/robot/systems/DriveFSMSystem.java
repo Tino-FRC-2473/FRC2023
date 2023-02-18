@@ -2,10 +2,7 @@ package frc.robot.systems;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import com.kauailabs.navx.frc.AHRS;
 
 // Robot Imports
@@ -16,6 +13,7 @@ import frc.robot.drive.DrivePower;
 import frc.robot.drive.DriveFunctions;
 import frc.robot.Constants;
 import frc.robot.DrivePoseEstimator;
+import frc.robot.PhotonCameraWrapper;
 
 public class DriveFSMSystem {
 
@@ -27,6 +25,9 @@ public class DriveFSMSystem {
 		TELE_STATE_MECANUM,
 		PURE_PURSUIT,
 		TURNING_STATE,
+		CVLowTapeAlign,
+		CVHighTapeAlign,
+		CVTagAlign,
 		IDLE,
 
 		P1N1,
@@ -63,6 +64,9 @@ public class DriveFSMSystem {
 	private CANSparkMax leftMotor2;
 	private CANSparkMax rightMotor2;
 
+	private CANSparkMax leftMotor;
+	private CANSparkMax rightMotor;
+
 	private double leftPower;
 	private double rightPower;
 
@@ -76,6 +80,10 @@ public class DriveFSMSystem {
 	private double prevEncoderPos = 0;
 	private double gyroAngleForOdo = 0;
 	private AHRS gyro;
+
+	private boolean forward = false;
+	private boolean aligned = false;
+	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 
 	private DrivePoseEstimator dpe = new DrivePoseEstimator();
 
@@ -101,6 +109,14 @@ public class DriveFSMSystem {
 		leftMotor1.getEncoder().setPosition(0);
 		rightMotor2.getEncoder().setPosition(0);
 		leftMotor2.getEncoder().setPosition(0);
+
+		leftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_DRIVE_LEFT,
+										CANSparkMax.MotorType.kBrushless);
+		rightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_DRIVE_RIGHT,
+										CANSparkMax.MotorType.kBrushless);
+
+		rightMotor.getEncoder().setPosition(0);
+		leftMotor.getEncoder().setPosition(0);
 
 
 		finishedTurning = false;
@@ -140,7 +156,7 @@ public class DriveFSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.P4N1;
+		currentState = FSMState.P2N1;
 
 		roboXPos = 0;
 		roboYPos = 0;
@@ -193,6 +209,16 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				handleTeleOp2MotorState(input);
+				break;
+
+			case CVHighTapeAlign:
+				handleCVTapeAlignState(false);
+				break;
+			case CVLowTapeAlign:
+				handleCVTapeAlignState(true);
+				break;
+			case CVTagAlign:
+				handleCVTagAlignState();
 				break;
 
 			case TELE_STATE_BALANCE:
@@ -328,6 +354,24 @@ public class DriveFSMSystem {
 				} else {
 					return FSMState.TURNING_STATE;
 				}
+
+			case CVLowTapeAlign:
+				if (!forward && aligned) {
+					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+				}
+				return FSMState.CVLowTapeAlign;
+
+			case CVHighTapeAlign:
+				if (!forward && aligned) {
+					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+				}
+				return FSMState.CVHighTapeAlign;
+
+			case CVTagAlign:
+				if (!forward && aligned) {
+					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+				}
+				return FSMState.CVTagAlign;
 
 			case IDLE:
 				return FSMState.IDLE;
@@ -621,7 +665,7 @@ public class DriveFSMSystem {
 			System.out.println("DONE");
 			finishedTurning = true;
 			leftMotor1.set(0);
-			rightMotor2.set(0);
+			rightMotor1.set(0);
 			leftMotor2.set(0);
 			rightMotor2.set(0);
 			return;
@@ -634,7 +678,7 @@ public class DriveFSMSystem {
 		power = -power / 4;
 
 		leftMotor1.set(-power);
-		rightMotor2.set(-power);
+		rightMotor1.set(-power);
 		leftMotor2.set(-power);
 		rightMotor2.set(-power);
 		// turning right is positive and left is negative
@@ -690,7 +734,6 @@ public class DriveFSMSystem {
 	}
 
 	/**
-	 * .
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 * @param forwards whether the robot is moving forwards or backwards
@@ -726,4 +769,63 @@ public class DriveFSMSystem {
 		}
 	}
 
+	/**.
+ 	* Aligns with reflective tape (higher or lower tape is dependent on boolean passed in)
+		and drives within 42 inches (lower) or 65 inches (higher)
+		@param lower lower of higher tape
+	*/
+	public void handleCVTapeAlignState(boolean lower) {
+		double angle;
+		if (lower) {
+			angle = pcw.getLowerTapeTurnAngle();
+			forward =  pcw.getLowerTapeDistance() > 42;
+			//drives forward until within 42 inches of lower tape
+		} else {
+			angle = pcw.getHigherTapeTurnAngle();
+			forward = pcw.getHigherTapeDistance() > 65;
+			//drives forward until within 65 inches of higher tape
+		}
+
+		if (angle > 4) {
+			leftMotor.set(-0.05);
+			rightMotor.set(-0.05);
+		} else if (angle  < -4) {
+			leftMotor.set(0.05);
+			rightMotor.set(0.05);
+		} else {
+			aligned = true;
+			if (forward) {
+				leftMotor.set(-0.05);
+				rightMotor.set(0.05);
+			} else {
+				leftMotor.set(0);
+				rightMotor.set(0);
+			}
+		}
+
+	}
+
+	/**.
+ 	* Aligns to april tag and drives up to within 35 inches of it
+	*/
+	public void handleCVTagAlignState() {
+		double angle = pcw.getTagTurnAngle();
+		forward =  pcw.getTagDistance() > 35;
+		if (angle > 4) {
+			leftMotor.set(-0.05);
+			rightMotor.set(-0.05);
+		} else if (angle  < -4) {
+			leftMotor.set(0.05);
+			rightMotor.set(0.05);
+		} else {
+			aligned = true;
+			if (forward) {
+				leftMotor.set(-0.05);
+				rightMotor.set(0.05);
+			}else {
+				leftMotor.set(0);
+				rightMotor.set(0);
+			}
+		}
+	}
 }

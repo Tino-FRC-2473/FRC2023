@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
 /**
  * The PhotonCameraWrapper class contains methods for estimating position
  * of robot relative to AprilTags on the field and updates SmartDashboard
@@ -37,9 +38,9 @@ public class PhotonCameraWrapper {
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
 		ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
-		atList.add(new AprilTag(1, new Pose3d(AprilTagConstants.APRILTAG_1_X_METERS,
-			AprilTagConstants.APRILTAG_1_Y_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
-			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE_RADIANS))));
+		atList.add(new AprilTag(2, new Pose3d(AprilTagConstants.APRILTAG_2_X_METERS,
+			AprilTagConstants.APRILTAG_2_Y_METERS, AprilTagConstants.APRILTAG_2_HEIGHT_METERS,
+			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_2_ANGLE_RADIANS))));
 
 		AprilTagFieldLayout atfl =
 				new AprilTagFieldLayout(atList,
@@ -48,6 +49,7 @@ public class PhotonCameraWrapper {
 
 		photonCamera =
 				new PhotonCamera("OV5647");
+		photonCamera.setDriverMode(true);
 		robotPoseEstimator = new PhotonPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY,
 		photonCamera, new Transform3d(
 			new Translation3d(VisionConstants.CAM_OFFSET_X_METERS,
@@ -67,13 +69,70 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(0); //Aprill Tag pipeline
 		return robotPoseEstimator.update();
 	}
+	//degrees
+	public double getLowerTapeTurnAngle() {
+		photonCamera.setPipelineIndex(1); //Tape pipeline
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			return Math.atan(Math.tan(result.getBestTarget().getYaw() * Math.PI / 180) + (VisionConstants.CAM_OFFSET_INCHES/getTagDistance())) * 180/Math.PI;
+		}
+		return -1;
+	}
+	//degrees
+	public double getHigherTapeTurnAngle() {
+		photonCamera.setPipelineIndex(2); //Tape pipeline
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			return Math.atan(Math.tan(result.getBestTarget().getYaw() * Math.PI / 180) + (VisionConstants.CAM_OFFSET_INCHES/getTagDistance())) * 180/Math.PI;
+		}
+		return -1;
+	}
+	//degrees
+	public double getTagTurnAngle() {
+		photonCamera.setPipelineIndex(0);
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			return Math.atan(Math.tan(result.getBestTarget().getYaw() * Math.PI / 180) + (VisionConstants.CAM_OFFSET_INCHES/getTagDistance())) * 180/Math.PI;
+		}
+		return -1;
+	}
+	//inches
+	public double getTagDistance() {
+		photonCamera.setPipelineIndex(0);
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch())) * 39.37;
+		} else {
+			return -1;
+		}
+	}
+	//inches
+	public double getLowerTapeDistance() {
+		photonCamera.setPipelineIndex(1); //Tape pipeline
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS, VisionConstants.LOW_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch())) * 39.37;
+		} else {
+			return -1;
+		}
+	}
+	//inches
+	public double getHigherTapeDistance() {
+		photonCamera.setPipelineIndex(2); //Tape pipeline
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS, VisionConstants.HIGH_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch())) * 39.37;
+		} else {
+			return -1;
+		}
+	}
 	/** @return Returns a distance in meters from the closest cone and -1 if there are no cones.*/
 	public double getDistanceToCone() {
 		photonCamera.setPipelineIndex(1); //Cone pipeline
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return PhotonUtils.calculateDistanceToTargetMeters(
-				VisionConstants.CAM_HEIGHT_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
+				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CONE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
 					result.getBestTarget().getPitch()));
 		}
@@ -85,7 +144,7 @@ public class PhotonCameraWrapper {
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return PhotonUtils.calculateDistanceToTargetMeters(
-				VisionConstants.CAM_HEIGHT_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
+				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CUBE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
 					result.getBestTarget().getPitch()));
 		}
