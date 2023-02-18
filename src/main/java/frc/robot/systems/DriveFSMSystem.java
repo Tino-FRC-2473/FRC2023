@@ -32,6 +32,7 @@ public class DriveFSMSystem {
 		CVLowTapeAlign,
 		CVHighTapeAlign,
 		CVTagAlign,
+		TELE_STATE_CV_ALIGN,
 		TELE_STATE_MECANUM,
 		PURE_PURSUIT,
 		TURNING_STATE,
@@ -78,7 +79,7 @@ public class DriveFSMSystem {
 	boolean forward = false;
 	boolean aligned = false;
 
-	//private DrivePoseEstimator dpe = new DrivePoseEstimator();
+	private DrivePoseEstimator dpe = new DrivePoseEstimator();
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 	private double xToATag = 0;
 	private double yToATag = 0;
@@ -173,20 +174,20 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		//dpe.updatePose(gyro.getAngle(), leftMotor.getEncoder().getPosition(),
-		//	rightMotor.getEncoder().getPosition());
+		dpe.updatePose(gyro.getAngle(), leftMotor.getEncoder().getPosition(),
+			rightMotor.getEncoder().getPosition());
 
-		// if (!pcw.getEstimatedGlobalPose().isEmpty()) {
-		// 	SmartDashboard.putNumber("X",
-		// 		Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX()));
-		// 	SmartDashboard.putNumber("Y",
-		// 		Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getY()));
-		// 	SmartDashboard.putNumber("Rotation", Constants.ONE_REVOLUTION_DEGREES
-		// 		- Units.radiansToDegrees(
-		// 		pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle()));
-		// 	SmartDashboard.putNumber("Rotation2",
-		// 		pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle());
-		// }
+		if (!pcw.getEstimatedGlobalPose().isEmpty()) {
+			SmartDashboard.putNumber("X",
+				Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX()));
+			SmartDashboard.putNumber("Y",
+				Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getY()));
+			SmartDashboard.putNumber("Rotation", Constants.ONE_REVOLUTION_DEGREES
+				- Units.radiansToDegrees(
+				pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle()));
+			SmartDashboard.putNumber("Rotation2",
+				pcw.getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle());
+		}
 		gyroAngleForOdo = gyro.getAngle();
 
 		currentEncoderPos = ((leftMotor.getEncoder().getPosition()
@@ -211,9 +212,9 @@ public class DriveFSMSystem {
 				handleTeleOpBalanceState(input);
 				break;
 
-			// case TELE_STATE_CV_ALIGN:
-			// 	handleCVAlignState(input);
-			// 	break;
+			case TELE_STATE_CV_ALIGN:
+				handleCVAlignState(input);
+				break;
 
 			case IDLE:
 				handleIdleState(input);
@@ -309,6 +310,7 @@ public class DriveFSMSystem {
 					forward = true;
 					return FSMState.CVTagAlign;
 				}
+				isAlignedToATag = false;
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 
 			case TELE_STATE_MECANUM:
@@ -447,6 +449,7 @@ public class DriveFSMSystem {
 			return;
 		}
 
+		Pose3d cvEstimatedPos = pcw.getEstimatedGlobalPose().get().estimatedPose;
 
 		if (isInArcadeDrive) {
 
@@ -485,21 +488,25 @@ public class DriveFSMSystem {
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
 
-			// if (!pcw.getEstimatedGlobalPose().isEmpty()) {
-			// 	// left is negative right is positive
-			// 	Pose3d cvEstimatedPos = pcw.getEstimatedGlobalPose().get().estimatedPose;
-			// 	angleToTurnToFaceTag = Math.abs((Constants.HALF_REVOLUTION_DEGREES
-			// 		+ Constants.ONE_REVOLUTION_DEGREES - Math.toDegrees(
-			// 		cvEstimatedPos.getRotation().getAngle())) + Math.toDegrees(
-			// 			Math.atan2(cvEstimatedPos.getY(),
-			// 			cvEstimatedPos.getX())));
+			if (!pcw.getEstimatedGlobalPose().isEmpty()) {
+				// left is negative right is positive
+				angleToTurnToFaceTag = Math.abs((Constants.HALF_REVOLUTION_DEGREES
+					+ Constants.ONE_REVOLUTION_DEGREES - Math.toDegrees(
+					cvEstimatedPos.getRotation().getAngle())) + Math.toDegrees(
+						Math.atan2(cvEstimatedPos.getY(),
+						cvEstimatedPos.getX())));
 
-			// 	if (cvEstimatedPos.getY() >= 0) {
-			// 		angleToTurnToFaceTag = -angleToTurnToFaceTag;
-			// 	}
+				if (cvEstimatedPos.getY() >= 0) {
+					angleToTurnToFaceTag = -angleToTurnToFaceTag;
+				}
 
-			// 	SmartDashboard.putNumber("angle to face: ", angleToTurnToFaceTag);
-			// 	SmartDashboard.putNumber("gyro: ", gyroAngleForOdo);
+				SmartDashboard.putNumber("angle to face: ", angleToTurnToFaceTag);
+				SmartDashboard.putNumber("gyro: ", gyroAngleForOdo);
+
+
+			}
+			System.out.println("X: " + roboXPos);
+			System.out.println("Y: " + roboYPos);
 
 
 			// }
@@ -603,6 +610,30 @@ public class DriveFSMSystem {
 	// 	// 	handleTurnState(input, -angleToTurnToFaceTag);
 	// 	// }
 	// }
+
+	/**
+	 * Handle behavior in TELE_STATE_CV_ALIGN.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleCVAlignState(TeleopInput input) {
+
+		xToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
+		yToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
+
+		System.out.println("angleToTurnToFaceTag: " + angleToTurnToFaceTag);
+		isAlignedToATag = true;
+
+		// handleTurnState(input, angleToTurnToFaceTag);
+		// double distToTravelToATag = Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) - 10;
+		// System.out.println("distToTravelToATag: " + distToTravelToATag);
+		// if (Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) < distToTravelToATag) {
+		// 	leftMotor.set(0.1);
+		// 	rightMotor.set(0.1);
+		// } else {
+		// 	handleTurnState(input, -angleToTurnToFaceTag);
+		// }
+	}
 
 	/**
 	 * Handle behavior in TURNING_STATE.
