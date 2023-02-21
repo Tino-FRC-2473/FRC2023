@@ -68,7 +68,7 @@ public class SpinningIntakeFSM {
 	public SpinningIntakeFSM() {
 		// Perform hardware init
 		if (HardwareMap.isTestBoardGrabber()) {
-			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_TEST_SPINNER_MOTOR,
+			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		} else {
 			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,

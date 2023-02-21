@@ -47,7 +47,7 @@ public class GroundMountFSM {
 	public GroundMountFSM() {
 		// Perform hardware init
 		if (HardwareMap.isTestBoardGroundMount()) {
-			pivotArmMotor = new CANSparkMax(HardwareMap.CAN_ID_TEST_GROUND_MOUNT,
+			pivotArmMotor = new CANSparkMax(HardwareMap.CAN_ID_GROUND_MOUNT,
 										CANSparkMax.MotorType.kBrushless);
 		} else {
 			pivotArmMotor = new CANSparkMax(HardwareMap.CAN_ID_GROUND_MOUNT,
@@ -81,7 +81,6 @@ public class GroundMountFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.START_STATE;
-		pivotArmMotor.getEncoder().setPosition(0);
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
