@@ -30,22 +30,24 @@ public class SpinningIntakeFSM {
 		EMPTY
 	}
 	//FIX VALUES
-	private static final double INTAKE_SPEED = 0.1;
-	private static final double RELEASE_SPEED = -0.1;
+	private static final double INTAKE_SPEED = 0.2;
+	private static final double RELEASE_SPEED = -0.2; //DONT FORGET -
 	//arbitrary constants for cube and cone
 	//6 inches
-	private static final int MIN_CONE_DISTANCE = 1240;
+	private static final int MIN_CONE_DISTANCE = 2150;
 	//8 inches
-	private static final int MIN_CUBE_DISTANCE = 970;
+	private static final int MIN_CUBE_DISTANCE = 1200;
 	//8.5 inches
-	private static final int MAX_COLOR_MEASURE = 915;
+	private static final int MAX_COLOR_MEASURE = 1050;
 	//9 inches
-	private static final int MIN_COLOR_MEASURE = 860;
+	private static final int MIN_COLOR_MEASURE = 950;
+	//? inches
+	private static final int MIN_RELEASE_DISTANCE = 800;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static ItemType itemType = ItemType.EMPTY;
 
 	//CUBE RGB THRESHOLD VALUES
-	private static final double BLUE_THRESHOLD = 0.175;
+	private static final double BLUE_THRESHOLD = 0.235;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -65,8 +67,13 @@ public class SpinningIntakeFSM {
 	 */
 	public SpinningIntakeFSM() {
 		// Perform hardware init
-		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
+		if (HardwareMap.isTestBoardGrabber()) {
+			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_TEST_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
+		} else {
+			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
+										CANSparkMax.MotorType.kBrushless);
+		}
 		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
 		colorSensor = new ColorSensorV3(Port.kOnboard);
 
@@ -132,6 +139,50 @@ public class SpinningIntakeFSM {
 		currentState = nextState(input);
 		if (previousState != currentState) {
 			System.out.println(currentState);
+		}
+	}
+	/**
+	 * Run given state and return if state is complete.
+	 * @param state FSMState state gives the state that the intakefsm is in
+	 * @return Boolean that returns if given state is complete
+	 */
+	public boolean updateAutonomous(FSMState state) {
+		//System.out.println(itemType);
+		SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
+		// SmartDashboard.putNumber("r", colorSensor.getColor().red);
+		// SmartDashboard.putNumber("g", colorSensor.getColor().green);
+		SmartDashboard.putNumber("b", colorSensor.getColor().blue);
+		SmartDashboard.putString("item type", itemType.toString());
+		SmartDashboard.putNumber("Blue threshold", BLUE_THRESHOLD);
+		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
+		switch (state) {
+			case START_STATE:
+				handleStartState();
+				break;
+			case IDLE_SPINNING:
+				handleIdleSpinningState();
+				break;
+			case IDLE_STOP:
+				handleIdleStopState();
+				break;
+			case RELEASE:
+				handleReleaseState();
+				break;
+			default:
+				throw new IllegalStateException("Invalid state: " + state.toString());
+		}
+		switch (state) {
+			case START_STATE:
+				return true;
+			case IDLE_SPINNING:
+				return ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
+					> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE);
+			case IDLE_STOP:
+				return true;
+			case RELEASE:
+				return distanceSensorObject.getValue() < MIN_RELEASE_DISTANCE;
+			default:
+				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 	}
 
