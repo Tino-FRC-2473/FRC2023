@@ -70,6 +70,14 @@ public class PhotonCameraWrapper {
 		return robotPoseEstimator.update();
 	}
 
+	/**
+	 * Sets PhotonCamera object pipeline index to the index inputted into the method.
+	 * @param index
+	 */
+	public void setPipelineIndex(int index) {
+		photonCamera.setPipelineIndex(index);
+	}
+
 	//degrees
 	public double getLowerTapeTurnAngle() {
 		photonCamera.setPipelineIndex(1); //Tape pipeline
@@ -79,7 +87,7 @@ public class PhotonCameraWrapper {
 		}
 		return -1;
 	}
-	
+
 	//degrees
 	public double getHigherTapeTurnAngle() {
 		photonCamera.setPipelineIndex(2); //Tape pipeline
@@ -108,6 +116,7 @@ public class PhotonCameraWrapper {
 			return -1;
 		}
 	}
+
 	//inches
 	public double getLowerTapeDistance() {
 		photonCamera.setPipelineIndex(1); //Tape pipeline
