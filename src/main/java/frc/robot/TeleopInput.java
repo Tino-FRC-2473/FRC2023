@@ -18,7 +18,8 @@ public class TeleopInput {
 
 	private static final int PIVOT_INCREASE_BUTTON = 5;
 	private static final int PIVOT_DECREASE_BUTTON = 3;
-	private static final int FINE_TUNING_BUTTON = 2;
+	private static final int EXTEND_BUTTON = 6;
+	private static final int RETRACT_BUTTON = 4;
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
 	private static final int BALANCE_BUTTON = 2;
@@ -91,6 +92,21 @@ public class TeleopInput {
 		return mechJoystick.getRawButton(PIVOT_DECREASE_BUTTON);
 	}
 
+	/**
+	 * Get the value of the Extend button.
+	 * @return True if button is pressed
+	 */
+	public boolean isExtendButtonPressed() {
+		return mechJoystick.getRawButton(EXTEND_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Retract button.
+	 * @return True if button is pressed
+	 */
+	public boolean isRetractButtonPressed() {
+		return mechJoystick.getRawButton(RETRACT_BUTTON);
+	}
 
 	/**
 	 * Get the value of the Shoot High button.
@@ -138,14 +154,6 @@ public class TeleopInput {
 	 */
 	public boolean isHomingButtonPressed() {
 		return mechJoystick.getRawButton(HOMING_BUTTON);
-	}
-
-	/**
-	 * Get the value of the Fine tuning button.
-	 * @return True if button is pressed
-	 */
-	public boolean isFineTuningButtonPressed() {
-		return mechJoystick.getRawButton(FINE_TUNING_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */

@@ -2,6 +2,7 @@ package frc.robot.systems;
 
 
 // WPILib Imports
+//import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Third party Hardware Imports
@@ -102,8 +103,6 @@ public class ArmFSM {
 	 * Hardware Map each of the motors
 	 *
 	 */
-
-	private boolean isFineTuning = false;
 	/**
 	 * Creates an instance of an ArmFSM.
 	 */
@@ -178,12 +177,6 @@ public class ArmFSM {
 		SmartDashboard.putBoolean("Is going Forward", input.isThrottleForward());
 		SmartDashboard.putNumber("Throttle Value", input.getThrottle());
 		System.out.println(teleArmMotor.getEncoder().getPosition());
-		SmartDashboard.putNumber("Extension Fraction", teleArmMotor.getEncoder().getPosition()
-			/ ARM_ENCODER_MAX_LENGTH_ROTATIONS);
-		System.out.println(pivotMotor.getEncoder().getPosition());
-		if (input.isFineTuningButtonPressed()) {
-			isFineTuning = !isFineTuning;
-		}
 		switch (currentState) {
 			case IDLE:
 				handleIdleState();
@@ -234,10 +227,10 @@ public class ArmFSM {
 	 */
 	public void updateAuto(FSMState state) {
 		SmartDashboard.putString("Current State", " " + currentState);
-		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
+		//SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
-		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
-		SmartDashboard.putBoolean("At Min Height", isMinHeight());
+		//SmartDashboard.putBoolean("At Max Height", isMaxHeight());
+		//SmartDashboard.putBoolean("At Min Height", isMinHeight());
 
 		switch (currentState) {
 			case IDLE:
@@ -423,7 +416,8 @@ public class ArmFSM {
 		}
 		return input.isPivotDecreaseButtonPressed()
 			|| input.isPivotIncreaseButtonPressed()
-			|| input.getmechJoystickY() != 0;
+			|| input.isExtendButtonPressed()
+			|| input.isRetractButtonPressed();
 	}
 
 	private boolean isShootOrPickupButtonPressed(TeleopInput input) {
@@ -447,12 +441,17 @@ public class ArmFSM {
 
 	private boolean atArmPosition(double pivotTarget, double armTarget) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		return withinError(pivotMotor.getEncoder().getPosition(), pivotTarget)
 			&& withinError(teleArmMotor.getEncoder().getPosition(), armTarget);
 =======
 		return //withinError(pivotMotor.getEncoder().getPosition(), pivotTarget);
 			withinError(teleArmMotor.getEncoder().getPosition(), armTarget);
 >>>>>>> parent of 9eb6d2b (Uncommented pivot code)
+=======
+		return withinError(pivotMotor.getEncoder().getPosition(), pivotTarget);
+			//withinError(teleArmMotor.getEncoder().getPosition(), armTarget);
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 	}
 	/*
 	 * What to do when in the IDLE state
@@ -469,7 +468,6 @@ public class ArmFSM {
 		// 	teleArmMotor.set(0);
 		// }
 	}
-
 	private void handleHomingState(TeleopInput input) {
 		// if (isMinHeight()) {
 		// 	pivotMotor.set(0);
@@ -492,6 +490,7 @@ public class ArmFSM {
 	 */
 	private void handleArmMechState(TeleopInput input) {
 		if (input != null) {
+<<<<<<< HEAD
 <<<<<<< HEAD
 			if (!isFineTuning) {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
@@ -527,6 +526,19 @@ public class ArmFSM {
 			// } else {
 			// 	pivotMotor.set(0);
 			// }
+=======
+			if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
+				//pivotMotor.set(PIVOT_MOTOR_POWER * Math.abs(input.getmechJoystickY()));
+				pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
+					CANSparkMax.ControlType.kDutyCycle);
+			} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
+				//pivotMotor.set(-PIVOT_MOTOR_POWER * Math.abs(input.getmechJoystickY()));
+				pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
+					CANSparkMax.ControlType.kDutyCycle);
+			} else {
+				pivotMotor.set(0);
+			}
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 
 			if (input.isExtendButtonPressed()) {
 				teleArmMotor.set(TELEARM_MOTOR_POWER);
@@ -534,7 +546,10 @@ public class ArmFSM {
 				teleArmMotor.set(-TELEARM_MOTOR_POWER);
 			} else {
 				teleArmMotor.set(0);
+<<<<<<< HEAD
 >>>>>>> parent of 9eb6d2b (Uncommented pivot code)
+=======
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 			}
 		} else {
 			teleArmMotor.set(0);
@@ -553,6 +568,7 @@ public class ArmFSM {
 					pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
+<<<<<<< HEAD
 =======
 				// if (withinError(pivotMotor.getEncoder().getPosition(),
 				// 	SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS) || isMaxHeight() || isMinHeight()) {
@@ -573,6 +589,16 @@ public class ArmFSM {
 					pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
+=======
+				// if (withinError(teleArmMotor.getEncoder().getPosition(),
+				// 	ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
+				// 	teleArmMotor.set(0);
+				// } else {
+				// 	//teleArmMotor.set(TELEARM_MOTOR_POWER);
+				// 	pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
+				// 		CANSparkMax.ControlType.kPosition);
+				// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 			} else {
 <<<<<<< HEAD
 				if (withinError(pivotMotor.getEncoder().getPosition(),
@@ -582,6 +608,7 @@ public class ArmFSM {
 					pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
+<<<<<<< HEAD
 =======
 				// if (withinError(pivotMotor.getEncoder().getPosition(),
 				// 	SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS) || isMaxHeight() || isMinHeight()) {
@@ -602,6 +629,16 @@ public class ArmFSM {
 					pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
+=======
+				// if (withinError(teleArmMotor.getEncoder().getPosition(),
+				// 	ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS)) {
+				// 	teleArmMotor.set(0);
+				// } else {
+				// 	//teleArmMotor.set(TELEARM_MOTOR_POWER);
+				// 	pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS,
+				// 		CANSparkMax.ControlType.kPosition);
+				// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 			}
 		} else {
 <<<<<<< HEAD
@@ -612,6 +649,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 		SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
@@ -628,6 +666,15 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 	ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
+			// 		CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		}
 	}
 
@@ -641,6 +688,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 	SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
@@ -661,6 +709,16 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_BACKWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 		ARM_ENCODER_HIGH_BACKWARD_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 		//teleArmMotor.set(TELEARM_MOTOR_POWER);
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_BACKWARD_ROTATIONS,
+			// 			CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		} else {
 <<<<<<< HEAD
 			if (withinError(pivotMotor.getEncoder().getPosition(),
@@ -670,6 +728,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 	SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
@@ -686,6 +745,15 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 	ARM_ENCODER_HIGH_BACKWARD_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_BACKWARD_ROTATIONS,
+			// 		CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		}
 	}
 
@@ -700,6 +768,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 	SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
@@ -720,6 +789,16 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_MID_FORWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 		ARM_ENCODER_MID_FORWARD_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 	//teleArmMotor.set(TELEARM_MOTOR_POWER);
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_MID_FORWARD_ROTATIONS,
+			// 		CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		} else {
 <<<<<<< HEAD
 			if (withinError(pivotMotor.getEncoder().getPosition(),
@@ -729,6 +808,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 	SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
@@ -745,6 +825,15 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_MID_FORWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 	ARM_ENCODER_MID_FORWARD_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_MID_FORWARD_ROTATIONS,
+			// 		CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		}
 	}
 
@@ -758,6 +847,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 	SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
@@ -778,6 +868,16 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_MID_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 		ARM_ENCODER_MID_BACKWARD_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 	//teleArmMotor.set(TELEARM_MOTOR_POWER);
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_MID_BACKWARD_ROTATIONS,
+			// 		CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		} else {
 <<<<<<< HEAD
 			if (withinError(pivotMotor.getEncoder().getPosition(),
@@ -787,6 +887,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 	SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
@@ -803,6 +904,15 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_MID_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 	ARM_ENCODER_MID_BACKWARD_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_MID_BACKWARD_ROTATIONS,
+			// 		CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		}
 	}
 	private void handleShootLowState(TeleopInput input) {
@@ -815,6 +925,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 	SHOOT_LOW_ANGLE_ENCODER_ROTATIONS)) {
@@ -835,6 +946,16 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_LOW_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 			ARM_ENCODER_LOW_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 	//teleArmMotor.set(TELEARM_MOTOR_POWER);
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_LOW_ROTATIONS,
+			// 		CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		} else {
 <<<<<<< HEAD
 			if (withinError(pivotMotor.getEncoder().getPosition(),
@@ -844,6 +965,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 	SHOOT_LOW_ANGLE_ENCODER_ROTATIONS)) {
@@ -860,6 +982,15 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_LOW_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 	ARM_ENCODER_LOW_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_LOW_ROTATIONS,
+			// 		CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		}
 	}
 
@@ -875,6 +1006,7 @@ public class ArmFSM {
 					SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 	SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
@@ -896,6 +1028,16 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 		ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 	//teleArmMotor.set(TELEARM_MOTOR_POWER);
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS,
+			// 		CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		} else {
 			teleArmMotor.set(0);
 			//pivotMotor.set(0);
@@ -912,6 +1054,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+<<<<<<< HEAD
 =======
 			// if (withinError(pivotMotor.getEncoder().getPosition(),
 			// 	SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
@@ -932,6 +1075,16 @@ public class ArmFSM {
 				pidControllerTeleArm.setReference(ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
+=======
+			// if (withinError(teleArmMotor.getEncoder().getPosition(),
+			// 	ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS)) {
+			// 	teleArmMotor.set(0);
+			// } else {
+			// 	//teleArmMotor.set(TELEARM_MOTOR_POWER);
+			// 	pidControllerTeleArm.setReference(ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS,
+			// 		CANSparkMax.ControlType.kPosition);
+			// }
+>>>>>>> parent of 5b0d83c (Merge branch 'dev/6/daiji_uchino/fine-tuning' into dev/5/daiji_uchino/updated-arm-fsm)
 		} else {
 			teleArmMotor.set(0);
 			//pivotMotor.set(0);
