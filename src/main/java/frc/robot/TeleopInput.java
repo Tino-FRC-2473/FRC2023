@@ -18,8 +18,8 @@ public class TeleopInput {
 
 	private static final int PIVOT_INCREASE_BUTTON = 5;
 	private static final int PIVOT_DECREASE_BUTTON = 3;
-	private static final int EXTEND_BUTTON = 6;
-	private static final int RETRACT_BUTTON = 4;
+	private static final int EXTEND_BUTTON = -1; //NOT GOING TO BE USED
+	private static final int RETRACT_BUTTON = -1; //NOT GOING TO BE USED
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
 	private static final int BALANCE_BUTTON = 2;
@@ -30,7 +30,7 @@ public class TeleopInput {
 	private static final int CV_ALIGN_BUTTON_MIDDLE_NODE = 3;
 	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
 
-	private static final int LOWER_GROUND_MOUNT = 6;
+	private static final int GROUND_MOUNT_BUTTON = 4;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -56,6 +56,15 @@ public class TeleopInput {
 	// control mapping is hidden from other classes.
 
 	/* ------------------------ Left Joystick ------------------------ */
+
+	/**
+	 * Get value of lower pivot button for ground mount.
+	 * @return true if pressed
+	 */
+	public boolean isPivotButtonPressed() {
+		return mechJoystick.getRawButton(GROUND_MOUNT_BUTTON);
+	}
+
 	/**
 	 * Get X axis of Left Joystick.
 	 * @return Axis value
@@ -156,13 +165,6 @@ public class TeleopInput {
 	 */
 	public boolean isHomingButtonPressed() {
 		return mechJoystick.getRawButton(HOMING_BUTTON);
-	}
-	/**
-	 * Get the value of the lower button.
-	 * @return True if button is pressed
-	 */
-	public boolean isLowerButtonPressed() {
-		return mechJoystick.getRawButton(LOWER_GROUND_MOUNT);
 	}
 	/* ------------------------ Right Joystick ------------------------ */
 	/**

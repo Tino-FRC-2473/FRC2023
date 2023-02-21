@@ -30,24 +30,24 @@ public class SpinningIntakeFSM {
 		EMPTY
 	}
 	//FIX VALUES
-	private static final double INTAKE_SPEED = 0.1;
-	private static final double RELEASE_SPEED = -0.1;
+	private static final double INTAKE_SPEED = 0.2;
+	private static final double RELEASE_SPEED = -0.2; //DONT FORGET -
 	//arbitrary constants for cube and cone
 	//6 inches
-	private static final int MIN_CONE_DISTANCE = 1240;
+	private static final int MIN_CONE_DISTANCE = 2150;
 	//8 inches
-	private static final int MIN_CUBE_DISTANCE = 970;
+	private static final int MIN_CUBE_DISTANCE = 1200;
 	//8.5 inches
-	private static final int MAX_COLOR_MEASURE = 915;
+	private static final int MAX_COLOR_MEASURE = 1050;
 	//9 inches
-	private static final int MIN_COLOR_MEASURE = 860;
+	private static final int MIN_COLOR_MEASURE = 950;
 	//? inches
 	private static final int MIN_RELEASE_DISTANCE = 800;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static ItemType itemType = ItemType.EMPTY;
 
 	//CUBE RGB THRESHOLD VALUES
-	private static final double BLUE_THRESHOLD = 0.175;
+	private static final double BLUE_THRESHOLD = 0.235;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -149,10 +149,11 @@ public class SpinningIntakeFSM {
 	public boolean updateAutonomous(FSMState state) {
 		//System.out.println(itemType);
 		SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
-		SmartDashboard.putNumber("r", colorSensor.getColor().red);
-		SmartDashboard.putNumber("g", colorSensor.getColor().green);
+		// SmartDashboard.putNumber("r", colorSensor.getColor().red);
+		// SmartDashboard.putNumber("g", colorSensor.getColor().green);
 		SmartDashboard.putNumber("b", colorSensor.getColor().blue);
 		SmartDashboard.putString("item type", itemType.toString());
+		SmartDashboard.putNumber("Blue threshold", BLUE_THRESHOLD);
 		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		switch (state) {
 			case START_STATE:
