@@ -898,7 +898,7 @@ public class DriveFSMSystem {
 		System.out.println("CUBE NODE");
 		double x = dpe.getCurPose().getX();
 		double y = dpe.getCurPose().getY();
-		double angle = dpe.getCurPose().getRotation();
+		double angle = dpe.getCurPose().getRotation().getDegrees();
 		forward = x > Units.inchesToMeters(45);
 		if (Math.abs(angle) < 4) {
 			aligned = true;
@@ -919,10 +919,10 @@ public class DriveFSMSystem {
 	}
 
 	public void turn(double angle) {
-		if (angle > 4) {
+		if (angle > 2) {
 			leftMotor.set(-0.05);
 			rightMotor.set(-0.05);
-		} else if (angle < -4) {
+		} else if (angle < -2) {
 			leftMotor.set(0.05);
 			rightMotor.set(0.05);
 		}

@@ -83,8 +83,7 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(1); //Tape pipeline
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return Math.atan(Math.tan(result.getBestTarget().getYaw() * Math.PI / 180) + (VisionConstants.CAM_OFFSET_INCHES/getTagDistance())) * 180/Math.PI;
-		}
+			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(VisionConstants.CAM_OFFSET_INCHES / getLowerTapeDistance()));		}
 		return -1;
 	}
 
@@ -93,8 +92,7 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(2); //Tape pipeline
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return Math.atan(Math.tan(result.getBestTarget().getYaw() * Math.PI / 180) + (VisionConstants.CAM_OFFSET_INCHES/getTagDistance())) * 180/Math.PI;
-		}
+			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(VisionConstants.CAM_OFFSET_INCHES / getHigherTapeDistance()));		}
 		return -1;
 	}
 	//degrees
@@ -102,8 +100,7 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(0);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return Math.atan(Math.tan(result.getBestTarget().getYaw() * Math.PI / 180) + (VisionConstants.CAM_OFFSET_INCHES/getTagDistance())) * 180/Math.PI;
-		}
+			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(VisionConstants.CAM_OFFSET_INCHES / getTagDistance()));		}
 		return -1;
 	}
 	//inches
