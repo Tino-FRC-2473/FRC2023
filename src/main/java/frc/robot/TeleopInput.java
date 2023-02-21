@@ -145,7 +145,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isFineTuningButtonPressed() {
-		return mechJoystick.getRawButton(FINE_TUNING_BUTTON);
+		return mechJoystick.getRawButtonPressed(FINE_TUNING_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */

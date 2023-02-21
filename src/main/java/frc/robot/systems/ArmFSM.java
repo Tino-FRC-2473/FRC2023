@@ -101,7 +101,7 @@ public class ArmFSM {
 		(142.46 + 12.837) * ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 
 	private static final double PID_PIVOT_MAX_POWER = 0.2;
-	private static final double ERROR_ARM = 0.3;
+	private static final double ERROR_ARM_ROTATIONS = 0.3;
 	private static final double PID_CONSTANT_PIVOT_P = 0.00022f;
 	private static final double PID_CONSTANT_PIVOT_I = 0.000055f;
 	private static final double PID_CONSTANT_PIVOT_D = 0.000008f;
@@ -427,7 +427,7 @@ public class ArmFSM {
 	 * @return whether they are within the error
 	 */
 	private boolean withinError(double a, double b) {
-		return Math.abs(a - b) < ERROR_ARM;
+		return Math.abs(a - b) < ERROR_ARM_ROTATIONS;
 	}
 
 	private boolean isMaxHeight() {
