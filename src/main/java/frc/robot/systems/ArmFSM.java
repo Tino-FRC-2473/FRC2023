@@ -75,16 +75,24 @@ public class ArmFSM {
 	 */
 	public ArmFSM() {
 		// Perform hardware init
-		pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
+		if (HardwareMap.isTestBoardArm()) {
+			pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
 										CANSparkMax.MotorType.kBrushless);
+			teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
+
+										CANSparkMax.MotorType.kBrushless);
+		} else {
+			pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
+										CANSparkMax.MotorType.kBrushless);
+			teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
+										CANSparkMax.MotorType.kBrushless);
+		}
 		pivotLimitSwitchHigh = pivotMotor.getForwardLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchHigh.enableLimitSwitch(true);
 		pivotLimitSwitchLow = pivotMotor.getReverseLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchLow.enableLimitSwitch(true);
-		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
-										CANSparkMax.MotorType.kBrushless);
 		pidControllerPivot = pivotMotor.getPIDController();
 		pidControllerPivot.setP(PID_CONSTANT_P);
 		pidControllerPivot.setI(PID_CONSTANT_I);
