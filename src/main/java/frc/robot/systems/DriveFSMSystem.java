@@ -1,23 +1,23 @@
 package frc.robot.systems;
 
+import com.kauailabs.navx.frc.AHRS;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-import edu.wpi.first.wpilibj.SPI;
-import com.kauailabs.navx.frc.AHRS;
-
-// Robot Imports
-import frc.robot.TeleopInput;
-import frc.robot.HardwareMap;
-import frc.robot.drive.DriveModes;
-import frc.robot.drive.DrivePower;
-import frc.robot.drive.DriveFunctions;
-import frc.robot.Constants;
-import frc.robot.DrivePoseEstimator;
-import frc.robot.PhotonCameraWrapper;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.SPI;
+import frc.robot.Constants;
+import frc.robot.DrivePoseEstimator;
+import frc.robot.HardwareMap;
+import frc.robot.PhotonCameraWrapper;
+// Robot Imports
+import frc.robot.TeleopInput;
+import frc.robot.drive.DriveFunctions;
+import frc.robot.drive.DriveModes;
+import frc.robot.drive.DrivePower;
 
 
 public class DriveFSMSystem {
@@ -33,6 +33,7 @@ public class DriveFSMSystem {
 		CVLowTapeAlign,
 		CVHighTapeAlign,
 		CVTagAlign,
+		CVMidCubeNodeAlign,
 		IDLE,
 
 		P1N1,
@@ -89,6 +90,7 @@ public class DriveFSMSystem {
 	private boolean forward = false;
 	private boolean aligned = false;
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
+	private DrivePoseEstimator dpe = new DrivePoseEstimator();
 	private CvSink cvSink;
 	private CvSource outputStrem;
 
@@ -247,6 +249,11 @@ public class DriveFSMSystem {
 			case CVTagAlign:
 				System.out.println("tag");
 				handleCVTagAlignState();
+				break;
+
+			case CVMidCubeNodeAlign:
+				System.out.println("mid cube node");
+				handleMidCubeNodeAlignState();
 				break;
 
 			case TELE_STATE_BALANCE:
@@ -413,6 +420,12 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CVTagAlign;
+
+			case CVMidCubeNodeAlign:
+				if (!forward && aligned) {
+					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+				}
+				return FSMState.CVMidCubeNodeAlign;
 
 			case IDLE:
 				return FSMState.IDLE;
@@ -877,6 +890,41 @@ public class DriveFSMSystem {
 				leftMotor.set(0);
 				rightMotor.set(0);
 			}
+		}
+	}
+
+	public void handleMidCubeNodeAlignState() {
+		pcw.setPipelineIndex(3); //3d pipeline
+		System.out.println("CUBE NODE");
+		double x = dpe.getCurPose().getX();
+		double y = dpe.getCurPose().getY();
+		double angle = dpe.getCurPose().getRotation();
+		forward = x > Units.inchesToMeters(45);
+		if (Math.abs(angle) < 4) {
+			aligned = true;
+			if (forward) {
+				leftMotor.set(-0.1);
+				rightMotor.set(0.1);
+			} else {
+				leftMotor.set(0);
+				rightMotor.set(0);
+				pcw.setPipelineIndex(4); //2d pipeline
+				double midAngle = Math.atan(y / (x + 8.5));
+				turn(midAngle);
+			}
+		} else {
+			turn(angle);
+		}
+
+	}
+
+	public void turn(double angle) {
+		if (angle > 4) {
+			leftMotor.set(-0.05);
+			rightMotor.set(-0.05);
+		} else if (angle < -4) {
+			leftMotor.set(0.05);
+			rightMotor.set(0.05);
 		}
 	}
 }
