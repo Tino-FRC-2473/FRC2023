@@ -120,6 +120,7 @@ public class ArmFSM {
 	private SparkMaxLimitSwitch pivotLimitSwitchLow;
 	private SparkMaxPIDController pidControllerPivot;
 	private SparkMaxPIDController pidControllerTeleArm;
+	private SparkMaxLimitSwitch teleArmLimitSwitch;
 
 	private double pivotEncoderRotationsOutOfIdle = 0;
 	private boolean isFineTuning = false;
@@ -138,6 +139,9 @@ public class ArmFSM {
 		pivotLimitSwitchLow.enableLimitSwitch(true);
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
+		teleArmLimitSwitch = teleArmMotor.getReverseLimitSwitch(
+								SparkMaxLimitSwitch.Type.kNormallyClosed);
+		teleArmLimitSwitch.enableLimitSwitch(true);
 		pidControllerPivot = pivotMotor.getPIDController();
 		pidControllerPivot.setP(PID_CONSTANT_PIVOT_P);
 		pidControllerPivot.setI(PID_CONSTANT_PIVOT_I);
