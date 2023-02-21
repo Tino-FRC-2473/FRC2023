@@ -79,6 +79,7 @@ public class ArmFSM {
 			pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
 										CANSparkMax.MotorType.kBrushless);
 			teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
+
 										CANSparkMax.MotorType.kBrushless);
 		} else {
 			pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
