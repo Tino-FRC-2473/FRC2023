@@ -38,7 +38,7 @@ public class PhotonCameraWrapper {
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
 		ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
-		atList.add(new AprilTag(2, new Pose3d(AprilTagConstants.APRILTAG_2_X_METERS,
+		atList.add(new AprilTag(0, new Pose3d(AprilTagConstants.APRILTAG_2_X_METERS,
 			AprilTagConstants.APRILTAG_2_Y_METERS, AprilTagConstants.APRILTAG_2_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_2_ANGLE_RADIANS))));
 
@@ -66,7 +66,7 @@ public class PhotonCameraWrapper {
 	 *  field and the robot is always firmly on the ground.
 	 */
 	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-		photonCamera.setPipelineIndex(0); //April Tag pipeline
+		photonCamera.setPipelineIndex(VisionConstants.THREEDTAG_PIPELINE_INDEX);
 		return robotPoseEstimator.update();
 	}
 
@@ -78,67 +78,96 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(index);
 	}
 
-	//degrees
+	/**
+	 * Returns the angle for the robot to turn to align with the lower reflective tape.
+	 * @return an angle that tells the robot how much to turn to align in degrees
+	 */
 	public double getLowerTapeTurnAngle() {
-		photonCamera.setPipelineIndex(1); //Tape pipeline
+		photonCamera.setPipelineIndex(VisionConstants.LOWERTAPE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(VisionConstants.CAM_OFFSET_INCHES / getLowerTapeDistance()));		}
-		return -1;
+			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
+				VisionConstants.CAM_OFFSET_INCHES / getLowerTapeDistance()));
+		}
+		return INVALID_TURN_RETURN_DEGREES;
 	}
 
-	//degrees
+	/**
+	 * Returns the angle for the robot to turn to align with the higher reflective tape.
+	 * @return an angle that tells the robot how much to turn to align in degrees
+	 */
 	public double getHigherTapeTurnAngle() {
-		photonCamera.setPipelineIndex(2); //Tape pipeline
+		photonCamera.setPipelineIndex(VisionConstants.HIGHERTAPE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(VisionConstants.CAM_OFFSET_INCHES / getHigherTapeDistance()));		}
-		return -1;
+			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
+				VisionConstants.CAM_OFFSET_INCHES / getHigherTapeDistance()));
+		}
+		return INVALID_TURN_RETURN_DEGREES;
 	}
-	//degrees
+	/**
+	 * Returns the angle for the robot to turn to align with the grid april tag.
+	 * @return an angle that tells the robot how much to turn to align in degrees
+	 */
 	public double getTagTurnAngle() {
-		photonCamera.setPipelineIndex(0);
+		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(VisionConstants.CAM_OFFSET_INCHES / getTagDistance()));		}
-		return -1;
+			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
+				VisionConstants.CAM_OFFSET_INCHES / getTagDistance()));
+		}
+		return INVALID_TURN_RETURN_DEGREES;
 	}
-	//inches
+	/**
+	 * Returns the distance to the grid april tag.
+	 * @return a distance in inches
+	 */
 	public double getTagDistance() {
-		photonCamera.setPipelineIndex(0);
+		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch())) * 39.37;
+			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS,
+			AprilTagConstants.APRILTAG_1_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS,
+			Units.degreesToRadians(result.getBestTarget().getPitch())) * Constants.METERS_TO_INCHES;
 		} else {
 			return -1;
 		}
 	}
 
-	//inches
+	/**
+	 * Returns the distance to the lower reflective tape.
+	 * @return a distance in inches
+	 */
 	public double getLowerTapeDistance() {
-		photonCamera.setPipelineIndex(1); //Tape pipeline
+		photonCamera.setPipelineIndex(VisionConstants.LOWERTAPE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS, VisionConstants.LOW_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch())) * 39.37;
+			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS,
+			VisionConstants.LOW_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS,
+			Units.degreesToRadians(result.getBestTarget().getPitch())) * Constants.METERS_TO_INCHES;
 		} else {
 			return -1;
 		}
 	}
-	//inches
+	/**
+	 * Returns the distance to the higher reflective tape.
+	 * @return a distance in inches
+	 */
 	public double getHigherTapeDistance() {
-		photonCamera.setPipelineIndex(2); //Tape pipeline
+		photonCamera.setPipelineIndex(VisionConstants.HIGHERTAPE_PIPELINE_INDEX);
 		System.out.println("index: " + photonCamera.getPipelineIndex());
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			System.out.println(PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS, VisionConstants.HIGH_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch())) * 39.37);
-			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS, VisionConstants.HIGH_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch())) * 39.37;
+			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS,
+			VisionConstants.HIGH_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS,
+			Units.degreesToRadians(result.getBestTarget().getPitch())) * Constants.METERS_TO_INCHES;
 		} else {
 			return -1;
 		}
 	}
 	/** @return Returns a distance in meters from the closest cone and -1 if there are no cones.*/
 	public double getDistanceToCone() {
-		photonCamera.setPipelineIndex(1); //Cone pipeline
+		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return PhotonUtils.calculateDistanceToTargetMeters(
@@ -150,7 +179,7 @@ public class PhotonCameraWrapper {
 	}
 /** @return Returns a distance in meters from the closest cube and -1 if there are no cubes.*/
 	public double getDistanceToCube() {
-		photonCamera.setPipelineIndex(2); //Cube pipeline
+		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return PhotonUtils.calculateDistanceToTargetMeters(
@@ -163,7 +192,7 @@ public class PhotonCameraWrapper {
 /** @return Returns the angle needed to turn for aligning the robot to the cone
  * and 360 if there are no cones.*/
 	public double getTurnAngleToCone() {
-		photonCamera.setPipelineIndex(1); //Cone pipeline
+		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return result.getBestTarget().getYaw();
@@ -173,7 +202,7 @@ public class PhotonCameraWrapper {
 /** @return Returns the angle needed to turn for aligning the robot to the cube
  * and 360 if there are no cubes.*/
 	public double getTurnAngleToCube() {
-		photonCamera.setPipelineIndex(2); //Cube pipeline
+		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return result.getBestTarget().getYaw();
