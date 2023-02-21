@@ -129,7 +129,8 @@ public class ArmFSM {
 	 */
 	public ArmFSM() {
 		// Perform hardware init
-		pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
+		if (HardwareMap.isTestBoardArm()) {
+			pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
 										CANSparkMax.MotorType.kBrushless);
 		pivotLimitSwitchHigh = pivotMotor.getReverseLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);

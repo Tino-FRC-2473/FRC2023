@@ -29,6 +29,8 @@ public class TeleopInput {
 	private static final int CV_ALIGN_BUTTON_MIDDLE_NODE = 3;
 	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
 
+	private static final int GROUND_MOUNT_BUTTON = 4;
+
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private Joystick mechJoystick;
@@ -53,6 +55,15 @@ public class TeleopInput {
 	// control mapping is hidden from other classes.
 
 	/* ------------------------ Left Joystick ------------------------ */
+
+	/**
+	 * Get value of lower pivot button for ground mount.
+	 * @return true if pressed
+	 */
+	public boolean isPivotButtonPressed() {
+		return mechJoystick.getRawButton(GROUND_MOUNT_BUTTON);
+	}
+
 	/**
 	 * Get X axis of Left Joystick.
 	 * @return Axis value
