@@ -35,8 +35,8 @@ public class ArmFSM {
 	//encoder over angle
 	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = -241.199 / 145;
 	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 204.594 / 17;
-	private static final float TELEARM_MOTOR_POWER = 0.4f;
-	private static final float PIVOT_MOTOR_POWER = 0.3f;
+	private static final float TELEARM_MOTOR_POWER = 1.0f;
+	private static final float PIVOT_MOTOR_POWER = 0.1f;
 	//19 inches
 	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 19
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
@@ -163,6 +163,7 @@ public class ArmFSM {
 		return currentState;
 	}
 
+
 	/**
 	 * On robot start set the start to IDLE state. Resets robot to original state.
 	 */
@@ -191,6 +192,7 @@ public class ArmFSM {
 		SmartDashboard.putBoolean("At Min Height", isMinHeight());
 		SmartDashboard.putBoolean("Is going Forward", input.isThrottleForward());
 		SmartDashboard.putNumber("Throttle Value", input.getThrottle());
+		SmartDashboard.putBoolean("TeleArm Limit Switch", teleArmLimitSwitch.isPressed());
 		System.out.println(teleArmMotor.getEncoder().getPosition());
 		switch (currentState) {
 			case IDLE:
@@ -495,10 +497,10 @@ public class ArmFSM {
 	private void handleArmMechState(TeleopInput input) {
 		if (input != null) {
 			if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-				pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
+				pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
 					CANSparkMax.ControlType.kDutyCycle);
 			} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-				pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
+				pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
 					CANSparkMax.ControlType.kDutyCycle);
 			} else {
 				pivotMotor.set(0);
