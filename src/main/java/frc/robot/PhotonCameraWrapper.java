@@ -71,14 +71,6 @@ public class PhotonCameraWrapper {
 	}
 
 	/**
-	 * Sets PhotonCamera object pipeline index to the index inputted into the method.
-	 * @param index
-	 */
-	public void setPipelineIndex(int index) {
-		photonCamera.setPipelineIndex(index);
-	}
-
-	/**
 	 * Returns the angle for the robot to turn to align with the lower reflective tape.
 	 * @return an angle that tells the robot how much to turn to align in degrees
 	 */
@@ -126,9 +118,10 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS,
+			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
+			VisionConstants.CAM_HEIGHT_METERS,
 			AprilTagConstants.APRILTAG_1_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS,
-			Units.degreesToRadians(result.getBestTarget().getPitch())) * Constants.METERS_TO_INCHES;
+			Units.degreesToRadians(result.getBestTarget().getPitch())));
 		} else {
 			return -1;
 		}
@@ -142,9 +135,10 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(VisionConstants.LOWERTAPE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS,
+			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
+			VisionConstants.CAM_HEIGHT_METERS,
 			VisionConstants.LOW_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS,
-			Units.degreesToRadians(result.getBestTarget().getPitch())) * Constants.METERS_TO_INCHES;
+			Units.degreesToRadians(result.getBestTarget().getPitch())));
 		} else {
 			return -1;
 		}
@@ -158,9 +152,10 @@ public class PhotonCameraWrapper {
 		System.out.println("index: " + photonCamera.getPipelineIndex());
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.CAM_HEIGHT_METERS,
+			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
+			VisionConstants.CAM_HEIGHT_METERS,
 			VisionConstants.HIGH_TAPE_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS,
-			Units.degreesToRadians(result.getBestTarget().getPitch())) * Constants.METERS_TO_INCHES;
+			Units.degreesToRadians(result.getBestTarget().getPitch())));
 		} else {
 			return -1;
 		}
@@ -170,10 +165,10 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return PhotonUtils.calculateDistanceToTargetMeters(
+			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
 				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CONE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
-					result.getBestTarget().getPitch()));
+					result.getBestTarget().getPitch())));
 		}
 		return -1;
 	}
@@ -182,10 +177,10 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return PhotonUtils.calculateDistanceToTargetMeters(
+			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
 				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CUBE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
-					result.getBestTarget().getPitch()));
+					result.getBestTarget().getPitch())));
 		}
 		return -1;
 	}

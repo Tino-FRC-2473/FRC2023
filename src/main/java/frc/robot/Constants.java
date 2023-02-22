@@ -3,9 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-	public static final double METERS_TO_INCHES = 39.37;
-	public static final double POWER_CONSTANT = 4;
-	public static final double ANGLE_TO_TARGET_THRESHOLD = 2;
+	public static final double ANGLE_TO_TARGET_THRESHOLD_DEGREES = 2;
 	public static final double CV_TURN_POWER = 0.05;
 	public static final double CV_FORWARD_POWER = 0.1;
 	public static final double HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES = 65;

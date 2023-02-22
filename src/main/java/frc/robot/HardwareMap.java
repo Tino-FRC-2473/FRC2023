@@ -10,12 +10,10 @@ public final class HardwareMap {
 	// ID numbers for devices on the CAN bus
 	public static final int CAN_ID_SPARK_PIVOT = 32;
 	public static final int CAN_ID_SPARK_TELEARM = 5;
-	// public static final int CAN_ID_SPARK_DRIVE_LEFT1 = 31;
-	// public static final int CAN_ID_SPARK_DRIVE_LEFT2 = 32;
-	// public static final int CAN_ID_SPARK_DRIVE_RIGHT1 = 33;
-	// public static final int CAN_ID_SPARK_DRIVE_RIGHT2 = 34;
-	public static final int CAN_ID_SPARK_DRIVE_RIGHT = 5;
-	public static final int CAN_ID_SPARK_DRIVE_LEFT = 6;
+	public static final int CAN_ID_SPARK_DRIVE_LEFT1 = 31;
+	public static final int CAN_ID_SPARK_DRIVE_LEFT2 = 32;
+	public static final int CAN_ID_SPARK_DRIVE_RIGHT1 = 33;
+	public static final int CAN_ID_SPARK_DRIVE_RIGHT2 = 34;
 
 
 	//grabber testing constants
