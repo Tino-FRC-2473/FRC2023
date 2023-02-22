@@ -20,7 +20,7 @@ public final class HardwareMap {
 	public static final int CAN_ID_SPARK_PIVOT = 35;
 	public static final int CAN_ID_SPARK_TELEARM = 13;
 	//ground mount constants
-	public static final int CAN_ID_GROUND_MOUNT = 8;
+	public static final int CAN_ID_GROUND_MOUNT = 10;
 
 	// Place jumper from DIO pin 9 to GND to indicate this is a test setup
 	private static final int DIO_TEST_SETUP_CHANNEL_ARM = 8;
