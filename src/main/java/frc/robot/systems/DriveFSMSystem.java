@@ -749,11 +749,13 @@ public class DriveFSMSystem {
 	public void handleCVTapeAlignState(boolean lower) {
 		double angle;
 		if (lower) {
+			pcw.setPipelineIndex(1);
 			angle = pcw.getLowerTapeTurnAngle();
 			forward =  pcw.getLowerTapeDistance() > Constants.LOWER_TAPE_DRIVEUP_DISTANCE_INCHES;
 			System.out.println("distance: " + pcw.getLowerTapeDistance());
 			//drives forward until within 42 inches of lower tape
 		} else {
+			pcw.setPipelineIndex(2);
 			angle = pcw.getHigherTapeTurnAngle();
 			forward = pcw.getHigherTapeDistance() > Constants.HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES;
 			System.out.println("distance: " + pcw.getHigherTapeDistance());
@@ -784,6 +786,7 @@ public class DriveFSMSystem {
 	*/
 	public void handleCVTagAlignState() {
 		System.out.println("TAG");
+		pcw.setPipelineIndex(0);
 		double angle = pcw.getTagTurnAngle();
 		forward =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
 		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD) {
