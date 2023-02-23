@@ -143,6 +143,5 @@ public class Constants {
 		static final double APRILTAG_8_HEIGHT_METERS = Units.inchesToMeters(18.22);
 		static final double APRILTAG_8_ANGLE_RADIANS = Units.degreesToRadians(0);
 	}
-	
-}
 
+}

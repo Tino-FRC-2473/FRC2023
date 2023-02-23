@@ -64,7 +64,7 @@ public class PhotonCameraWrapper {
 			AprilTagConstants.APRILTAG_5_Y_METERS, AprilTagConstants.APRILTAG_5_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_5_ANGLE_RADIANS))));
 
-		atList.add(new AprilTag(AprilTagConstants.APRILTAG_6_ID, 
+		atList.add(new AprilTag(AprilTagConstants.APRILTAG_6_ID,
 			new Pose3d(AprilTagConstants.APRILTAG_6_X_METERS,
 			AprilTagConstants.APRILTAG_6_Y_METERS, AprilTagConstants.APRILTAG_6_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_6_ANGLE_RADIANS))));
