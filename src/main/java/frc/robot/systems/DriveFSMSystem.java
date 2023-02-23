@@ -194,7 +194,6 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-
 		gyroAngleForOdo = gyro.getAngle();
 
 		currentEncoderPos = ((leftMotor1.getEncoder().getPosition()
@@ -208,17 +207,17 @@ public class DriveFSMSystem {
 				break;
 
 			case CV_LOW_TAPE_ALIGN:
-				System.out.println("low");
+				System.out.println("low state");
 				handleCVTapeAlignState(true);
 				break;
 
 			case CV_HIGH_TAPE_ALIGN:
-				System.out.println("high");
+				System.out.println("high state");
 				handleCVTapeAlignState(false);
 				break;
 
 			case CV_TAG_ALIGN:
-				System.out.println("tag");
+				System.out.println("tag state");
 				handleCVTagAlignState();
 				break;
 
@@ -354,17 +353,17 @@ public class DriveFSMSystem {
 				}
 				return FSMState.TURNING_STATE;
 			case CV_LOW_TAPE_ALIGN:
-				if (!isForwardEnough && isAligned) {
+				if (!input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_LOW_TAPE_ALIGN;
 			case CV_HIGH_TAPE_ALIGN:
-				if (!isForwardEnough && isAligned) {
+				if (!input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_HIGH_TAPE_ALIGN;
 			case CV_TAG_ALIGN:
-				if (!isForwardEnough && isAligned) {
+				if (!input.isDriveJoystickCVTagButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_TAG_ALIGN;
@@ -488,8 +487,6 @@ public class DriveFSMSystem {
 			return;
 		}
 
-		// Pose3d cvEstimatedPos = pcw.getEstimatedGlobalPose().get().estimatedPose;
-
 		if (isInArcadeDrive) {
 
 			currentEncoderPos = ((leftMotor1.getEncoder().getPosition()
@@ -569,14 +566,7 @@ public class DriveFSMSystem {
 			return;
 		}
 		finishedTurning = false;
-		System.out.println(getHeading());
 		double error = degrees - getHeading();
-		// if (error > Constants.HALF_REVOLUTION_DEGREES) {
-		// 	error -= Constants.ONE_REVOLUTION_DEGREES;
-		// }
-		// if (error < -Constants.HALF_REVOLUTION_DEGREES) {
-		// 	error += Constants.ONE_REVOLUTION_DEGREES;
-		// }
 
 		if (error > Constants.HALF_REVOLUTION_DEGREES) {
 			error -= Constants.ONE_REVOLUTION_DEGREES;
@@ -584,9 +574,7 @@ public class DriveFSMSystem {
 		if (error < -Constants.HALF_REVOLUTION_DEGREES) {
 			error += Constants.ONE_REVOLUTION_DEGREES;
 		}
-		System.out.println("ERROR: " + error);
 		if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
-			System.out.println("DONE");
 			finishedTurning = true;
 			leftMotor1.set(0);
 			rightMotor1.set(0);
@@ -649,11 +637,6 @@ public class DriveFSMSystem {
 		roboYPos += dY;
 
 		prevEncoderPos = this.currentEncoderPos;
-
-		//System.out.println("X Pos: " + roboXPos);
-		//System.out.println("Y Pos: " + roboYPos);
-		//System.out.println("Gyro: " + gyroAngleForOdo);
-
 	}
 
 	/**
@@ -669,8 +652,6 @@ public class DriveFSMSystem {
 		}
 		double roboX = -roboXPos;
 		double roboY = roboYPos;
-		System.out.println("x: " + roboX);
-		System.out.println("y: " + roboY);
 
 		if (forwards) {
 			leftMotor1.set(-Constants.AUTONOMUS_MOVE_POWER);
@@ -703,16 +684,13 @@ public class DriveFSMSystem {
 			angle = pcw.getLowerTapeTurnAngle();
 			isForwardEnough =  pcw.getLowerTapeDistance()
 				> VisionConstants.LOWER_TAPE_DRIVEUP_DISTANCE_INCHES;
-			System.out.println("distance: " + pcw.getLowerTapeDistance());
 			//drives forward until within 42 inches of lower tape
 		} else {
 			angle = pcw.getHigherTapeTurnAngle();
 			isForwardEnough = pcw.getHigherTapeDistance()
 				> VisionConstants.HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES;
-			System.out.println("distance: " + pcw.getHigherTapeDistance());
 			//drives forward until within 65 inches of higher tape
 		}
-		System.out.println("angle: " + angle);
 		if (angle > VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
 			leftMotor1.set(-VisionConstants.CV_TURN_POWER);
 			leftMotor2.set(-VisionConstants.CV_TURN_POWER);
@@ -744,7 +722,6 @@ public class DriveFSMSystem {
  	* Aligns to april tag and drives up to within 35 inches of it
 	*/
 	public void handleCVTagAlignState() {
-		System.out.println("TAG");
 		double angle = pcw.getTagTurnAngle();
 		isForwardEnough =  pcw.getTagDistance() > VisionConstants.TAG_DRIVEUP_DISTANCE_INCHES;
 		if (angle > VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {

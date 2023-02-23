@@ -32,7 +32,6 @@ public class ArmFSM {
 	private static final float PIVOT_MOTOR_POWER = 0.1f;
 	private static final double ARM_ENCODER_STARTING_ANGLE_ROTATIONS = 20;
 	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 20;
-	private static final double ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS = 20;
 	private static final double ARM_ENCODER_HIGH_BACKWARD_ROTATIONS = 40;
 	private static final double ARM_ENCODER_MID_FORWARD_ROTATIONS = 10;
 	private static final double ARM_ENCODER_MID_BACKWARD_ROTATIONS = 10;
