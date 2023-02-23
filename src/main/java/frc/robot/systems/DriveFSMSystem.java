@@ -237,6 +237,8 @@ public class DriveFSMSystem {
 
 			case P1N1:
 				moveState(input, true, Constants.P1X1, 0);
+				// set the grabber to be at the low state to drop off block
+				// reset the arm to idle state
 				break;
 
 			case P1N2:
@@ -251,6 +253,8 @@ public class DriveFSMSystem {
 
 			case P2N1:
 				moveState(input, true, Constants.P2X1, 0);
+				// set the grabber to be at the low state to drop off block
+				// reset the arm to idle state
 				break;
 
 			case P2N2:
@@ -260,15 +264,19 @@ public class DriveFSMSystem {
 			// path 3
 
 			case P3N1:
-				moveState(input, false, Constants.P3X1, 0);
+				moveState(input, true, Constants.P3X1, 0);
+				// set grabber at high height to drop off cube
 				break;
 
 			case P3N2:
-				moveState(input, true, Constants.P3X2, 0);
+				moveState(input, false, Constants.P3X2, 0);
+				// set grabber at low height to pick up another cube
 				break;
 
 			case P3N3:
 				handleTurnState(input, Constants.P3A3);
+				// set grabnber at mid height to drop off cube
+				// reset the arm to idle state
 				break;
 
 			case P3N4:
