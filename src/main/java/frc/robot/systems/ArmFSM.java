@@ -40,9 +40,9 @@ public class ArmFSM {
 	private static final double ENCODER_TICKS_SLOW_DOWN_RANGE_MAX =
 		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (105 + 12);
 	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 204.594 / 17;
-	private static final float TELEARM_MOTOR_POWER = 0.4f;
+	private static final float TELEARM_MOTOR_POWER = 0.1f;
 	private static final float TELEARM_MOTOR_POWER_FINE_TUNING = 0.05f;
-	private static final float PIVOT_MOTOR_POWER = 0.3f;
+	private static final float PIVOT_MOTOR_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_POWER_FINE_TUNING = 0.05f;
 
@@ -105,7 +105,7 @@ public class ArmFSM {
 	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS =
 		(142.46 + 12.837) * ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 
-	private static final double PID_PIVOT_MAX_POWER = 0.2;
+	private static final double PID_PIVOT_MAX_POWER = 0.1;
 	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.1;
 	private static final double ERROR_ARM_ROTATIONS = 0.3;
 	private static final double PID_CONSTANT_PIVOT_P = 0.00022f;
@@ -114,7 +114,7 @@ public class ArmFSM {
 	private static final double PID_CONSTANT_ARM_P = 0.00022f;
 	private static final double PID_CONSTANT_ARM_I = 0.000055f;
 	private static final double PID_CONSTANT_ARM_D = 0.000008f;
-	private static final double PID_ARM_MAX_POWER = 0.2;
+	private static final double PID_ARM_MAX_POWER = 0.1;
 
 
 	/* ======================== Private variables ======================== */
@@ -143,6 +143,7 @@ public class ArmFSM {
 		pivotLimitSwitchLow = pivotMotor.getForwardLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchLow.enableLimitSwitch(true);
+		pivotMotor.setInverted(true);
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
 		teleArmLimitSwitch = teleArmMotor.getReverseLimitSwitch(
