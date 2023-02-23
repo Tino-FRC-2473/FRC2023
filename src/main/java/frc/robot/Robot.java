@@ -23,6 +23,7 @@ public class Robot extends TimedRobot {
 	private DriveFSMSystem driveSystem;
 	private SpinningIntakeFSM spinningIntakeFSM;
 	private GroundMountFSM groundMountFSM;
+	private int step = 0;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -55,6 +56,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousInit() {
+		step = 0;
 		System.out.println("-------- Autonomous Init --------");
 		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 			&& !HardwareMap.isTestBoardGroundMount()) {
@@ -88,7 +90,24 @@ public class Robot extends TimedRobot {
 			spinningIntakeFSM.update(null);
 		}
 		if (HardwareMap.isTestBoardGroundMount()) {
-			groundMountFSM.update(null);
+			if (step == 0) {
+				boolean done = groundMountFSM.updateAutonomous(
+					GroundMountFSM.FSMState.AUTONOMOUS_DOWN);
+				if (done) {
+					step++;
+				}
+			}
+			if (step == 1) {
+				boolean done = groundMountFSM.updateAutonomous(
+					GroundMountFSM.FSMState.AUTONOMOUS_UP);
+				if (done) {
+					step++;
+				}
+			}
+			if (step == 2) {
+				groundMountFSM.updateAutonomous(
+					GroundMountFSM.FSMState.AUTONOMOUS_IDLE);
+			}
 		}
 	}
 
