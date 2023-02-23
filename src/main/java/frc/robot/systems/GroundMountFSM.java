@@ -25,12 +25,11 @@ public class GroundMountFSM {
 		AUTONOMOUS_IDLE
 	}
 	//arbitrary constants, must test all of these
-	private static final double PIVOT_DOWN_POWER = -0.05;
-	private static final double PIVOT_UP_POWER = 0.05;
+	private static final double PIVOT_UP_POWER = 0.07;
 	private static final double MAX_POWER = 0.2;
 	private boolean zeroed = false;
-	private static final double BOTTOM_ENCODER_LIMIT = -47.00; //ARITRARY VALUE
-	private static final double P_CONSTANT = 0.002;
+	private static final double BOTTOM_ENCODER_LIMIT = -47.00; //ARBITRARY VALUE
+	private static final double P_CONSTANT = 0.005;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -259,19 +258,12 @@ public class GroundMountFSM {
 	/* AUTONOMOUS HANDLES */
 
 	private void handleAutonomousDownState() {
-		if (isLimitSwitchLowPressed()) {
-			pivotArmMotor.set(0);
-			return;
-		}
-		pivotArmMotor.set(PIVOT_DOWN_POWER);
+		pivotArmMotor.set((BOTTOM_ENCODER_LIMIT
+			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT);
 	}
 
 	private void handleAutonomousUpState() {
-		if (isLimitSwitchHighPressed()) {
-			pivotArmMotor.set(0);
-			return;
-		}
-		pivotArmMotor.set(PIVOT_UP_POWER);
+		pivotArmMotor.set(-pivotArmMotor.getEncoder().getPosition() * P_CONSTANT);
 	}
 
 	private void handleAutonomousIdleState() {
