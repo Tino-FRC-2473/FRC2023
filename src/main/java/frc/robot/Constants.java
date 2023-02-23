@@ -3,14 +3,6 @@ package frc.robot;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-	public static final double ANGLE_TO_TARGET_THRESHOLD_DEGREES = 2;
-	public static final double CV_TURN_POWER = 0.05;
-	public static final double CV_FORWARD_POWER = 0.1;
-	public static final double HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES = 65;
-	public static final double LOWER_TAPE_DRIVEUP_DISTANCE_INCHES = 42;
-	public static final double TAG_DRIVEUP_DISTANCE_INCHES = 35;
-	public static final int WEBCAM_PIXELS_WIDTH = 480;
-	public static final int WEBCAM_PIXELS_HEIGHT = 480;
 	public static final double WHEEL_DIAMETER_INCHES = 4.0; //7.65
 	public static final double MAX_POWER = 1;
 	public static final double REDUCED_MAX_POWER = 0.5;
@@ -63,7 +55,6 @@ public class Constants {
 	public static final double P4Y7 = 21.449;
 	public static final double P4A8 =  180;
 
-
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
 	public static final double DY_INCHES_CONST = 1.1742067733;
@@ -75,24 +66,34 @@ public class Constants {
 
 	public static final double METERS_TO_INCHES = 39.37;
 
-	static class VisionConstants {
-		static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
-		static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(8.6);
-		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(19.5);
-		static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
-		static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
-		static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
-		static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
-		static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
-		static final double CAM_OFFSET_INCHES = 8.6;
-		static final int TWODTAG_PIPELINE_INDEX = 0;
-		static final int LOWERTAPE_PIPELINE_INDEX = 1;
-		static final int HIGHERTAPE_PIPELINE_INDEX = 2;
-		static final int THREEDTAG_PIPELINE_INDEX = 3;
-		static final int CUBE_PIPELINE_INDEX = 4;
-		static final int CONE_PIPELINE_INDEX = 5;
+	// CV Constants
+	public static class VisionConstants {
+		public static final double ANGLE_TO_TARGET_THRESHOLD_DEGREES = 2;
+		public static final double CV_TURN_POWER = 0.05;
+		public static final double CV_FORWARD_POWER = 0.1;
+		public static final double HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES = 65;
+		public static final double LOWER_TAPE_DRIVEUP_DISTANCE_INCHES = 42;
+		public static final double TAG_DRIVEUP_DISTANCE_INCHES = 35;
+		public static final int WEBCAM_PIXELS_WIDTH = 480;
+		public static final int WEBCAM_PIXELS_HEIGHT = 480;
+		public static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
+		public static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(8.6);
+		public static final double CAM_HEIGHT_METERS = Units.inchesToMeters(19.5);
+		public static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
+		public static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
+		public static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
+		public static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
+		public static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
+		public static final double CAM_OFFSET_INCHES = 8.6;
+		public static final int TWODTAG_PIPELINE_INDEX = 0;
+		public static final int LOWERTAPE_PIPELINE_INDEX = 1;
+		public static final int HIGHERTAPE_PIPELINE_INDEX = 2;
+		public static final int THREEDTAG_PIPELINE_INDEX = 3;
+		public static final int CUBE_PIPELINE_INDEX = 4;
+		public static final int CONE_PIPELINE_INDEX = 5;
 
 	}
+
 	static class AprilTagConstants {
 		static final double APRILTAG_1_X_METERS = Units.inchesToMeters(610.77);
 		static final double APRILTAG_1_Y_METERS = Units.inchesToMeters(42.19);

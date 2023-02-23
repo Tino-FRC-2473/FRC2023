@@ -9,6 +9,7 @@ import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.wpilibj.SPI;
 import frc.robot.Constants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.HardwareMap;
 import frc.robot.PhotonCameraWrapper;
 // Robot Imports
@@ -121,7 +122,7 @@ public class DriveFSMSystem {
 		CameraServer.startAutomaticCapture();
 		cvSink = CameraServer.getVideo();
 		outputStrem = CameraServer.putVideo("ROBOCAM",
-			Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_WIDTH);
+			VisionConstants.WEBCAM_PIXELS_WIDTH, VisionConstants.WEBCAM_PIXELS_HEIGHT);
 		// Reset state machine
 		resetTeleop();
 
@@ -701,34 +702,34 @@ public class DriveFSMSystem {
 		if (lower) {
 			angle = pcw.getLowerTapeTurnAngle();
 			isForwardEnough =  pcw.getLowerTapeDistance()
-				> Constants.LOWER_TAPE_DRIVEUP_DISTANCE_INCHES;
+				> VisionConstants.LOWER_TAPE_DRIVEUP_DISTANCE_INCHES;
 			System.out.println("distance: " + pcw.getLowerTapeDistance());
 			//drives forward until within 42 inches of lower tape
 		} else {
 			angle = pcw.getHigherTapeTurnAngle();
 			isForwardEnough = pcw.getHigherTapeDistance()
-				> Constants.HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES;
+				> VisionConstants.HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES;
 			System.out.println("distance: " + pcw.getHigherTapeDistance());
 			//drives forward until within 65 inches of higher tape
 		}
 		System.out.println("angle: " + angle);
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(-Constants.CV_TURN_POWER);
-			leftMotor2.set(-Constants.CV_TURN_POWER);
-			rightMotor1.set(-Constants.CV_TURN_POWER);
-			rightMotor2.set(-Constants.CV_TURN_POWER);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(Constants.CV_TURN_POWER);
-			rightMotor1.set(Constants.CV_TURN_POWER);
-			leftMotor2.set(Constants.CV_TURN_POWER);
-			rightMotor2.set(Constants.CV_TURN_POWER);
+		if (angle > VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			leftMotor1.set(-VisionConstants.CV_TURN_POWER);
+			leftMotor2.set(-VisionConstants.CV_TURN_POWER);
+			rightMotor1.set(-VisionConstants.CV_TURN_POWER);
+			rightMotor2.set(-VisionConstants.CV_TURN_POWER);
+		} else if (angle  < -VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			leftMotor1.set(VisionConstants.CV_TURN_POWER);
+			rightMotor1.set(VisionConstants.CV_TURN_POWER);
+			leftMotor2.set(VisionConstants.CV_TURN_POWER);
+			rightMotor2.set(VisionConstants.CV_TURN_POWER);
 		} else {
 			isAligned = true;
 			if (isForwardEnough) {
-				leftMotor1.set(-Constants.CV_FORWARD_POWER);
-				rightMotor1.set(Constants.CV_FORWARD_POWER);
-				leftMotor2.set(-Constants.CV_FORWARD_POWER);
-				rightMotor2.set(Constants.CV_FORWARD_POWER);
+				leftMotor1.set(-VisionConstants.CV_FORWARD_POWER);
+				rightMotor1.set(VisionConstants.CV_FORWARD_POWER);
+				leftMotor2.set(-VisionConstants.CV_FORWARD_POWER);
+				rightMotor2.set(VisionConstants.CV_FORWARD_POWER);
 			} else {
 				leftMotor1.set(0);
 				rightMotor1.set(0);
@@ -745,24 +746,24 @@ public class DriveFSMSystem {
 	public void handleCVTagAlignState() {
 		System.out.println("TAG");
 		double angle = pcw.getTagTurnAngle();
-		isForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(-Constants.CV_TURN_POWER);
-			rightMotor1.set(-Constants.CV_TURN_POWER);
-			leftMotor2.set(-Constants.CV_TURN_POWER);
-			rightMotor2.set(-Constants.CV_TURN_POWER);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(Constants.CV_TURN_POWER);
-			rightMotor1.set(Constants.CV_TURN_POWER);
-			leftMotor2.set(Constants.CV_TURN_POWER);
-			rightMotor2.set(Constants.CV_TURN_POWER);
+		isForwardEnough =  pcw.getTagDistance() > VisionConstants.TAG_DRIVEUP_DISTANCE_INCHES;
+		if (angle > VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			leftMotor1.set(-VisionConstants.CV_TURN_POWER);
+			rightMotor1.set(-VisionConstants.CV_TURN_POWER);
+			leftMotor2.set(-VisionConstants.CV_TURN_POWER);
+			rightMotor2.set(-VisionConstants.CV_TURN_POWER);
+		} else if (angle  < -VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			leftMotor1.set(VisionConstants.CV_TURN_POWER);
+			rightMotor1.set(VisionConstants.CV_TURN_POWER);
+			leftMotor2.set(VisionConstants.CV_TURN_POWER);
+			rightMotor2.set(VisionConstants.CV_TURN_POWER);
 		} else {
 			isAligned = true;
 			if (isForwardEnough) {
-				leftMotor1.set(-Constants.CV_FORWARD_POWER);
-				rightMotor1.set(Constants.CV_FORWARD_POWER);
-				leftMotor2.set(-Constants.CV_FORWARD_POWER);
-				rightMotor2.set(Constants.CV_FORWARD_POWER);
+				leftMotor1.set(-VisionConstants.CV_FORWARD_POWER);
+				rightMotor1.set(VisionConstants.CV_FORWARD_POWER);
+				leftMotor2.set(-VisionConstants.CV_FORWARD_POWER);
+				rightMotor2.set(VisionConstants.CV_FORWARD_POWER);
 			} else {
 				leftMotor1.set(0);
 				rightMotor1.set(0);
