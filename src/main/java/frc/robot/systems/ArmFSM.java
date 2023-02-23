@@ -35,8 +35,8 @@ public class ArmFSM {
 	//encoder over angle
 	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = -241.199 / 145;
 	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 204.594 / 17;
-	private static final float TELEARM_MOTOR_POWER = 1.0f;
-	private static final float PIVOT_MOTOR_POWER = 0.1f;
+	private static final float TELEARM_MOTOR_POWER = 0.5f;
+	private static final float PIVOT_MOTOR_POWER = 0.2f;
 	//19 inches
 	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 19
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
@@ -131,6 +131,7 @@ public class ArmFSM {
 		pivotLimitSwitchLow = pivotMotor.getForwardLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchLow.enableLimitSwitch(true);
+		pivotMotor.setInverted(true);
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
 		teleArmLimitSwitch = teleArmMotor.getReverseLimitSwitch(
@@ -497,10 +498,10 @@ public class ArmFSM {
 	private void handleArmMechState(TeleopInput input) {
 		if (input != null) {
 			if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-				pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
+				pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
 					CANSparkMax.ControlType.kDutyCycle);
 			} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-				pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
+				pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
 					CANSparkMax.ControlType.kDutyCycle);
 			} else {
 				pivotMotor.set(0);
