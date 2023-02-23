@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj.DigitalInput;
  * configuration of the robot.
  */
 public final class HardwareMap {
-	// ID numbers for devices on the CAN bus
-	public static final int CAN_ID_SPARK_DRIVE_RIGHT = 5;
-	public static final int CAN_ID_SPARK_DRIVE_LEFT = 6;
+	// ID numbers for drive motors
+	public static final int CAN_ID_SPARK_DRIVE_LEFT1 = 31;
+	public static final int CAN_ID_SPARK_DRIVE_LEFT2 = 32;
+	public static final int CAN_ID_SPARK_DRIVE_RIGHT1 = 33;
+	public static final int CAN_ID_SPARK_DRIVE_RIGHT2 = 34;
 
 	//grabber constants
 	public static final int CAN_ID_SPINNER_MOTOR = 40;
