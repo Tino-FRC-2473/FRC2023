@@ -6,19 +6,12 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import com.kauailabs.navx.frc.AHRS;
-
-// Robot Imports
-import frc.robot.TeleopInput;
+import frc.robot.Constants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.HardwareMap;
 import frc.robot.PhotonCameraWrapper;
 import frc.robot.drive.DriveModes;
 import frc.robot.drive.DrivePower;
-import frc.robot.drive.DriveFunctions;
-import frc.robot.Constants;
-import frc.robot.DrivePoseEstimator;
 
 // Java Imports
 
@@ -76,10 +69,8 @@ public class DriveFSMSystem {
 
 	private DrivePoseEstimator dpe = new DrivePoseEstimator();
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
-	private double xToATag = 0;
-	private double yToATag = 0;
-	private boolean isAlignedToATag = false;
-
+	private CvSink cvSink;
+	private CvSource outputStrem;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -650,5 +641,35 @@ public class DriveFSMSystem {
 		prevEncoderPos = this.currentEncoderPos;
 	}
 
-
+	/**.
+ 	* Aligns to april tag and drives up to within 35 inches of it
+	*/
+	public void handleCVTagAlignState() {
+		double angle = pcw.getTagTurnAngle();
+		isForwardEnough =  pcw.getTagDistance() > VisionConstants.TAG_DRIVEUP_DISTANCE_INCHES;
+		if (angle > VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			leftMotor1.set(-VisionConstants.CV_TURN_POWER);
+			rightMotor1.set(-VisionConstants.CV_TURN_POWER);
+			leftMotor2.set(-VisionConstants.CV_TURN_POWER);
+			rightMotor2.set(-VisionConstants.CV_TURN_POWER);
+		} else if (angle  < -VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			leftMotor1.set(VisionConstants.CV_TURN_POWER);
+			rightMotor1.set(VisionConstants.CV_TURN_POWER);
+			leftMotor2.set(VisionConstants.CV_TURN_POWER);
+			rightMotor2.set(VisionConstants.CV_TURN_POWER);
+		} else {
+			isAligned = true;
+			if (isForwardEnough) {
+				leftMotor1.set(-VisionConstants.CV_FORWARD_POWER);
+				rightMotor1.set(VisionConstants.CV_FORWARD_POWER);
+				leftMotor2.set(-VisionConstants.CV_FORWARD_POWER);
+				rightMotor2.set(VisionConstants.CV_FORWARD_POWER);
+			} else {
+				leftMotor1.set(0);
+				rightMotor1.set(0);
+				leftMotor2.set(0);
+				rightMotor2.set(0);
+			}
+		}
+	}
 }

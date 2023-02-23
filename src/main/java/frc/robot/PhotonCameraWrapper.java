@@ -19,7 +19,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 /**
  * The PhotonCameraWrapper class contains methods for estimating position
- * of robot relative to AprilTags on the field and updates SmartDashboard
+ * of robot relative to targets on the field and updates SmartDashboard
  * with its coordinates.
  */
 public class PhotonCameraWrapper {
@@ -111,4 +111,6 @@ public class PhotonCameraWrapper {
 		}
 		return INVALID_TURN_RETURN_DEGREES;
 	}
+
+
 }
