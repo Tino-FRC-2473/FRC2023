@@ -39,35 +39,43 @@ public class PhotonCameraWrapper {
 	public PhotonCameraWrapper() {
 		ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
 
-		atList.add(new AprilTag(AprilTagConstants.APRILTAG_1_ID, new Pose3d(AprilTagConstants.APRILTAG_1_X_METERS,
+		atList.add(new AprilTag(AprilTagConstants.APRILTAG_1_ID, 
+			new Pose3d(AprilTagConstants.APRILTAG_1_X_METERS,
 			AprilTagConstants.APRILTAG_1_Y_METERS, AprilTagConstants.APRILTAG_1_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_1_ANGLE_RADIANS))));
 
-		atList.add(new AprilTag(AprilTagConstants.APRILTAG_2_ID, new Pose3d(AprilTagConstants.APRILTAG_2_X_METERS,
+		atList.add(new AprilTag(AprilTagConstants.APRILTAG_2_ID, 
+			new Pose3d(AprilTagConstants.APRILTAG_2_X_METERS,
 			AprilTagConstants.APRILTAG_2_Y_METERS, AprilTagConstants.APRILTAG_2_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_2_ANGLE_RADIANS))));
 
-		atList.add(new AprilTag(AprilTagConstants.APRILTAG_3_ID, new Pose3d(AprilTagConstants.APRILTAG_3_X_METERS,
+		atList.add(new AprilTag(AprilTagConstants.APRILTAG_3_ID, 
+			new Pose3d(AprilTagConstants.APRILTAG_3_X_METERS,
 			AprilTagConstants.APRILTAG_3_Y_METERS, AprilTagConstants.APRILTAG_3_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_3_ANGLE_RADIANS))));
 
-		atList.add(new AprilTag(AprilTagConstants.APRILTAG_4_ID, new Pose3d(AprilTagConstants.APRILTAG_4_X_METERS,
+		atList.add(new AprilTag(AprilTagConstants.APRILTAG_4_ID, 
+			new Pose3d(AprilTagConstants.APRILTAG_4_X_METERS,
 			AprilTagConstants.APRILTAG_4_Y_METERS, AprilTagConstants.APRILTAG_4_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_4_ANGLE_RADIANS))));
 
-		atList.add(new AprilTag(AprilTagConstants.APRILTAG_5_ID, new Pose3d(AprilTagConstants.APRILTAG_5_X_METERS,
+		atList.add(new AprilTag(AprilTagConstants.APRILTAG_5_ID, 
+			new Pose3d(AprilTagConstants.APRILTAG_5_X_METERS,
 			AprilTagConstants.APRILTAG_5_Y_METERS, AprilTagConstants.APRILTAG_5_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_5_ANGLE_RADIANS))));
 
-		atList.add(new AprilTag(AprilTagConstants.APRILTAG_6_ID, new Pose3d(AprilTagConstants.APRILTAG_6_X_METERS,
+		atList.add(new AprilTag(AprilTagConstants.APRILTAG_6_ID, 
+			new Pose3d(AprilTagConstants.APRILTAG_6_X_METERS,
 			AprilTagConstants.APRILTAG_6_Y_METERS, AprilTagConstants.APRILTAG_6_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_6_ANGLE_RADIANS))));
-		
-		atList.add(new AprilTag(AprilTagConstants.APRILTAG_7_ID, new Pose3d(AprilTagConstants.APRILTAG_7_X_METERS,
+
+		atList.add(new AprilTag(AprilTagConstants.APRILTAG_7_ID, 
+		new Pose3d(AprilTagConstants.APRILTAG_7_X_METERS,
 			AprilTagConstants.APRILTAG_7_Y_METERS, AprilTagConstants.APRILTAG_7_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_7_ANGLE_RADIANS))));
-		
-		atList.add(new AprilTag(AprilTagConstants.APRILTAG_8_ID, new Pose3d(AprilTagConstants.APRILTAG_8_X_METERS,
+
+		atList.add(new AprilTag(AprilTagConstants.APRILTAG_8_ID, 
+		new Pose3d(AprilTagConstants.APRILTAG_8_X_METERS,
 			AprilTagConstants.APRILTAG_8_Y_METERS, AprilTagConstants.APRILTAG_8_HEIGHT_METERS,
 			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_8_ANGLE_RADIANS))));
 
