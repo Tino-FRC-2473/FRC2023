@@ -35,10 +35,15 @@ public class ArmFSM {
 	//starts at 71 inches to 33 inches
 	//encoder over angle
 	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = -241.199 / 145;
+	private static final double ENCODER_TICKS_SLOW_DOWN_RANGE_MIN =
+		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (75 + 12);
+	private static final double ENCODER_TICKS_SLOW_DOWN_RANGE_MAX =
+		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (105 + 12);
 	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 204.594 / 17;
 	private static final float TELEARM_MOTOR_POWER = 0.4f;
 	private static final float TELEARM_MOTOR_POWER_FINE_TUNING = 0.05f;
 	private static final float PIVOT_MOTOR_POWER = 0.3f;
+	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_POWER_FINE_TUNING = 0.05f;
 
 	//20 inches
@@ -101,6 +106,7 @@ public class ArmFSM {
 		(142.46 + 12.837) * ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 
 	private static final double PID_PIVOT_MAX_POWER = 0.2;
+	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.1;
 	private static final double ERROR_ARM_ROTATIONS = 0.3;
 	private static final double PID_CONSTANT_PIVOT_P = 0.00022f;
 	private static final double PID_CONSTANT_PIVOT_I = 0.000055f;
@@ -202,6 +208,15 @@ public class ArmFSM {
 		System.out.println(pivotMotor.getEncoder().getPosition());
 		if (input.isFineTuningButtonPressed()) {
 			isFineTuning = !isFineTuning;
+		}
+		if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+			&& pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
+				// pivotMotor.setPower(PIVOT_MOTOR_SLOW_DOWN_POWER);
+			pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,
+				PID_PIVOT_SLOW_DOWN_MAX_POWER);
+		} else {
+			pidControllerPivot.setOutputRange(-PID_PIVOT_MAX_POWER,
+				PID_PIVOT_MAX_POWER);
 		}
 		switch (currentState) {
 			case IDLE:
@@ -509,11 +524,25 @@ public class ArmFSM {
 		if (input != null) {
 			if (!isFineTuning) {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
-						CANSparkMax.ControlType.kDutyCycle);
+					if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+						&& pivotMotor.getEncoder().getPosition()
+						< ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
+						pidControllerPivot.setReference(-PIVOT_MOTOR_SLOW_DOWN_POWER,
+							CANSparkMax.ControlType.kDutyCycle);
+					} else {
+						pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
+							CANSparkMax.ControlType.kDutyCycle);
+					}
 				} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-					pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
-						CANSparkMax.ControlType.kDutyCycle);
+					if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+						&& pivotMotor.getEncoder().getPosition()
+						< ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
+						pidControllerPivot.setReference(-PIVOT_MOTOR_SLOW_DOWN_POWER,
+							CANSparkMax.ControlType.kDutyCycle);
+					} else {
+						pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
+							CANSparkMax.ControlType.kDutyCycle);
+					}
 				} else {
 					pivotMotor.set(0);
 				}
