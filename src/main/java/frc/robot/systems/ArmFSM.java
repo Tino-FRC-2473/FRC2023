@@ -147,7 +147,7 @@ public class ArmFSM {
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
 		teleArmLimitSwitch = teleArmMotor.getReverseLimitSwitch(
-								SparkMaxLimitSwitch.Type.kNormallyClosed);
+								SparkMaxLimitSwitch.Type.kNormallyOpen);
 		teleArmLimitSwitch.enableLimitSwitch(true);
 		pidControllerPivot = pivotMotor.getPIDController();
 		pidControllerPivot.setP(PID_CONSTANT_PIVOT_P);
