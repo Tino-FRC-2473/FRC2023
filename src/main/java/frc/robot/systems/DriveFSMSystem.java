@@ -174,8 +174,8 @@ public class DriveFSMSystem {
 		roboXPos = 0;
 		roboYPos = 0;
 
-		System.out.println("X: " + roboXPos);
-		System.out.println("Y: " + roboYPos);
+		// System.out.println("X: " + roboXPos);
+		// System.out.println("Y: " + roboYPos);
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -209,7 +209,9 @@ public class DriveFSMSystem {
 
 		updateLineOdometryTele(gyroAngleForOdo);
 
-		System.out.println(gyroAngleForOdo);
+		// System.out.println(gyroAngleForOdo);
+		// System.out.println("Velocity: " + Math.sqrt(Math.abs(Math.pow(gyro.getVelocityX(), 2))
+		// 	+ Math.abs(Math.pow(gyro.getVelocityY(), 2))));
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -330,6 +332,13 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.TELE_STATE_CV_ALIGN;
+
+			case TELE_STATE_BALANCE:
+				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
+					System.out.println("in balance state");
+					return FSMState.TELE_STATE_BALANCE;
+				}
+				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 
 			case IDLE:
 				return FSMState.IDLE;
@@ -495,15 +504,19 @@ public class DriveFSMSystem {
 			// 	SmartDashboard.putNumber("angle to face: ", angleToTurnToFaceTag);
 			// 	SmartDashboard.putNumber("gyro: ", gyroAngleForOdo);
 
-
 			// }
-			System.out.println("X: " + roboXPos);
-			System.out.println("Y: " + roboYPos);
+			// System.out.println("X: " + roboXPos);
+			// System.out.println("Y: " + roboYPos);
+
+			// System.out.println("leftPower: " + leftPower);
+			// System.out.println("rightPower: " + rightPower);
 
 			leftMotor1.set(leftPower);
 			rightMotor1.set(rightPower);
 			leftMotor2.set(leftPower);
 			rightMotor2.set(rightPower);
+
+			// System.out.println(leftMotor1.get());
 
 		} else {
 			leftMotor1.set((input.getdriveJoystickY()));
@@ -520,14 +533,41 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleTeleOpBalanceState(TeleopInput input) {
-		if (gyro.getPitch() >= -Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES
-			&& gyro.getPitch() <= Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES) {
+		System.out.println("pitch " + gyro.getPitch());
+		System.out.println("yaw " + gyro.getYaw());
+		System.out.println("roll " + gyro.getRoll());
+
+		if (180 - Math.abs(gyro.getRoll()) < 2 && 180 - Math.abs(gyro.getRoll()) > -2) {
 			leftPower = 0;
 			rightPower = 0;
-		} else {
-			leftPower = gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT_PID_P;
-			rightPower = -gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT_PID_P;
+		} else if (gyro.getRoll() > 0) {
+			leftPower = (180 - Math.abs(gyro.getRoll())) / 200;
+			rightPower = (180 - Math.abs(gyro.getRoll())) / 200;
+		} else if (gyro.getRoll() < 0) {
+			leftPower = -(180 - Math.abs(gyro.getRoll())) / 200;
+			rightPower = -(180 - Math.abs(gyro.getRoll())) / 200;
 		}
+
+
+		// if (gyro.getPitch() >= -Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES
+		// 	&& gyro.getPitch() <= Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES) {
+		// 	leftPower = 0;
+		// 	rightPower = 0;
+		// } else {
+		// 	// leftPower = gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT_PID_P;
+		// 	// rightPower = -gyro.getPitch() / Constants.CHARGING_STATION_BALANCE_CONSTANT_PID_P;
+
+		// 	leftPower = gyro.getPitch() / 10;
+		// 	rightPower = -gyro.getPitch() / 10;
+		// }
+
+
+		System.out.println("left power: " + leftPower);
+		System.out.println("right power: " + rightPower);
+		leftMotor1.set(-leftPower);
+		rightMotor1.set(rightPower);
+		leftMotor2.set(-leftPower);
+		rightMotor2.set(rightPower);
 	}
 
 	/**
@@ -565,7 +605,7 @@ public class DriveFSMSystem {
 		// 	return;
 		// }
 		finishedTurning = false;
-		System.out.println(getHeading());
+		// System.out.println(getHeading());
 		double error = degrees - getHeading();
 		// if (error > Constants.HALF_REVOLUTION_DEGREES) {
 		// 	error -= Constants.ONE_REVOLUTION_DEGREES;
