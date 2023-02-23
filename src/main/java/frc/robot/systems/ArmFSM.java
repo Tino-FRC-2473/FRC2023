@@ -34,16 +34,12 @@ public class ArmFSM {
 
 	//starts at 71 inches to 33 inches
 	//encoder over angle
-	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = -241.199 / 145;
-	private static final double ENCODER_TICKS_SLOW_DOWN_RANGE_MIN =
-		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (75 + 12);
-	private static final double ENCODER_TICKS_SLOW_DOWN_RANGE_MAX =
-		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (105 + 12);
-	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 204.594 / 17;
-	private static final float TELEARM_MOTOR_POWER = 0.1f;
+	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = -74.002 / 36;
+	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 530 / 39;
+	private static final float TELEARM_MOTOR_POWER = 0.2f;
 	private static final float TELEARM_MOTOR_POWER_FINE_TUNING = 0.05f;
 	private static final float PIVOT_MOTOR_POWER = 0.1f;
-	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.1f;
+	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.05f;
 	private static final float PIVOT_MOTOR_POWER_FINE_TUNING = 0.05f;
 
 	//20 inches
@@ -77,23 +73,27 @@ public class ArmFSM {
 
 	//All encoder measures are from minimum limit switch
 	//Angle measure in comments are assuming 0 is horizon not min limit switch
+	private static final double ENCODER_TICKS_SLOW_DOWN_RANGE_MIN =
+		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (75 + 13);
+	private static final double ENCODER_TICKS_SLOW_DOWN_RANGE_MAX =
+		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (105 + 13);
 	//90 degrees
-	private static final double ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS = (90 + 12.837)
+	private static final double ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS = (90 + 13)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//111.8 degrees
-	private static final double ARM_ENCODER_STARTING_ANGLE_ROTATIONS = (111.8 + 12.837)
+	private static final double ARM_ENCODER_STARTING_ANGLE_ROTATIONS = (111.8 + 13)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//36.762 degrees
-	private static final double SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS = (36.762 + 12.837)
+	private static final double SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS = (36.762 + 13)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//40.368 degrees
-	private static final double SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS = (40.368 + 12.837)
+	private static final double SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS = (40.368 + 13)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//150.98 degrees
-	private static final double SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS = (150.98 + 12.837)
+	private static final double SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS = (150.98 + 13)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//147.976 degrees
-	private static final double SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS = (147.976 + 12.837)
+	private static final double SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS = (147.976 + 13)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//-12.837 degrees
 	private static final double SHOOT_LOW_ANGLE_ENCODER_ROTATIONS = 0.3
@@ -106,7 +106,7 @@ public class ArmFSM {
 		(142.46 + 12.837) * ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 
 	private static final double PID_PIVOT_MAX_POWER = 0.1;
-	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.1;
+	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.05;
 	private static final double ERROR_ARM_ROTATIONS = 0.3;
 	private static final double PID_CONSTANT_PIVOT_P = 0.00022f;
 	private static final double PID_CONSTANT_PIVOT_I = 0.000055f;
@@ -147,7 +147,7 @@ public class ArmFSM {
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
 		teleArmLimitSwitch = teleArmMotor.getReverseLimitSwitch(
-								SparkMaxLimitSwitch.Type.kNormallyOpen);
+								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		teleArmLimitSwitch.enableLimitSwitch(true);
 		pidControllerPivot = pivotMotor.getPIDController();
 		pidControllerPivot.setP(PID_CONSTANT_PIVOT_P);
@@ -210,8 +210,8 @@ public class ArmFSM {
 		if (input.isFineTuningButtonPressed()) {
 			isFineTuning = !isFineTuning;
 		}
-		if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
-			&& pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
+		if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+			&& pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
 				// pivotMotor.setPower(PIVOT_MOTOR_SLOW_DOWN_POWER);
 			pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,
 				PID_PIVOT_SLOW_DOWN_MAX_POWER);
@@ -525,21 +525,23 @@ public class ArmFSM {
 		if (input != null) {
 			if (!isFineTuning) {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-					if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+					if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
 						&& pivotMotor.getEncoder().getPosition()
-						< ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
+						> ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
 						pidControllerPivot.setReference(-PIVOT_MOTOR_SLOW_DOWN_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
+						System.out.println("HIGH");
 					} else {
 						pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
 					}
 				} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-					if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+					if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
 						&& pivotMotor.getEncoder().getPosition()
-						< ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
+						> ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
 						pidControllerPivot.setReference(-PIVOT_MOTOR_SLOW_DOWN_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
+						System.out.println("HIGH");
 					} else {
 						pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
@@ -547,7 +549,7 @@ public class ArmFSM {
 				} else {
 					pivotMotor.set(0);
 				}
-				teleArmMotor.set(input.getmechJoystickY() * TELEARM_MOTOR_POWER);
+				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER);
 			} else {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
 					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER_FINE_TUNING,
@@ -558,7 +560,7 @@ public class ArmFSM {
 				} else {
 					pivotMotor.set(0);
 				}
-				teleArmMotor.set(input.getmechJoystickY() * TELEARM_MOTOR_POWER_FINE_TUNING);
+				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER_FINE_TUNING);
 			}
 		} else {
 			teleArmMotor.set(0);
