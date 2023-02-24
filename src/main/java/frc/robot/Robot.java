@@ -36,9 +36,9 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 				&& !HardwareMap.isTestBoardGroundMount()) {
-				driveSystem = new DriveFSMSystem();
-				spinningIntakeFSM = new SpinningIntakeFSM();	
-				armSystem = new ArmFSM();
+			driveSystem = new DriveFSMSystem();
+			spinningIntakeFSM = new SpinningIntakeFSM();
+			armSystem = new ArmFSM();
 			if (HardwareMap.isRobotGroundMount()) {
 				armSystem = new ArmFSM();
 			} else {
