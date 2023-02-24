@@ -116,7 +116,7 @@ public class ArmFSM {
 	private static final double PID_CONSTANT_ARM_I = 0.000055f;
 	private static final double PID_CONSTANT_ARM_D = 0.000008f;
 	private static final double PID_ARM_MAX_POWER = 0.1;
-
+	private static final double JOYSTICK_DRIFT_Y = 0.03;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -486,7 +486,7 @@ public class ArmFSM {
 		}
 		return input.isPivotDecreaseButtonPressed()
 			|| input.isPivotIncreaseButtonPressed()
-			|| input.getmechJoystickY() != 0;
+			|| Math.abs(input.getmechJoystickY()) < JOYSTICK_DRIFT_Y;
 	}
 
 	private boolean isShootOrPickupButtonPressed(TeleopInput input) {
