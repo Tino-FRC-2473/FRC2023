@@ -181,8 +181,6 @@ public class ArmFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
-		pivotMotor.getEncoder().setPosition(0);
-		teleArmMotor.getEncoder().setPosition(0);
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -212,12 +210,17 @@ public class ArmFSM {
 		}
 		if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
 			&& pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
-				// pivotMotor.setPower(PIVOT_MOTOR_SLOW_DOWN_POWER);
 			pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,
 				PID_PIVOT_SLOW_DOWN_MAX_POWER);
 		} else {
 			pidControllerPivot.setOutputRange(-PID_PIVOT_MAX_POWER,
 				PID_PIVOT_MAX_POWER);
+		}
+		if (isMinHeight()) {
+			pivotMotor.getEncoder().setPosition(0);
+		}
+		if (teleArmLimitSwitch.isPressed()) {
+			teleArmMotor.getEncoder().setPosition(0);
 		}
 		switch (currentState) {
 			case IDLE:
@@ -268,45 +271,54 @@ public class ArmFSM {
 
 	/**
 	 * Updates the Autonomous FSMState.
+	 * @return finished
 	 * @param state TeleopInput
 	 */
-	public void updateAuto(FSMState state) {
+	public boolean updateAuto(FSMState state) {
 		SmartDashboard.putString("Current State", " " + currentState);
 		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
 		SmartDashboard.putBoolean("At Min Height", isMinHeight());
-
-		switch (currentState) {
+		if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+			&& pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
+			pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,
+				PID_PIVOT_SLOW_DOWN_MAX_POWER);
+		} else {
+			pidControllerPivot.setOutputRange(-PID_PIVOT_MAX_POWER,
+				PID_PIVOT_MAX_POWER);
+		}
+		if (isMinHeight()) {
+			pivotMotor.getEncoder().setPosition(0);
+		}
+		if (teleArmLimitSwitch.isPressed()) {
+			teleArmMotor.getEncoder().setPosition(0);
+		}
+		switch (state) {
 			case IDLE:
 				handleIdleState();
-				break;
+				return true;
 			case AUTONOMOUS_RETRACT:
 				handleAutonomousRetractState(null);
-				break;
+				return teleArmLimitSwitch.isPressed();
 			case SHOOT_HIGH_FORWARD:
 				handleShootHighForwardState(null);
-				break;
+				return atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS, ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS);
 			case SHOOT_HIGH_BACKWARD:
 				handleShootHighBackwardState(null);
-				break;
+				return atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS, ARM_ENCODER_HIGH_BACKWARD_ROTATIONS);
 			case SHOOT_MID_FORWARD:
 				handleShootMidForwardState(null);
-				break;
+				return atArmPosition(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS, ARM_ENCODER_MID_FORWARD_ROTATIONS);
 			case SHOOT_MID_BACKWARD:
 				handleShootMidBackwardState(null);
-				break;
+				return atArmPosition(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS, ARM_ENCODER_MID_BACKWARD_ROTATIONS);
 			case SHOOT_LOW_FORWARD:
 				handleShootLowState(null);
-				break;
+				return atArmPosition(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS, ARM_ENCODER_LOW_ROTATIONS);
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		FSMState newState = nextState(null);
-		if (currentState != newState) {
-			System.out.println(newState);
-		}
-		currentState = newState;
 	}
 	/*
 	 * When inputs are pressed, the states will change likewise
@@ -623,15 +635,15 @@ public class ArmFSM {
 			if (withinError(pivotMotor.getEncoder().getPosition(),
 					SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 				pivotMotor.set(0);
+				if (withinError(teleArmMotor.getEncoder().getPosition(),
+					ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
+					teleArmMotor.set(0);
+				} else {
+					pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
+				}
 			} else {
 				pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
-					CANSparkMax.ControlType.kPosition);
-			}
-			if (withinError(teleArmMotor.getEncoder().getPosition(),
-				ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
-				teleArmMotor.set(0);
-			} else {
-				pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
 		}
@@ -666,15 +678,15 @@ public class ArmFSM {
 			if (withinError(pivotMotor.getEncoder().getPosition(),
 				SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
 				pivotMotor.set(0);
+				if (withinError(teleArmMotor.getEncoder().getPosition(),
+					ARM_ENCODER_HIGH_BACKWARD_ROTATIONS)) {
+					teleArmMotor.set(0);
+				} else {
+					pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_BACKWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
+				}
 			} else {
 				pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
-					CANSparkMax.ControlType.kPosition);
-			}
-			if (withinError(teleArmMotor.getEncoder().getPosition(),
-				ARM_ENCODER_HIGH_BACKWARD_ROTATIONS)) {
-				teleArmMotor.set(0);
-			} else {
-				pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
 		}
@@ -710,15 +722,15 @@ public class ArmFSM {
 			if (withinError(pivotMotor.getEncoder().getPosition(),
 				SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
 				pivotMotor.set(0);
+				if (withinError(teleArmMotor.getEncoder().getPosition(),
+					ARM_ENCODER_MID_FORWARD_ROTATIONS)) {
+					teleArmMotor.set(0);
+				} else {
+					pidControllerTeleArm.setReference(ARM_ENCODER_MID_FORWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
+				}
 			} else {
 				pidControllerPivot.setReference(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
-					CANSparkMax.ControlType.kPosition);
-			}
-			if (withinError(teleArmMotor.getEncoder().getPosition(),
-				ARM_ENCODER_MID_FORWARD_ROTATIONS)) {
-				teleArmMotor.set(0);
-			} else {
-				pidControllerTeleArm.setReference(ARM_ENCODER_MID_FORWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
 		}
@@ -753,15 +765,15 @@ public class ArmFSM {
 			if (withinError(pivotMotor.getEncoder().getPosition(),
 				SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS)) {
 				pivotMotor.set(0);
+				if (withinError(teleArmMotor.getEncoder().getPosition(),
+					ARM_ENCODER_MID_BACKWARD_ROTATIONS)) {
+					teleArmMotor.set(0);
+				} else {
+					pidControllerTeleArm.setReference(ARM_ENCODER_MID_BACKWARD_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
+				}
 			} else {
 				pidControllerPivot.setReference(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS,
-					CANSparkMax.ControlType.kPosition);
-			}
-			if (withinError(teleArmMotor.getEncoder().getPosition(),
-				ARM_ENCODER_MID_BACKWARD_ROTATIONS)) {
-				teleArmMotor.set(0);
-			} else {
-				pidControllerTeleArm.setReference(ARM_ENCODER_MID_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
 		}
@@ -795,15 +807,15 @@ public class ArmFSM {
 			if (withinError(pivotMotor.getEncoder().getPosition(),
 				SHOOT_LOW_ANGLE_ENCODER_ROTATIONS)) {
 				pivotMotor.set(0);
+				if (withinError(teleArmMotor.getEncoder().getPosition(),
+					ARM_ENCODER_LOW_ROTATIONS)) {
+					teleArmMotor.set(0);
+				} else {
+					pidControllerTeleArm.setReference(ARM_ENCODER_LOW_ROTATIONS,
+						CANSparkMax.ControlType.kPosition);
+				}
 			} else {
 				pidControllerPivot.setReference(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS,
-					CANSparkMax.ControlType.kPosition);
-			}
-			if (withinError(teleArmMotor.getEncoder().getPosition(),
-				ARM_ENCODER_LOW_ROTATIONS)) {
-				teleArmMotor.set(0);
-			} else {
-				pidControllerTeleArm.setReference(ARM_ENCODER_LOW_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
 		}
