@@ -61,6 +61,10 @@ public final class HardwareMap {
 		return !HardwareMap.testBoardPinGroundMount.get();
 	}
 
+	/**
+	 * Check if the current RoboRIO is part of a ground mount real robot setup.
+	 * @return true if the current setup is a real robot that is using the ground mount
+	 */
 	public static boolean isRobotGroundMount() {
 		return !HardwareMap.robotBoardPinGroundMount.get();
 	}
