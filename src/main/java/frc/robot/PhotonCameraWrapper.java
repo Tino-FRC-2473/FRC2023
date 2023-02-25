@@ -1,11 +1,11 @@
 package frc.robot;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Optional;
 
 import org.photonvision.PhotonCamera;
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.Constants.AprilTagConstants;
@@ -35,15 +35,15 @@ public class PhotonCameraWrapper {
 
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
-		ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
-		atList.add(new AprilTag(0, new Pose3d(AprilTagConstants.APRILTAG_2_X_METERS,
-			AprilTagConstants.APRILTAG_2_Y_METERS, AprilTagConstants.APRILTAG_2_HEIGHT_METERS,
-			new Rotation3d(0, 0, AprilTagConstants.APRILTAG_2_ANGLE_RADIANS))));
-
-		AprilTagFieldLayout atfl =
-				new AprilTagFieldLayout(atList,
-										FIELD_LENGTH_METERS,
-										FIELD_WIDTH_METERS);
+		AprilTagFieldLayout atfl = null;
+		try {
+			atfl = AprilTagFieldLayout.loadFromResource(
+				AprilTagFields.k2023ChargedUp.m_resourceFile);
+			System.out.println(atfl);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		photonCamera =
 				new PhotonCamera("OV5647");
@@ -220,5 +220,15 @@ public class PhotonCameraWrapper {
 	public int getAprilTagID() {
 		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		return photonCamera.getLatestResult().getBestTarget().getFiducialId();
+	}
+
+
+	public boolean isParallelToSubstation() {
+		Pose3d pose = getEstimatedGlobalPose();
+		double rotation = Units.radiansToDegrees(pose.getRotation().getAngle());
+		if (rotation < 180 + Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES && rotation > 180 - Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			return true;
+		}
+		return false;
 	}
 }
