@@ -145,11 +145,13 @@ public class ArmFSM {
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchLow.enableLimitSwitch(true);
 		pivotMotor.setInverted(true);
+		pivotMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		teleArmMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_TELEARM,
 										CANSparkMax.MotorType.kBrushless);
 		teleArmLimitSwitch = teleArmMotor.getReverseLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		teleArmLimitSwitch.enableLimitSwitch(true);
+		teleArmMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		pidControllerPivot = pivotMotor.getPIDController();
 		pidControllerPivot.setP(PID_CONSTANT_PIVOT_P);
 		pidControllerPivot.setI(PID_CONSTANT_PIVOT_I);
