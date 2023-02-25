@@ -5,6 +5,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.drive.DriveFunctions;
 // Systems
 import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
@@ -34,6 +35,8 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 
 		// Instantiate all systems here
+		driveSystem = new DriveFSMSystem();
+		/* 
 		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 			&& !HardwareMap.isTestBoardGroundMount()) {
 			driveSystem = new DriveFSMSystem();
@@ -51,11 +54,14 @@ public class Robot extends TimedRobot {
 		if (HardwareMap.isTestBoardGroundMount()) {
 			groundMountFSM = new GroundMountFSM();
 		}
+		*/
 	}
 
 	@Override
 	public void autonomousInit() {
+		driveSystem.resetAutonomous();
 		System.out.println("-------- Autonomous Init --------");
+		/* 
 		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 			&& !HardwareMap.isTestBoardGroundMount()) {
 			armSystem.reset();
@@ -71,10 +77,13 @@ public class Robot extends TimedRobot {
 		if (HardwareMap.isTestBoardGroundMount()) {
 			groundMountFSM.reset();
 		}
+		*/
 	}
 
 	@Override
 	public void autonomousPeriodic() {
+		driveSystem.update(null);
+		/* 
 		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 			&& !HardwareMap.isTestBoardGroundMount()) {
 			armSystem.update(null);
@@ -90,11 +99,14 @@ public class Robot extends TimedRobot {
 		if (HardwareMap.isTestBoardGroundMount()) {
 			groundMountFSM.update(null);
 		}
+		*/
 	}
 
 	@Override
 	public void teleopInit() {
+		driveSystem.resetTeleop();
 		System.out.println("-------- Teleop Init --------");
+		/* 
 		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 			&& !HardwareMap.isTestBoardGroundMount()) {
 			armSystem.reset();
@@ -110,10 +122,14 @@ public class Robot extends TimedRobot {
 		if (HardwareMap.isTestBoardGroundMount()) {
 			groundMountFSM.reset();
 		}
+		*/
 	}
+	
 
 	@Override
 	public void teleopPeriodic() {
+		driveSystem.update(input);
+		/* 
 		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 			&& !HardwareMap.isTestBoardGroundMount()) {
 			armSystem.update(input);
@@ -129,6 +145,7 @@ public class Robot extends TimedRobot {
 		if (HardwareMap.isTestBoardGroundMount()) {
 			groundMountFSM.update(input);
 		}
+		*/
 	}
 
 	@Override

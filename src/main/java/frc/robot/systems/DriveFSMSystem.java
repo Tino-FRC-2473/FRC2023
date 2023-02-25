@@ -112,7 +112,7 @@ public class DriveFSMSystem {
 										CANSparkMax.MotorType.kBrushless);
 
 		leftMotorBack.follow(leftMotorFront);
-		rightMotorBack.follow(rightMotorBack);
+		rightMotorBack.follow(rightMotorFront);
 
 		rightMotorFront.getEncoder().setPosition(0);
 		leftMotorBack.getEncoder().setPosition(0);
@@ -523,7 +523,7 @@ public class DriveFSMSystem {
 				- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
 			double steerAngle = input.getSteerAngle();
-			double currentLeftPower = leftMotorBack.get();
+			double currentLeftPower = leftMotorFront.get();
 			double currentRightPower = rightMotorFront.get();
 
 
@@ -787,6 +787,8 @@ public class DriveFSMSystem {
 			return;
 		}
 		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
+		System.out.println(pcw.getTagDistance());
+		System.out.println(pcw.getTagTurnAngle());
 		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
 			cvmove(TURN_RIGHT_OPT);
 		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
