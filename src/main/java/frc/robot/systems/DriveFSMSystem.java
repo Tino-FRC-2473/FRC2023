@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
 import frc.robot.Constants;
 import frc.robot.HardwareMap;
@@ -717,27 +718,15 @@ public class DriveFSMSystem {
 			return;
 		}
 		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(-Constants.CV_TURN_POWER);
-			leftMotor2.set(-Constants.CV_TURN_POWER);
-			rightMotor1.set(-Constants.CV_TURN_POWER);
-			rightMotor2.set(-Constants.CV_TURN_POWER);
+			cvmove(4);
 		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(Constants.CV_TURN_POWER);
-			rightMotor1.set(Constants.CV_TURN_POWER);
-			leftMotor2.set(Constants.CV_TURN_POWER);
-			rightMotor2.set(Constants.CV_TURN_POWER);
+			cvmove(3);
 		} else {
 			isAligned = true;
 			if (isNotForwardEnough) {
-				leftMotor1.set(-Constants.CV_FORWARD_POWER);
-				rightMotor1.set(Constants.CV_FORWARD_POWER);
-				leftMotor2.set(-Constants.CV_FORWARD_POWER);
-				rightMotor2.set(Constants.CV_FORWARD_POWER);
+				cvmove(1);
 			} else {
-				leftMotor1.set(0);
-				rightMotor1.set(0);
-				leftMotor2.set(0);
-				rightMotor2.set(0);
+				cvmove(0);
 			}
 		}
 
@@ -754,28 +743,86 @@ public class DriveFSMSystem {
 		}
 		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
 		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(-Constants.CV_TURN_POWER);
-			rightMotor1.set(-Constants.CV_TURN_POWER);
-			leftMotor2.set(-Constants.CV_TURN_POWER);
-			rightMotor2.set(-Constants.CV_TURN_POWER);
+			cvmove(4);
 		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(Constants.CV_TURN_POWER);
-			rightMotor1.set(Constants.CV_TURN_POWER);
-			leftMotor2.set(Constants.CV_TURN_POWER);
-			rightMotor2.set(Constants.CV_TURN_POWER);
+			cvmove(3);
 		} else {
 			isAligned = true;
 			if (isNotForwardEnough) {
-				leftMotor1.set(-Constants.CV_FORWARD_POWER);
-				rightMotor1.set(Constants.CV_FORWARD_POWER);
-				leftMotor2.set(-Constants.CV_FORWARD_POWER);
-				rightMotor2.set(Constants.CV_FORWARD_POWER);
+				cvmove(1);
 			} else {
+				cvmove(0);
+			}
+		}
+	}
+
+	public void handleMidCubeNodeAlignState() {
+		pcw.setPipelineIndex(3); //3d pipeline
+		System.out.println("CUBE NODE");
+		double x = pcw.getEstimatedGlobalPose().getX();
+		double y = pcw.getEstimatedGlobalPose().getY();
+		double angle = pcw.getEstimatedGlobalPose().getRotation().getAngle();
+		isNotForwardEnough = x > Units.inchesToMeters(45);
+		if (Math.abs(angle) < 4) {
+			isAligned = true;
+			if (isNotForwardEnough) {
+				cvmove(1);
+			} else {
+				cvmove(0);
+				pcw.setPipelineIndex(4); //2d pipeline
+				double midAngle = Math.atan(y / (x + 8.5));
+				if (midAngle > 4) {
+					cvmove(4);
+				} else if (midAngle < -4) {
+					cvmove(3);
+				}
+			}
+		} else {
+			if (angle > 4) {
+				cvmove(4);
+			} else if (angle < -4) {
+				cvmove(3);
+			}
+		}
+	}
+
+	public void cvmove(int opt) {
+		switch(opt) {
+			//stop
+			case 0:
 				leftMotor1.set(0);
 				rightMotor1.set(0);
 				leftMotor2.set(0);
 				rightMotor2.set(0);
-			}
+				break;
+			//forward
+			case 1:
+				leftMotor1.set(-Constants.CV_FORWARD_POWER);
+				rightMotor1.set(Constants.CV_FORWARD_POWER);
+				leftMotor2.set(-Constants.CV_FORWARD_POWER);
+				rightMotor2.set(Constants.CV_FORWARD_POWER);
+				break;
+			//backward
+			case 2:
+				leftMotor1.set(Constants.CV_FORWARD_POWER);
+				rightMotor1.set(-Constants.CV_FORWARD_POWER);
+				leftMotor2.set(Constants.CV_FORWARD_POWER);
+				rightMotor2.set(-Constants.CV_FORWARD_POWER);
+				break;
+			//turn left
+			case 3:
+				leftMotor1.set(Constants.CV_TURN_POWER);
+				rightMotor1.set(Constants.CV_TURN_POWER);
+				leftMotor2.set(Constants.CV_TURN_POWER);
+				rightMotor2.set(Constants.CV_TURN_POWER);
+				break;
+			//turn right
+			case 4:
+				leftMotor1.set(-Constants.CV_TURN_POWER);
+				rightMotor1.set(-Constants.CV_TURN_POWER);
+				leftMotor2.set(-Constants.CV_TURN_POWER);
+				rightMotor2.set(-Constants.CV_TURN_POWER);
+				break;
 		}
 	}
 }

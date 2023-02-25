@@ -73,6 +73,14 @@ public class PhotonCameraWrapper {
 	}
 
 	/**
+	 * Sets PhotonCamera object pipeline index to the index inputted into the method.
+	 * @param index
+	 */
+	public void setPipelineIndex(int index) {
+		photonCamera.setPipelineIndex(index);
+	}
+
+	/**
 	 * Returns the angle for the robot to turn to align with the lower reflective tape.
 	 * @return an angle that tells the robot how much to turn to align in degrees
 	 */
