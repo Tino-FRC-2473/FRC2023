@@ -35,13 +35,12 @@ public final class HardwareMap {
 		new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_GROUND_MOUNT);
 
 	/**
-	 * Check if the current RoboRIO is part of a arm test setup or real robot.
+	 * Check if the current RoboRIO is part of a ground mount test setup or real robot.
 	 * @return true if the current setup is a test setup
 	 */
 	public static boolean isTestBoardArm() {
 		return !HardwareMap.testBoardPinArm.get();
 	}
-
 	/**
 	 * Check if the current RoboRIO is part of a grabber test setup or real robot.
 	 * @return true if the current setup is a test setup
