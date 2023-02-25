@@ -767,6 +767,8 @@ public class DriveFSMSystem {
 			isAligned = true;
 			if (isNotForwardEnough) {
 				cvmove(1);
+				x = pcw.getEstimatedGlobalPose().getX();
+				System.out.println("pose x: " + pcw.getEstimatedGlobalPose().getX());
 			} else {
 				cvmove(0);
 				pcw.setPipelineIndex(4); //2d pipeline
