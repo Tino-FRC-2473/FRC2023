@@ -92,15 +92,53 @@ public class Constants {
 		static final int CONE_PIPELINE_INDEX = 5;
 
 	}
-	static class AprilTagConstants {
-		static final double APRILTAG_1_X_METERS = Units.inchesToMeters(610.77);
-		static final double APRILTAG_1_Y_METERS = Units.inchesToMeters(42.19);
-		static final double APRILTAG_1_HEIGHT_METERS = Units.inchesToMeters(17.5);
-		static final double APRILTAG_1_ANGLE_RADIANS = Units.degreesToRadians(180);
+	public static class AprilTagConstants {
+		public static final int APRILTAG_1_ID = 1;
+		public static final double APRILTAG_1_X_METERS = Units.inchesToMeters(610.77);
+		public static final double APRILTAG_1_Y_METERS = Units.inchesToMeters(42.19);
+		public static final double APRILTAG_1_HEIGHT_METERS = Units.inchesToMeters(17.5);
+		public static final double APRILTAG_1_ANGLE_RADIANS = Units.degreesToRadians(180);
 
-		static final double APRILTAG_2_X_METERS = Units.inchesToMeters(0);
-		static final double APRILTAG_2_Y_METERS = Units.inchesToMeters(0);
-		static final double APRILTAG_2_HEIGHT_METERS = Units.inchesToMeters(17.5);
-		static final double APRILTAG_2_ANGLE_RADIANS = Units.degreesToRadians(180);
+		public static final int APRILTAG_2_ID = 2;
+		public static final double APRILTAG_2_X_METERS = Units.inchesToMeters(0);
+		public static final double APRILTAG_2_Y_METERS = Units.inchesToMeters(0);
+		public static final double APRILTAG_2_HEIGHT_METERS = Units.inchesToMeters(17.5);
+		public static final double APRILTAG_2_ANGLE_RADIANS = Units.degreesToRadians(180);
+
+		public static final int APRILTAG_3_ID = 3;
+		public static final double APRILTAG_3_X_METERS = Units.inchesToMeters(610.77);
+		public static final double APRILTAG_3_Y_METERS = Units.inchesToMeters(174.19);
+		public static final double APRILTAG_3_HEIGHT_METERS = Units.inchesToMeters(18.22);
+		public static final double APRILTAG_3_ANGLE_RADIANS = Units.degreesToRadians(180);
+
+		public static final int APRILTAG_4_ID = 4;
+		public static final double APRILTAG_4_X_METERS = Units.inchesToMeters(636.96);
+		public static final double APRILTAG_4_Y_METERS = Units.inchesToMeters(265.74);
+		public static final double APRILTAG_4_HEIGHT_METERS = Units.inchesToMeters(27.38);
+		public static final double APRILTAG_4_ANGLE_RADIANS = Units.degreesToRadians(180);
+
+		public static final int APRILTAG_5_ID = 5;
+		public static final double APRILTAG_5_X_METERS = Units.inchesToMeters(14.25);
+		public static final double APRILTAG_5_Y_METERS = Units.inchesToMeters(265.74);
+		public static final double APRILTAG_5_HEIGHT_METERS = Units.inchesToMeters(27.38);
+		public static final double APRILTAG_5_ANGLE_RADIANS = Units.degreesToRadians(0);
+
+		public static final int APRILTAG_6_ID = 6;
+		public static final double APRILTAG_6_X_METERS = Units.inchesToMeters(40.45);
+		public static final double APRILTAG_6_Y_METERS = Units.inchesToMeters(174.19);
+		public static final double APRILTAG_6_HEIGHT_METERS = Units.inchesToMeters(18.22);
+		public static final double APRILTAG_6_ANGLE_RADIANS = Units.degreesToRadians(0);
+
+		public static final int APRILTAG_7_ID = 7;
+		public static final double APRILTAG_7_X_METERS = Units.inchesToMeters(40.45);
+		public static final double APRILTAG_7_Y_METERS = Units.inchesToMeters(108.19);
+		public static final double APRILTAG_7_HEIGHT_METERS = Units.inchesToMeters(18.22);
+		public static final double APRILTAG_7_ANGLE_RADIANS = Units.degreesToRadians(0);
+
+		public static final int APRILTAG_8_ID = 8;
+		public static final double APRILTAG_8_X_METERS = Units.inchesToMeters(40.45);
+		public static final double APRILTAG_8_Y_METERS = Units.inchesToMeters(42.19);
+		public static final double APRILTAG_8_HEIGHT_METERS = Units.inchesToMeters(18.22);
+		public static final double APRILTAG_8_ANGLE_RADIANS = Units.degreesToRadians(0);
 	}
 }

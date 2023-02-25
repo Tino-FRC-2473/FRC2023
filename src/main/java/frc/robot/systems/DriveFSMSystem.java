@@ -757,6 +757,7 @@ public class DriveFSMSystem {
 	}
 
 	public void handleMidCubeNodeAlignState() {
+		int id = pcw.getAprilTagID();
 		pcw.setPipelineIndex(3); //3d pipeline
 		System.out.println("CUBE NODE");
 		double x = pcw.getEstimatedGlobalPose().getX();
@@ -772,7 +773,7 @@ public class DriveFSMSystem {
 			} else {
 				cvmove(0);
 				pcw.setPipelineIndex(4); //2d pipeline
-				double midAngle = Math.atan(y / (x + 8.5));
+				double midAngle = Math.atan(y / (getAprilTagXPos(id) - x + 8.5));
 				if (midAngle > 4) {
 					cvmove(4);
 				} else if (midAngle < -4) {
@@ -827,4 +828,25 @@ public class DriveFSMSystem {
 				break;
 		}
 	}
+
+	public double getAprilTagXPos(int id) {
+		if(id == 1) {
+			return Constants.AprilTagConstants.APRILTAG_1_X_METERS;
+		} else if (id == 2) {
+			return Constants.AprilTagConstants.APRILTAG_2_X_METERS;
+		} else if (id == 3) {
+			return Constants.AprilTagConstants.APRILTAG_3_X_METERS;
+		} else if (id == 4) {
+			return Constants.AprilTagConstants.APRILTAG_4_X_METERS;
+		} else if (id == 5) {
+			return Constants.AprilTagConstants.APRILTAG_5_X_METERS;
+		} else if (id == 6) {
+			return Constants.AprilTagConstants.APRILTAG_6_X_METERS;
+		} else if (id == 7) {
+			return Constants.AprilTagConstants.APRILTAG_7_X_METERS;
+		} else {
+			return Constants.AprilTagConstants.APRILTAG_8_X_METERS;
+		}
+	}
+
 }
