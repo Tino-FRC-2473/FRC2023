@@ -37,7 +37,7 @@ public class ArmFSM {
 	//encoder over angle
 	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = -74.002 / 36;
 	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 530 / 39;
-	private static final float TELEARM_MOTOR_POWER = 0.2f;
+	private static final float TELEARM_MOTOR_POWER = 0.4f;
 	private static final float TELEARM_MOTOR_POWER_FINE_TUNING = 0.05f;
 	private static final float PIVOT_MOTOR_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.05f;
@@ -201,6 +201,7 @@ public class ArmFSM {
 		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
 		SmartDashboard.putBoolean("At Min Height", isMinHeight());
+		SmartDashboard.putBoolean("At Arm Min", teleArmLimitSwitch.isPressed());
 		SmartDashboard.putBoolean("Is going Forward", input.isThrottleForward());
 		SmartDashboard.putNumber("Throttle Value", input.getThrottle());
 		SmartDashboard.putNumber("Extension Fraction", teleArmMotor.getEncoder().getPosition()
@@ -486,7 +487,7 @@ public class ArmFSM {
 		}
 		return input.isPivotDecreaseButtonPressed()
 			|| input.isPivotIncreaseButtonPressed()
-			|| Math.abs(input.getmechJoystickY()) < JOYSTICK_DRIFT_Y;
+			|| Math.abs(input.getmechJoystickY()) > JOYSTICK_DRIFT_Y;
 	}
 
 	private boolean isShootOrPickupButtonPressed(TeleopInput input) {
