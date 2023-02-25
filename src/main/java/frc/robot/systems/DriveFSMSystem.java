@@ -196,10 +196,6 @@ public class DriveFSMSystem {
 
 		updateLineOdometryTele(gyroAngleForOdo);
 
-		// System.out.println(gyroAngleForOdo);
-		// System.out.println("Velocity: " + Math.sqrt(Math.abs(Math.pow(gyro.getVelocityX(), 2))
-		// 	+ Math.abs(Math.pow(gyro.getVelocityY(), 2))));
-
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				handleTeleOp2MotorState(input);
@@ -449,14 +445,10 @@ public class DriveFSMSystem {
 			return;
 		}
 
-		// Pose3d cvEstimatedPos = pcw.getEstimatedGlobalPose().get().estimatedPose;
-
 		if (isInArcadeDrive) {
 
 			currentEncoderPos = ((leftMotorFront.getEncoder().getPosition()
 				- rightMotorFront.getEncoder().getPosition()) / 2.0);
-
-			// updateLineOdometryTele(gyroAngleForOdo);
 
 			double steerAngle = input.getSteerAngle();
 			double currentLeftPower = leftMotorBack.get();
@@ -559,21 +551,6 @@ public class DriveFSMSystem {
 	 */
 	private void handleCVAlignState(TeleopInput input) {
 
-		// xToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
-		// yToATag = Units.metersToInches(pcw.getEstimatedGlobalPose().get().estimatedPose.getX());
-
-		// System.out.println("angleToTurnToFaceTag: " + angleToTurnToFaceTag);
-		// System.out.println("in method");
-		// isAlignedToATag = true;
-		// handleTurnState(input, 90);
-		// double distToTravelToATag = Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) - 10;
-		// System.out.println("distToTravelToATag: " + distToTravelToATag);
-		// if (Math.sqrt(Math.pow(xToATag, 2) + Math.pow(yToATag, 2)) < distToTravelToATag) {
-		// 	leftMotor.set(0.1);
-		// 	rightMotor.set(0.1);
-		// } else {
-		// 	handleTurnState(input, -angleToTurnToFaceTag);
-		// }
 	}
 
 	/**
