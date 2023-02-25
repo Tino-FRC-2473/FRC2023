@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
+	public static final double INVALID_TURN_RETURN_DEGREES = 360;
 	public static final double ANGLE_TO_TARGET_THRESHOLD_DEGREES = 2;
 	public static final double CV_TURN_POWER = 0.03;
 	public static final double CV_FORWARD_POWER = 0.1;

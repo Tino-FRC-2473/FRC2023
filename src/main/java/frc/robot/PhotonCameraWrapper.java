@@ -30,8 +30,6 @@ public class PhotonCameraWrapper {
 		/** RobotPoseEstimator object to estimate position of robot.*/
 	private PhotonPoseEstimator robotPoseEstimator;
 
-	public static final double INVALID_TURN_RETURN_DEGREES = 360;
-
 	public static final double FIELD_WIDTH_METERS = 500;
 	public static final double FIELD_LENGTH_METERS = 500;
 
@@ -81,7 +79,7 @@ public class PhotonCameraWrapper {
 			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
 				VisionConstants.CAM_OFFSET_INCHES / getLowerTapeDistance()));
 		}
-		return INVALID_TURN_RETURN_DEGREES;
+		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
 
 	/**
@@ -95,7 +93,7 @@ public class PhotonCameraWrapper {
 			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
 				VisionConstants.CAM_OFFSET_INCHES / getHigherTapeDistance()));
 		}
-		return INVALID_TURN_RETURN_DEGREES;
+		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
 	/**
 	 * Returns the angle for the robot to turn to align with the grid april tag.
@@ -108,7 +106,7 @@ public class PhotonCameraWrapper {
 			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
 				VisionConstants.CAM_OFFSET_INCHES / getTagDistance()));
 		}
-		return INVALID_TURN_RETURN_DEGREES;
+		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
 	/**
 	 * Returns the distance to the grid april tag.
@@ -192,7 +190,7 @@ public class PhotonCameraWrapper {
 		if (result.hasTargets()) {
 			return result.getBestTarget().getYaw();
 		}
-		return INVALID_TURN_RETURN_DEGREES;
+		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cube
  * and 360 if there are no cubes.*/
@@ -202,6 +200,6 @@ public class PhotonCameraWrapper {
 		if (result.hasTargets()) {
 			return result.getBestTarget().getYaw();
 		}
-		return INVALID_TURN_RETURN_DEGREES;
+		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
 }

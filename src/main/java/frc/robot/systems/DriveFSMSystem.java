@@ -81,7 +81,7 @@ public class DriveFSMSystem {
 	private double gyroAngleForOdo = 0;
 	private AHRS gyro;
 
-	private boolean isForwardEnough = false;
+	private boolean isNotForwardEnough = false;
 	private boolean isAligned = false;
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 	private CvSink cvSink;
@@ -338,11 +338,12 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				if (input != null && input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
-					isAligned = false; isForwardEnough = true; return FSMState.CV_LOW_TAPE_ALIGN;
+					isAligned = false; isNotForwardEnough = true; return FSMState.CV_LOW_TAPE_ALIGN;
 				} else if (input != null && input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
-					isAligned = false; isForwardEnough = true; return FSMState.CV_HIGH_TAPE_ALIGN;
+					isAligned = false; isNotForwardEnough = true;
+					return FSMState.CV_HIGH_TAPE_ALIGN;
 				} else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
-					isAligned = false; isForwardEnough = true; return FSMState.CV_TAG_ALIGN;
+					isAligned = false; isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
 				} else {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
@@ -353,17 +354,17 @@ public class DriveFSMSystem {
 				}
 				return FSMState.TURNING_STATE;
 			case CV_LOW_TAPE_ALIGN:
-				if (!isForwardEnough && isAligned) {
+				if (!input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_LOW_TAPE_ALIGN;
 			case CV_HIGH_TAPE_ALIGN:
-				if (!isForwardEnough && isAligned) {
+				if (!input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_HIGH_TAPE_ALIGN;
 			case CV_TAG_ALIGN:
-				if (!isForwardEnough && isAligned) {
+				if (!input.isDriveJoystickCVTagButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_TAG_ALIGN;
@@ -612,10 +613,10 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleIdleState(TeleopInput input) {
-		// leftMotor1.set(0);
-		// rightMotor1.set(0);
-		// leftMotor2.set(0);
-		// rightMotor2.set(0);
+		leftMotor1.set(0);
+		rightMotor1.set(0);
+		leftMotor2.set(0);
+		rightMotor2.set(0);
 	}
 
 	/**
@@ -700,18 +701,21 @@ public class DriveFSMSystem {
 		double angle;
 		if (lower) {
 			angle = pcw.getLowerTapeTurnAngle();
-			isForwardEnough =  pcw.getLowerTapeDistance()
+			isNotForwardEnough =  pcw.getLowerTapeDistance()
 				> Constants.LOWER_TAPE_DRIVEUP_DISTANCE_INCHES;
 			System.out.println("distance: " + pcw.getLowerTapeDistance());
 			//drives forward until within 42 inches of lower tape
 		} else {
 			angle = pcw.getHigherTapeTurnAngle();
-			isForwardEnough = pcw.getHigherTapeDistance()
+			isNotForwardEnough = pcw.getHigherTapeDistance()
 				> Constants.HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES;
 			System.out.println("distance: " + pcw.getHigherTapeDistance());
 			//drives forward until within 65 inches of higher tape
 		}
 		System.out.println("angle: " + angle);
+		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
+			return;
+		}
 		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
 			leftMotor1.set(-Constants.CV_TURN_POWER);
 			leftMotor2.set(-Constants.CV_TURN_POWER);
@@ -724,7 +728,7 @@ public class DriveFSMSystem {
 			rightMotor2.set(Constants.CV_TURN_POWER);
 		} else {
 			isAligned = true;
-			if (isForwardEnough) {
+			if (isNotForwardEnough) {
 				leftMotor1.set(-Constants.CV_FORWARD_POWER);
 				rightMotor1.set(Constants.CV_FORWARD_POWER);
 				leftMotor2.set(-Constants.CV_FORWARD_POWER);
@@ -745,7 +749,10 @@ public class DriveFSMSystem {
 	public void handleCVTagAlignState() {
 		System.out.println("TAG");
 		double angle = pcw.getTagTurnAngle();
-		isForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
+		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
+			return;
+		}
+		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
 		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
 			leftMotor1.set(-Constants.CV_TURN_POWER);
 			rightMotor1.set(-Constants.CV_TURN_POWER);
@@ -758,7 +765,7 @@ public class DriveFSMSystem {
 			rightMotor2.set(Constants.CV_TURN_POWER);
 		} else {
 			isAligned = true;
-			if (isForwardEnough) {
+			if (isNotForwardEnough) {
 				leftMotor1.set(-Constants.CV_FORWARD_POWER);
 				rightMotor1.set(Constants.CV_FORWARD_POWER);
 				leftMotor2.set(-Constants.CV_FORWARD_POWER);
