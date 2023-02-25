@@ -35,7 +35,7 @@ public class ArmFSM {
 
 	//starts at 71 inches to 33 inches
 	//encoder over angle
-	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = -74.002 / 36;
+	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = -320.641 / 171;
 	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 530 / 39;
 	private static final float TELEARM_MOTOR_POWER = 0.4f;
 	private static final float TELEARM_MOTOR_POWER_FINE_TUNING = 0.05f;
