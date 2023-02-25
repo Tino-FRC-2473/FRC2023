@@ -63,9 +63,13 @@ public class PhotonCameraWrapper {
 	 *  on the field, and the time of the observation. Assumes a planar
 	 *  field and the robot is always firmly on the ground.
 	 */
-	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+	public Pose3d getEstimatedGlobalPose() {
 		photonCamera.setPipelineIndex(VisionConstants.THREEDTAG_PIPELINE_INDEX);
-		return robotPoseEstimator.update();
+		Optional<EstimatedRobotPose> optPose = robotPoseEstimator.update();
+		if (optPose.isEmpty()) {
+			return null;
+		}
+		return optPose.get().estimatedPose;
 	}
 
 	/**
