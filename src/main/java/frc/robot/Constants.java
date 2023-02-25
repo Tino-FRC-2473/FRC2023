@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
+	public static final double APRILTAG_TO_HIGH_CUBENODE_METERS = Units.inchesToMeters(8.5);
 	public static final double INVALID_TURN_RETURN_DEGREES = 360;
 	public static final double ANGLE_TO_TARGET_THRESHOLD_DEGREES = 2;
 	public static final double CV_TURN_POWER = 0.03;
@@ -74,22 +75,22 @@ public class Constants {
 
 	public static final double QUARTER_PI = Math.PI / 4;
 
-	static class VisionConstants {
-		static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
-		static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(-3.5);
-		static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.5);
-		static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
-		static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
-		static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
-		static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
-		static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
-		static final double CAM_OFFSET_INCHES = -3.5;
-		static final int TWODTAG_PIPELINE_INDEX = 0;
-		static final int LOWERTAPE_PIPELINE_INDEX = 1;
-		static final int HIGHERTAPE_PIPELINE_INDEX = 2;
-		static final int THREEDTAG_PIPELINE_INDEX = 3;
-		static final int CUBE_PIPELINE_INDEX = 4;
-		static final int CONE_PIPELINE_INDEX = 5;
+	public static class VisionConstants {
+		public static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
+		public static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(-3.5);
+		public static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.5);
+		public static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
+		public static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
+		public static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
+		public static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
+		public static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
+		public static final double CAM_OFFSET_INCHES = -3.5;
+		public static final int TWODTAG_PIPELINE_INDEX = 0;
+		public static final int LOWERTAPE_PIPELINE_INDEX = 1;
+		public static final int HIGHERTAPE_PIPELINE_INDEX = 2;
+		public static final int THREEDTAG_PIPELINE_INDEX = 3;
+		public static final int CUBE_PIPELINE_INDEX = 4;
+		public static final int CONE_PIPELINE_INDEX = 5;
 
 	}
 	public static class AprilTagConstants {

@@ -17,6 +17,8 @@ import frc.robot.TeleopInput;
 import frc.robot.drive.DriveFunctions;
 import frc.robot.drive.DriveModes;
 import frc.robot.drive.DrivePower;
+import frc.robot.Constants.VisionConstants;
+
 
 public class DriveFSMSystem {
 
@@ -86,6 +88,10 @@ public class DriveFSMSystem {
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 	private CvSink cvSink;
 	private CvSource outputStrem;
+	static final int TURN_RIGHT_OPT = 4;
+	static final int TURN_LEFT_OPT = 3;
+	static final int MOVE_FORWARD_OPT = 1;
+	static final int MOVE_BACKWARD_OPT = 2;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -717,13 +723,13 @@ public class DriveFSMSystem {
 			return;
 		}
 		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(4);
+			cvmove(TURN_RIGHT_OPT);
 		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(3);
+			cvmove(TURN_LEFT_OPT);
 		} else {
 			isAligned = true;
 			if (isNotForwardEnough) {
-				cvmove(1);
+				cvmove(MOVE_FORWARD_OPT);
 			} else {
 				cvmove(0);
 			}
@@ -742,28 +748,29 @@ public class DriveFSMSystem {
 		}
 		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
 		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(4);
+			cvmove(TURN_RIGHT_OPT);
 		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(3);
+			cvmove(TURN_LEFT_OPT);
 		} else {
 			isAligned = true;
 			if (isNotForwardEnough) {
-				cvmove(1);
+				cvmove(MOVE_FORWARD_OPT);
 			} else {
 				cvmove(0);
 			}
 		}
 	}
-
+	/**
+	 * Aligns to the high cube node (the one without an april tag).
+	 */
 	public void handleMidCubeNodeAlignState() {
-		int id = pcw.getAprilTagID();
-		pcw.setPipelineIndex(3); //3d pipeline
+		pcw.setPipelineIndex(VisionConstants.THREEDTAG_PIPELINE_INDEX); //3d pipeline
 		System.out.println("CUBE NODE");
 		double x = pcw.getEstimatedGlobalPose().getX();
 		double y = pcw.getEstimatedGlobalPose().getY();
 		double angle = pcw.getEstimatedGlobalPose().getRotation().getAngle();
-		isNotForwardEnough = x > Units.inchesToMeters(45);
-		if (Math.abs(angle) < 4) {
+		isNotForwardEnough = x > Units.inchesToMeters(Constants.TAG_DRIVEUP_DISTANCE_INCHES);
+		if (Math.abs(angle) < Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
 			isAligned = true;
 			if (isNotForwardEnough) {
 				cvmove(1);
@@ -771,25 +778,28 @@ public class DriveFSMSystem {
 				System.out.println("pose x: " + pcw.getEstimatedGlobalPose().getX());
 			} else {
 				cvmove(0);
-				pcw.setPipelineIndex(4); //2d pipeline
-				double midAngle = Math.atan(y / (getAprilTagXPos(id) - x + 8.5));
-				if (midAngle > 4) {
-					cvmove(4);
-				} else if (midAngle < -4) {
-					cvmove(3);
+				pcw.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX); //2d pipeline
+				double midAngle = Math.atan(y / (x + Constants.APRILTAG_TO_HIGH_CUBENODE_METERS));
+				if (midAngle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+					cvmove(TURN_RIGHT_OPT);
+				} else if (midAngle < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+					cvmove(TURN_LEFT_OPT);
 				}
 			}
 		} else {
-			if (angle > 4) {
-				cvmove(4);
-			} else if (angle < -4) {
-				cvmove(3);
+			if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+				cvmove(TURN_RIGHT_OPT);
+			} else if (angle < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+				cvmove(TURN_LEFT_OPT);
 			}
 		}
 	}
-
+	/**
+	 * Basic moving commands for CV.
+	 * @param opt how you want to move: forward, backwards, turn left, turn right, or idle.
+	 */
 	public void cvmove(int opt) {
-		switch(opt) {
+		switch (opt) {
 			//stop
 			case 0:
 				leftMotor1.set(0);
@@ -798,54 +808,36 @@ public class DriveFSMSystem {
 				rightMotor2.set(0);
 				break;
 			//forward
-			case 1:
+			case MOVE_FORWARD_OPT:
 				leftMotor1.set(-Constants.CV_FORWARD_POWER);
 				rightMotor1.set(Constants.CV_FORWARD_POWER);
 				leftMotor2.set(-Constants.CV_FORWARD_POWER);
 				rightMotor2.set(Constants.CV_FORWARD_POWER);
 				break;
 			//backward
-			case 2:
+			case MOVE_BACKWARD_OPT:
 				leftMotor1.set(Constants.CV_FORWARD_POWER);
 				rightMotor1.set(-Constants.CV_FORWARD_POWER);
 				leftMotor2.set(Constants.CV_FORWARD_POWER);
 				rightMotor2.set(-Constants.CV_FORWARD_POWER);
 				break;
 			//turn left
-			case 3:
+			case TURN_LEFT_OPT:
 				leftMotor1.set(Constants.CV_TURN_POWER);
 				rightMotor1.set(Constants.CV_TURN_POWER);
 				leftMotor2.set(Constants.CV_TURN_POWER);
 				rightMotor2.set(Constants.CV_TURN_POWER);
 				break;
 			//turn right
-			case 4:
+			case TURN_RIGHT_OPT:
 				leftMotor1.set(-Constants.CV_TURN_POWER);
 				rightMotor1.set(-Constants.CV_TURN_POWER);
 				leftMotor2.set(-Constants.CV_TURN_POWER);
 				rightMotor2.set(-Constants.CV_TURN_POWER);
 				break;
+			default:
+				System.out.println("ERROR");
+				break;
 		}
 	}
-
-	public double getAprilTagXPos(int id) {
-		if(id == 1) {
-			return Constants.AprilTagConstants.APRILTAG_1_X_METERS;
-		} else if (id == 2) {
-			return Constants.AprilTagConstants.APRILTAG_2_X_METERS;
-		} else if (id == 3) {
-			return Constants.AprilTagConstants.APRILTAG_3_X_METERS;
-		} else if (id == 4) {
-			return Constants.AprilTagConstants.APRILTAG_4_X_METERS;
-		} else if (id == 5) {
-			return Constants.AprilTagConstants.APRILTAG_5_X_METERS;
-		} else if (id == 6) {
-			return Constants.AprilTagConstants.APRILTAG_6_X_METERS;
-		} else if (id == 7) {
-			return Constants.AprilTagConstants.APRILTAG_7_X_METERS;
-		} else {
-			return Constants.AprilTagConstants.APRILTAG_8_X_METERS;
-		}
-	}
-
 }

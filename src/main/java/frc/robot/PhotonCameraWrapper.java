@@ -214,7 +214,9 @@ public class PhotonCameraWrapper {
 		}
 		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
-
+/**
+ * @return Returns the ID of the closest April Tag seen.
+ */
 	public int getAprilTagID() {
 		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		return photonCamera.getLatestResult().getBestTarget().getFiducialId();
