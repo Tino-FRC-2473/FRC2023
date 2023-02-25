@@ -12,11 +12,11 @@ public class Constants {
 	public static final double TELEOP_ACCELERATION_CONSTANT = 0.05;
 	public static final double TELEOP_ACCELERATION_MIN = 0.1;
 	public static final double TURNING_IN_PLACE_THRESHOLD = 0.05;
-	public static final double ENCODER_CONSTANT = 1.1065983131;
+	public static final double ENCODER_CONSTANT_ONE_TICK_TO_ONE_REV = 1.1065983131;
 	public static final double COUNTS_PER_MOTOR_REVOLUTION = 42;
 	public static final double GEAR_RATIO = 8.0; //26.0 * 4.67 / 12.0;
 	public static final double REVOLUTIONS_PER_INCH
-		= GEAR_RATIO / (Math.PI * WHEEL_DIAMETER_INCHES * ENCODER_CONSTANT);
+		= GEAR_RATIO / (Math.PI * WHEEL_DIAMETER_INCHES * ENCODER_CONSTANT_ONE_TICK_TO_ONE_REV);
 	public static final double GYRO_MULTIPLER_TELOP = 0.9181799233;
 	public static final double MIN_TURN_POWER = 0.125;
 	public static final double TURN_ERROR_THRESHOLD_DEGREE = 5.0;
@@ -30,6 +30,7 @@ public class Constants {
 	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 200;
 	public static final double AUTONOMUS_MOVE_POWER = 0.1;
 	public static final double AUTONOMUS_MOVE_THRESHOLD = 1.5;
+	public static final double POWER_TO_HOLD_ROBO_ON_TILTED_CS = 0.03;
 
 	// Path points added
 	public static final double P1X1 = 28.271;
