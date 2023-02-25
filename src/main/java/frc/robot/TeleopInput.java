@@ -22,6 +22,8 @@ public class TeleopInput {
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
 	private static final int BALANCE_BUTTON = 2;
+	private static final int HOLD_BUTTON = 5;
+	private static final int FINE_TUNING_BUTTON_DRIVE = 6;
 	private static final int AIM_LOW_BUTTON = 11;
 	private static final int SUBSTATION_PICKUP_BUTTON = 8;
 	private static final int HOMING_BUTTON = 10;
@@ -228,6 +230,22 @@ public class TeleopInput {
 	 */
 	public double getSteerAngle() {
 		return steeringWheel.getX();
+	}
+
+	/**
+	 * Get if hold button (5) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isSteeringWheelHoldPressedRaw() {
+		return steeringWheel.getRawButton(HOLD_BUTTON);
+	}
+
+	/**
+	 * Get if fine tuning button (6) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isSteeringWheelFineTuningPressedRaw() {
+		return steeringWheel.getRawButton(FINE_TUNING_BUTTON_DRIVE);
 	}
 
 	/* ======================== Private methods ======================== */
