@@ -9,7 +9,6 @@ import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.wpilibj.SPI;
 import frc.robot.Constants;
-import frc.robot.Constants.VisionConstants;
 import frc.robot.HardwareMap;
 import frc.robot.PhotonCameraWrapper;
 // Robot Imports
@@ -122,7 +121,7 @@ public class DriveFSMSystem {
 		CameraServer.startAutomaticCapture();
 		cvSink = CameraServer.getVideo();
 		outputStrem = CameraServer.putVideo("ROBOCAM",
-			VisionConstants.WEBCAM_PIXELS_WIDTH, VisionConstants.WEBCAM_PIXELS_HEIGHT);
+			Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_WIDTH);
 		// Reset state machine
 		resetTeleop();
 
@@ -194,6 +193,7 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+
 		gyroAngleForOdo = gyro.getAngle();
 
 		currentEncoderPos = ((leftMotor1.getEncoder().getPosition()
@@ -207,17 +207,17 @@ public class DriveFSMSystem {
 				break;
 
 			case CV_LOW_TAPE_ALIGN:
-				System.out.println("low state");
+				System.out.println("low");
 				handleCVTapeAlignState(true);
 				break;
 
 			case CV_HIGH_TAPE_ALIGN:
-				System.out.println("high state");
+				System.out.println("high");
 				handleCVTapeAlignState(false);
 				break;
 
 			case CV_TAG_ALIGN:
-				System.out.println("tag state");
+				System.out.println("tag");
 				handleCVTagAlignState();
 				break;
 
@@ -237,8 +237,6 @@ public class DriveFSMSystem {
 
 			case P1N1:
 				moveState(input, true, Constants.P1X1, 0);
-				// set the grabber to be at the low state to drop off block
-				// reset the arm to idle state
 				break;
 
 			case P1N2:
@@ -253,8 +251,6 @@ public class DriveFSMSystem {
 
 			case P2N1:
 				moveState(input, true, Constants.P2X1, 0);
-				// set the grabber to be at the low state to drop off block
-				// reset the arm to idle state
 				break;
 
 			case P2N2:
@@ -264,19 +260,15 @@ public class DriveFSMSystem {
 			// path 3
 
 			case P3N1:
-				moveState(input, true, Constants.P3X1, 0);
-				// set grabber at high height to drop off cube
+				moveState(input, false, Constants.P3X1, 0);
 				break;
 
 			case P3N2:
-				moveState(input, false, Constants.P3X2, 0);
-				// set grabber at low height to pick up another cube
+				moveState(input, true, Constants.P3X2, 0);
 				break;
 
 			case P3N3:
 				handleTurnState(input, Constants.P3A3);
-				// set grabnber at mid height to drop off cube
-				// reset the arm to idle state
 				break;
 
 			case P3N4:
@@ -361,17 +353,17 @@ public class DriveFSMSystem {
 				}
 				return FSMState.TURNING_STATE;
 			case CV_LOW_TAPE_ALIGN:
-				if (!input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
+				if (!isForwardEnough && isAligned) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_LOW_TAPE_ALIGN;
 			case CV_HIGH_TAPE_ALIGN:
-				if (!input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
+				if (!isForwardEnough && isAligned) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_HIGH_TAPE_ALIGN;
 			case CV_TAG_ALIGN:
-				if (!input.isDriveJoystickCVTagButtonPressedRaw()) {
+				if (!isForwardEnough && isAligned) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_TAG_ALIGN;
@@ -495,6 +487,8 @@ public class DriveFSMSystem {
 			return;
 		}
 
+		// Pose3d cvEstimatedPos = pcw.getEstimatedGlobalPose().get().estimatedPose;
+
 		if (isInArcadeDrive) {
 
 			currentEncoderPos = ((leftMotor1.getEncoder().getPosition()
@@ -574,7 +568,14 @@ public class DriveFSMSystem {
 			return;
 		}
 		finishedTurning = false;
+		System.out.println(getHeading());
 		double error = degrees - getHeading();
+		// if (error > Constants.HALF_REVOLUTION_DEGREES) {
+		// 	error -= Constants.ONE_REVOLUTION_DEGREES;
+		// }
+		// if (error < -Constants.HALF_REVOLUTION_DEGREES) {
+		// 	error += Constants.ONE_REVOLUTION_DEGREES;
+		// }
 
 		if (error > Constants.HALF_REVOLUTION_DEGREES) {
 			error -= Constants.ONE_REVOLUTION_DEGREES;
@@ -582,7 +583,9 @@ public class DriveFSMSystem {
 		if (error < -Constants.HALF_REVOLUTION_DEGREES) {
 			error += Constants.ONE_REVOLUTION_DEGREES;
 		}
+		System.out.println("ERROR: " + error);
 		if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
+			System.out.println("DONE");
 			finishedTurning = true;
 			leftMotor1.set(0);
 			rightMotor1.set(0);
@@ -645,6 +648,11 @@ public class DriveFSMSystem {
 		roboYPos += dY;
 
 		prevEncoderPos = this.currentEncoderPos;
+
+		//System.out.println("X Pos: " + roboXPos);
+		//System.out.println("Y Pos: " + roboYPos);
+		//System.out.println("Gyro: " + gyroAngleForOdo);
+
 	}
 
 	/**
@@ -660,6 +668,8 @@ public class DriveFSMSystem {
 		}
 		double roboX = -roboXPos;
 		double roboY = roboYPos;
+		System.out.println("x: " + roboX);
+		System.out.println("y: " + roboY);
 
 		if (forwards) {
 			leftMotor1.set(-Constants.AUTONOMUS_MOVE_POWER);
@@ -691,31 +701,34 @@ public class DriveFSMSystem {
 		if (lower) {
 			angle = pcw.getLowerTapeTurnAngle();
 			isForwardEnough =  pcw.getLowerTapeDistance()
-				> VisionConstants.LOWER_TAPE_DRIVEUP_DISTANCE_INCHES;
+				> Constants.LOWER_TAPE_DRIVEUP_DISTANCE_INCHES;
+			System.out.println("distance: " + pcw.getLowerTapeDistance());
 			//drives forward until within 42 inches of lower tape
 		} else {
 			angle = pcw.getHigherTapeTurnAngle();
 			isForwardEnough = pcw.getHigherTapeDistance()
-				> VisionConstants.HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES;
+				> Constants.HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES;
+			System.out.println("distance: " + pcw.getHigherTapeDistance());
 			//drives forward until within 65 inches of higher tape
 		}
-		if (angle > VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(-VisionConstants.CV_TURN_POWER);
-			leftMotor2.set(-VisionConstants.CV_TURN_POWER);
-			rightMotor1.set(-VisionConstants.CV_TURN_POWER);
-			rightMotor2.set(-VisionConstants.CV_TURN_POWER);
-		} else if (angle  < -VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(VisionConstants.CV_TURN_POWER);
-			rightMotor1.set(VisionConstants.CV_TURN_POWER);
-			leftMotor2.set(VisionConstants.CV_TURN_POWER);
-			rightMotor2.set(VisionConstants.CV_TURN_POWER);
+		System.out.println("angle: " + angle);
+		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			leftMotor1.set(-Constants.CV_TURN_POWER);
+			leftMotor2.set(-Constants.CV_TURN_POWER);
+			rightMotor1.set(-Constants.CV_TURN_POWER);
+			rightMotor2.set(-Constants.CV_TURN_POWER);
+		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			leftMotor1.set(Constants.CV_TURN_POWER);
+			rightMotor1.set(Constants.CV_TURN_POWER);
+			leftMotor2.set(Constants.CV_TURN_POWER);
+			rightMotor2.set(Constants.CV_TURN_POWER);
 		} else {
 			isAligned = true;
 			if (isForwardEnough) {
-				leftMotor1.set(-VisionConstants.CV_FORWARD_POWER);
-				rightMotor1.set(VisionConstants.CV_FORWARD_POWER);
-				leftMotor2.set(-VisionConstants.CV_FORWARD_POWER);
-				rightMotor2.set(VisionConstants.CV_FORWARD_POWER);
+				leftMotor1.set(-Constants.CV_FORWARD_POWER);
+				rightMotor1.set(Constants.CV_FORWARD_POWER);
+				leftMotor2.set(-Constants.CV_FORWARD_POWER);
+				rightMotor2.set(Constants.CV_FORWARD_POWER);
 			} else {
 				leftMotor1.set(0);
 				rightMotor1.set(0);
@@ -730,25 +743,26 @@ public class DriveFSMSystem {
  	* Aligns to april tag and drives up to within 35 inches of it
 	*/
 	public void handleCVTagAlignState() {
+		System.out.println("TAG");
 		double angle = pcw.getTagTurnAngle();
-		isForwardEnough =  pcw.getTagDistance() > VisionConstants.TAG_DRIVEUP_DISTANCE_INCHES;
-		if (angle > VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(-VisionConstants.CV_TURN_POWER);
-			rightMotor1.set(-VisionConstants.CV_TURN_POWER);
-			leftMotor2.set(-VisionConstants.CV_TURN_POWER);
-			rightMotor2.set(-VisionConstants.CV_TURN_POWER);
-		} else if (angle  < -VisionConstants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			leftMotor1.set(VisionConstants.CV_TURN_POWER);
-			rightMotor1.set(VisionConstants.CV_TURN_POWER);
-			leftMotor2.set(VisionConstants.CV_TURN_POWER);
-			rightMotor2.set(VisionConstants.CV_TURN_POWER);
+		isForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
+		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			leftMotor1.set(-Constants.CV_TURN_POWER);
+			rightMotor1.set(-Constants.CV_TURN_POWER);
+			leftMotor2.set(-Constants.CV_TURN_POWER);
+			rightMotor2.set(-Constants.CV_TURN_POWER);
+		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			leftMotor1.set(Constants.CV_TURN_POWER);
+			rightMotor1.set(Constants.CV_TURN_POWER);
+			leftMotor2.set(Constants.CV_TURN_POWER);
+			rightMotor2.set(Constants.CV_TURN_POWER);
 		} else {
 			isAligned = true;
 			if (isForwardEnough) {
-				leftMotor1.set(-VisionConstants.CV_FORWARD_POWER);
-				rightMotor1.set(VisionConstants.CV_FORWARD_POWER);
-				leftMotor2.set(-VisionConstants.CV_FORWARD_POWER);
-				rightMotor2.set(VisionConstants.CV_FORWARD_POWER);
+				leftMotor1.set(-Constants.CV_FORWARD_POWER);
+				rightMotor1.set(Constants.CV_FORWARD_POWER);
+				leftMotor2.set(-Constants.CV_FORWARD_POWER);
+				rightMotor2.set(Constants.CV_FORWARD_POWER);
 			} else {
 				leftMotor1.set(0);
 				rightMotor1.set(0);

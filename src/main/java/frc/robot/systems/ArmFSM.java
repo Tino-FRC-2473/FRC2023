@@ -498,7 +498,7 @@ public class ArmFSM {
 			ARM_ENCODER_STARTING_ANGLE_ROTATIONS)) {
 			pivotMotor.set(0);
 		} else {
-			pidController.setReference(ARM_ENCODER_STARTING_ANGLE_ROTATIONS,
+			pidControllerPivot.setReference(ARM_ENCODER_STARTING_ANGLE_ROTATIONS,
 				CANSparkMax.ControlType.kPosition);
 		}
 	}
@@ -764,7 +764,7 @@ public class ArmFSM {
 				SHOOT_LOW_ANGLE_ENCODER_ROTATIONS)) {
 				pivotMotor.set(0);
 			} else {
-				pidController.setReference(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS,
+				pidControllerPivot.setReference(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
 			if (withinError(teleArmMotor.getEncoder().getPosition(),
