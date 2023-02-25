@@ -36,18 +36,19 @@ public class SpinningIntakeFSM {
 	//6 inches
 	private static final int MIN_CONE_DISTANCE = 2150;
 	//8 inches
-	private static final int MIN_CUBE_DISTANCE = 1200;
+	private static final int MIN_CUBE_DISTANCE = 1060;
 	//8.5 inches
-	private static final int MAX_COLOR_MEASURE = 1050;
+	private static final int MAX_COLOR_MEASURE = 1420;
 	//9 inches
-	private static final int MIN_COLOR_MEASURE = 950;
+	private static final int MIN_COLOR_MEASURE = 1060;
 	//? inches
 	private static final int MIN_RELEASE_DISTANCE = 800;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static ItemType itemType = ItemType.EMPTY;
 
 	//CUBE RGB THRESHOLD VALUES
-	private static final double BLUE_THRESHOLD = 0.235;
+	private static final double BLUE_THRESHOLD = 0.23;
+	private double lastBlue = -1;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -195,9 +196,8 @@ public class SpinningIntakeFSM {
 		return itemType;
 	}
 	private void updateItem() {
-		double b =  colorSensor.getColor().blue;
-
-		//System.out.println(r + " " + g + " " + b + " " + colorSensorCube.getProximity());
+		double b = colorSensor.getColor().blue;
+		System.out.println(b + " " + distanceSensorObject.getValue());
 		if (b > BLUE_THRESHOLD) {
 			itemType = ItemType.CUBE;
 		} else {
@@ -253,10 +253,14 @@ public class SpinningIntakeFSM {
 	private void handleStartState() {
 	}
 	private void handleIdleSpinningState() {
+		double newBlue = colorSensor.getColor().blue;
 		if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
-			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE) {
+			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE
+			&& lastBlue != newBlue) {
+			System.out.println(distanceSensorObject.getValue());
 			updateItem();
 		}
+		lastBlue = newBlue;
 		spinnerMotor.set(INTAKE_SPEED);
 	}
 	private void handleIdleStopState() {
