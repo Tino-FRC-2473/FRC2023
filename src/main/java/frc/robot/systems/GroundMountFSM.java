@@ -25,8 +25,11 @@ public class GroundMountFSM {
 		AUTONOMOUS_IDLE
 	}
 	//arbitrary constants, must test all of these
-	private static final double PIVOT_DOWN_POWER = -0.05;
-	private static final double PIVOT_UP_POWER = 0.05;
+	private static final double PIVOT_UP_POWER = 0.07;
+	private static final double MAX_POWER = 0.2;
+	private boolean zeroed = false;
+	private static final double BOTTOM_ENCODER_LIMIT = -47.00; //ARBITRARY VALUE
+	private static final double P_CONSTANT = 0.005;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -53,6 +56,7 @@ public class GroundMountFSM {
 			pivotArmMotor = new CANSparkMax(HardwareMap.CAN_ID_GROUND_MOUNT,
 										CANSparkMax.MotorType.kBrushless);
 		}
+		pivotArmMotor.setInverted(true);
 		limitSwitchHigh = pivotArmMotor.getForwardLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		limitSwitchHigh.enableLimitSwitch(true);
@@ -80,6 +84,7 @@ public class GroundMountFSM {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
+		zeroed = false;
 		currentState = FSMState.START_STATE;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -163,7 +168,11 @@ public class GroundMountFSM {
 
 		switch (currentState) {
 			case START_STATE:
-				return FSMState.PIVOTING_UP;
+				if (zeroed) {
+					return FSMState.PIVOTED_UP;
+				} else {
+					return FSMState.START_STATE;
+				}
 			case PIVOTING_UP:
 				if (input.isPivotButtonPressed()) {
 					return FSMState.PIVOTING_DOWN;
@@ -211,43 +220,50 @@ public class GroundMountFSM {
 	private boolean isLimitSwitchLowPressed() {
 		return limitSwitchLow.isPressed();
 	}
+	private double capMotorPower(double a) {
+		if (a > MAX_POWER) {
+			return MAX_POWER;
+		} else if (a < -MAX_POWER) {
+			return -MAX_POWER;
+		}
+		return a;
+	}
 
 	/* ------------------------ FSM state handlers ------------------------ */
 	/**
 	 * Handle behavior in states.
 	 */
 	private void handleStartState() {
-		//do nothing
+		pivotArmMotor.set(PIVOT_UP_POWER);
+		if (limitSwitchHigh.isPressed()) {
+			zeroed = true;
+			pivotArmMotor.getEncoder().setPosition(0);
+		}
 	}
 	private void handlePivotedUpState() {
-		pivotArmMotor.set(0);
+		pivotArmMotor.set(-pivotArmMotor.getEncoder().getPosition() * P_CONSTANT);
 	}
 	private void handlePivotingUpState() {
-		pivotArmMotor.set(PIVOT_UP_POWER);
+		pivotArmMotor.set(-pivotArmMotor.getEncoder().getPosition() * P_CONSTANT);
 	}
 	private void handlePivotedDownState() {
-		pivotArmMotor.set(0);
+		pivotArmMotor.set((BOTTOM_ENCODER_LIMIT
+			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT);
 	}
 	private void handlePivotingDownState() {
-		pivotArmMotor.set(PIVOT_DOWN_POWER);
+		pivotArmMotor.set((BOTTOM_ENCODER_LIMIT
+			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT);
 	}
 
 	/* AUTONOMOUS HANDLES */
 
 	private void handleAutonomousDownState() {
-		if (isLimitSwitchLowPressed()) {
-			pivotArmMotor.set(0);
-			return;
-		}
-		pivotArmMotor.set(PIVOT_DOWN_POWER);
+		pivotArmMotor.set((BOTTOM_ENCODER_LIMIT
+			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT);
 	}
 
 	private void handleAutonomousUpState() {
-		if (isLimitSwitchHighPressed()) {
-			pivotArmMotor.set(0);
-			return;
-		}
-		pivotArmMotor.set(PIVOT_UP_POWER);
+		pivotArmMotor.set(-pivotArmMotor.getEncoder().getPosition() * P_CONSTANT);
 	}
 
 	private void handleAutonomousIdleState() {
