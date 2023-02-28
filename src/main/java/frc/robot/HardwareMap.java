@@ -36,6 +36,10 @@ public final class HardwareMap {
 		new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_GROUND_MOUNT);
 	private static DigitalInput testBoardPinArmGrabber =
 		new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_ARM_GRABBER);
+
+
+
+
 	/**
 	 * Check if the current RoboRIO is part of a ground mount test setup or real robot.
 	 * @return true if the current setup is a test setup
@@ -57,6 +61,10 @@ public final class HardwareMap {
 	public static boolean isTestBoardGroundMount() {
 		return !HardwareMap.testBoardPinGroundMount.get();
 	}
+
+
+
+
 	/**Check if the current RoboRIO.
 	 * @return true if
 	 */
