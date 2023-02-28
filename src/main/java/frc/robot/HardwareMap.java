@@ -18,10 +18,10 @@ public final class HardwareMap {
 	public static final int ANALOGIO_ID_DISTANCE_SENSOR = 0;
 
 	//arm robot constants
-	public static final int CAN_ID_SPARK_PIVOT = 35;
-	public static final int CAN_ID_SPARK_TELEARM = 13;
+	public static final int CAN_ID_SPARK_PIVOT = 13;
+	public static final int CAN_ID_SPARK_TELEARM = 35;
 	//ground mount constants
-	public static final int CAN_ID_GROUND_MOUNT = 8;
+	public static final int CAN_ID_GROUND_MOUNT = 10;
 
 	// Place jumper from DIO pin 9 to GND to indicate this is a test setup
 	private static final int DIO_TEST_SETUP_CHANNEL_ARM = 8;
@@ -36,9 +36,6 @@ public final class HardwareMap {
 		new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_GROUND_MOUNT);
 	private static DigitalInput testBoardPinArmGrabber =
 		new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL_ARM_GRABBER);
-
-
-
 
 	/**
 	 * Check if the current RoboRIO is part of a ground mount test setup or real robot.
@@ -61,9 +58,6 @@ public final class HardwareMap {
 	public static boolean isTestBoardGroundMount() {
 		return !HardwareMap.testBoardPinGroundMount.get();
 	}
-
-
-
 
 	/**Check if the current RoboRIO.
 	 * @return true if
