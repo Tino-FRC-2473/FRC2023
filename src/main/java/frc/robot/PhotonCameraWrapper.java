@@ -1,12 +1,10 @@
 package frc.robot;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import org.photonvision.PhotonCamera;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.Constants.AprilTagConstants;
 import frc.robot.Constants.VisionConstants;
@@ -14,8 +12,11 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import org.photonvision.PhotonUtils;
 import edu.wpi.first.math.util.Units;
-import org.photonvision.PhotonPoseEstimator;
+import edu.wpi.first.math.geometry.Pose3d;
+import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
+
+import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 /**
@@ -32,7 +33,7 @@ public class PhotonCameraWrapper {
 
 	public static final double FIELD_WIDTH_METERS = 500;
 	public static final double FIELD_LENGTH_METERS = 500;
-
+	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
 		AprilTagFieldLayout atfl = null;
@@ -70,6 +71,21 @@ public class PhotonCameraWrapper {
 			return null;
 		}
 		return optPose.get().estimatedPose;
+	}
+	/**
+	 * Gets estimated global pose.
+	 * @return A pair of the fused camera observations to a single Pose2d
+	 *  on the field, and the time of the observation. Assumes a planar
+	 *  field and the robot is always firmly on the ground.
+	 */
+	public double getTagRotation() {
+		photonCamera.setPipelineIndex(VisionConstants.THREEDTAG_PIPELINE_INDEX);
+		var result = photonCamera.getLatestResult();
+		if (!result.hasTargets()) {
+			return -Constants.INVALID_TURN_RETURN_DEGREES;
+		}
+		return Units.radiansToDegrees(
+			result.getBestTarget().getBestCameraToTarget().getRotation().getAngle());
 	}
 
 	/**
@@ -222,11 +238,16 @@ public class PhotonCameraWrapper {
 		return photonCamera.getLatestResult().getBestTarget().getFiducialId();
 	}
 
-
+/**
+ * @return Returns if the robot is parallel to the april tag of the double substation.
+ */
 	public boolean isParallelToSubstation() {
-		Pose3d pose = getEstimatedGlobalPose();
-		double rotation = Units.radiansToDegrees(pose.getRotation().getAngle());
-		if (rotation < 180 + Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES && rotation > 180 - Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+		double rotation = getTagRotation();
+		if (rotation == -Constants.INVALID_TURN_RETURN_DEGREES) {
+			return false;
+		}
+		if (rotation < APRIL_TAG_ANGLE_DEGREES + Constants.SUBSTATION_ANGLE_THRESHOLD_DEGREES
+			&& rotation > APRIL_TAG_ANGLE_DEGREES - Constants.SUBSTATION_ANGLE_THRESHOLD_DEGREES) {
 			return true;
 		}
 		return false;
