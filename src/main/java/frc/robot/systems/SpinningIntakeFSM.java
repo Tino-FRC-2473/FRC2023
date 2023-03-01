@@ -59,6 +59,7 @@ public class SpinningIntakeFSM {
 	//private DigitalInput limitSwitchCone;
 	private AnalogInput distanceSensorObject;
 	private ColorSensorV3 colorSensor;
+	private boolean isMotorAllowed = false;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -120,6 +121,10 @@ public class SpinningIntakeFSM {
 		if (input == null) {
 			return;
 		}
+		if (input.isIntakeButtonPressed()) {
+			isMotorAllowed = !isMotorAllowed;
+			spinnerMotor.set(0);
+		}
 		switch (currentState) {
 			case START_STATE:
 				handleStartState();
@@ -150,8 +155,8 @@ public class SpinningIntakeFSM {
 	public boolean updateAutonomous(FSMState state) {
 		//System.out.println(itemType);
 		SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
-		// SmartDashboard.putNumber("r", colorSensor.getColor().red);
-		// SmartDashboard.putNumber("g", colorSensor.getColor().green);
+		SmartDashboard.putNumber("r", colorSensor.getColor().red);
+		SmartDashboard.putNumber("g", colorSensor.getColor().green);
 		SmartDashboard.putNumber("b", colorSensor.getColor().blue);
 		SmartDashboard.putString("item type", itemType.toString());
 		SmartDashboard.putNumber("Blue threshold", BLUE_THRESHOLD);
@@ -251,6 +256,7 @@ public class SpinningIntakeFSM {
 	 * Handle behavior in states.
 	 */
 	private void handleStartState() {
+		spinnerMotor.set(0);
 	}
 	private void handleIdleSpinningState() {
 		double newBlue = colorSensor.getColor().blue;
@@ -261,13 +267,17 @@ public class SpinningIntakeFSM {
 			updateItem();
 		}
 		lastBlue = newBlue;
-		spinnerMotor.set(INTAKE_SPEED);
+		if (isMotorAllowed) {
+			spinnerMotor.set(INTAKE_SPEED);
+		}
 	}
 	private void handleIdleStopState() {
 		spinnerMotor.set(0);
 	}
 	private void handleReleaseState() {
 		itemType = ItemType.EMPTY;
-		spinnerMotor.set(RELEASE_SPEED);
+		if (isMotorAllowed) {
+			spinnerMotor.set(RELEASE_SPEED);
+		}
 	}
 }

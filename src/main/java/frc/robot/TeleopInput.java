@@ -32,7 +32,7 @@ public class TeleopInput {
 	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
 
 	private static final int GROUND_MOUNT_BUTTON = 4;
-
+	private static final int INTAKE_BUTTON = 6;
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private Joystick mechJoystick;
@@ -161,6 +161,13 @@ public class TeleopInput {
 		return mechJoystick.getRawButtonPressed(FINE_TUNING_BUTTON);
 	}
 
+	/**
+	 * Get the value of the intake button.
+	 * @return True if button is pressed
+	 */
+	public boolean isIntakeButtonPressed() {
+		return mechJoystick.getRawButtonPressed(INTAKE_BUTTON);
+	}
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
 	 * Get X axis of Right Joystick.
