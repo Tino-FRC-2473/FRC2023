@@ -130,6 +130,7 @@ public class ArmFSM {
 	private SparkMaxLimitSwitch teleArmLimitSwitch;
 
 	private double pivotEncoderRotationsIntoIdle = 0;
+	private double pivotEncoderRotationsAfterPivot = 0;
 	private boolean isFineTuning = false;
 	/**
 	 * Creates an instance of an ArmFSM.
@@ -569,9 +570,11 @@ public class ArmFSM {
 							> ENCODER_TICKS_SLOW_DOWN_RANGE_MIN) {
 						pidControllerPivot.setReference(-PIVOT_MOTOR_SLOW_DOWN_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
+						pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 					} else {
 						pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
+						pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 					}
 				} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
 					if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX
@@ -579,23 +582,37 @@ public class ArmFSM {
 						> ENCODER_TICKS_SLOW_DOWN_RANGE_MIN) {
 						pidControllerPivot.setReference(PIVOT_MOTOR_SLOW_DOWN_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
+						pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 					} else {
 						pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
+						pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 					}
 				} else {
-					pivotMotor.set(0);
+					if (pivotEncoderRotationsAfterPivot != 0) {
+						pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
+							CANSparkMax.ControlType.kPosition);
+					} else {
+						pivotMotor.set(0);
+					}
 				}
 				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER);
 			} else {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
 					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER_FINE_TUNING,
 						CANSparkMax.ControlType.kDutyCycle);
+					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
 					pidControllerPivot.setReference(PIVOT_MOTOR_POWER_FINE_TUNING,
 						CANSparkMax.ControlType.kDutyCycle);
+					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else {
-					pivotMotor.set(0);
+					if (pivotEncoderRotationsAfterPivot != 0) {
+						pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
+							CANSparkMax.ControlType.kPosition);
+					} else {
+						pivotMotor.set(0);
+					}
 				}
 				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER_FINE_TUNING);
 			}
