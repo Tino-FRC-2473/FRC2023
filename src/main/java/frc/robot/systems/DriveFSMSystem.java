@@ -1,5 +1,6 @@
 package frc.robot.systems;
 
+
 import com.kauailabs.navx.frc.AHRS;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
@@ -7,9 +8,11 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.Constants.VisionConstants;
+import edu.wpi.first.math.util.Units;
 import frc.robot.HardwareMap;
 import frc.robot.PhotonCameraWrapper;
 // Robot Imports
@@ -17,7 +20,6 @@ import frc.robot.TeleopInput;
 import frc.robot.drive.DriveFunctions;
 import frc.robot.drive.DriveModes;
 import frc.robot.drive.DrivePower;
-import frc.robot.Constants.VisionConstants;
 
 
 public class DriveFSMSystem {
@@ -112,7 +114,7 @@ public class DriveFSMSystem {
 										CANSparkMax.MotorType.kBrushless);
 
 		leftMotorBack.follow(leftMotorFront);
-		rightMotorBack.follow(rightMotorBack);
+		rightMotorBack.follow(rightMotorFront);
 
 		rightMotorFront.getEncoder().setPosition(0);
 		leftMotorBack.getEncoder().setPosition(0);
@@ -181,6 +183,11 @@ public class DriveFSMSystem {
 		rightMotorBack.getEncoder().setPosition(0);
 		leftMotorFront.getEncoder().setPosition(0);
 
+		rightMotorFront.set(0);
+		leftMotorBack.set(0);
+		rightMotorBack.set(0);
+		leftMotorFront.set(0);
+
 		gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
@@ -210,6 +217,7 @@ public class DriveFSMSystem {
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
 		updateLineOdometryTele(gyroAngleForOdo);
+		SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -523,7 +531,7 @@ public class DriveFSMSystem {
 				- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
 			double steerAngle = input.getSteerAngle();
-			double currentLeftPower = leftMotorBack.get();
+			double currentLeftPower = leftMotorFront.get();
 			double currentRightPower = rightMotorFront.get();
 
 
@@ -787,6 +795,8 @@ public class DriveFSMSystem {
 			return;
 		}
 		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
+		System.out.println(pcw.getTagDistance());
+		System.out.println(pcw.getTagTurnAngle());
 		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
 			cvmove(TURN_RIGHT_OPT);
 		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {

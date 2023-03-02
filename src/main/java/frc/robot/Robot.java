@@ -98,6 +98,25 @@ public class Robot extends TimedRobot {
 		armSystem.update(input);
 		driveSystem.update(input);
 		spinningIntakeFSM.update(input);
+		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
+			&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
+			armSystem.update(input);
+			driveSystem.update(input);
+			spinningIntakeFSM.update(input);
+		}
+		if (HardwareMap.isTestBoardArm()) {
+			armSystem.update(input);
+		}
+		if (HardwareMap.isTestBoardGrabber()) {
+			spinningIntakeFSM.update(input);
+		}
+		if (HardwareMap.isTestBoardGroundMount()) {
+			groundMountFSM.update(input);
+		}
+		if (HardwareMap.isTestBoardArmGrabber()) {
+			armSystem.update(input);
+			spinningIntakeFSM.update(input);
+		}
 	}
 
 	@Override
