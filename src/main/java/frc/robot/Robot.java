@@ -35,78 +35,53 @@ public class Robot extends TimedRobot {
 		driveSystem = new DriveFSMSystem();
 		armSystem = new ArmFSM();
 		spinningIntakeFSM = new SpinningIntakeFSM();
-		// Instantiate all systems here
-		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
-		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-		// }
-		// if (HardwareMap.isTestBoardArm()) {
-		// 	armSystem = new ArmFSM();
-		// }
-
-		// if (HardwareMap.isTestBoardGrabber()) {
-		// 	spinningIntakeFSM = new SpinningIntakeFSM();
-		// }
-
-		// if (HardwareMap.isTestBoardGroundMount()) {
-		// 	groundMountFSM = new GroundMountFSM();
-		// }
-		// if (HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem = new ArmFSM();
-		// 	spinningIntakeFSM = new SpinningIntakeFSM();
-		// }
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		armSystem.reset();
-		driveSystem.resetAutonomous();
-		spinningIntakeFSM.reset();
-		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
-		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.reset();
-		// 	driveSystem.resetAutonomous();
-		// 	spinningIntakeFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardArm()) {
-		// 	armSystem.reset();
-		// }
-		// if (HardwareMap.isTestBoardGrabber()) {
-		// 	spinningIntakeFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardGroundMount()) {
-		// 	groundMountFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.reset();
-		// 	spinningIntakeFSM.reset();
-		// }
+		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
+			&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
+			armSystem.reset();
+			driveSystem.resetAutonomous();
+			spinningIntakeFSM.reset();
+		}
+		if (HardwareMap.isTestBoardArm()) {
+			armSystem.reset();
+		}
+		if (HardwareMap.isTestBoardGrabber()) {
+			spinningIntakeFSM.reset();
+		}
+		if (HardwareMap.isTestBoardGroundMount()) {
+			groundMountFSM.reset();
+		}
+		if (HardwareMap.isTestBoardArmGrabber()) {
+			armSystem.reset();
+			spinningIntakeFSM.reset();
+		}
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		armSystem.update(null);
-		driveSystem.update(null);
-		spinningIntakeFSM.update(null);
-		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
-		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.update(null);
-		// 	driveSystem.update(null);
-		// 	spinningIntakeFSM.update(null);
-		// }
-		// if (HardwareMap.isTestBoardArm()) {
-		// 	armSystem.update(null);
-		// }
-		// if (HardwareMap.isTestBoardGrabber()) {
-		// 	spinningIntakeFSM.update(null);
-		// }
-		// if (HardwareMap.isTestBoardGroundMount()) {
-		// 	groundMountFSM.update(null);
-		// }
-		// if (HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.update(null);
-		// 	spinningIntakeFSM.update(null);
-		// }
+		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
+			&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
+			armSystem.update(null);
+			driveSystem.update(null);
+			spinningIntakeFSM.update(null);
+		}
+		if (HardwareMap.isTestBoardArm()) {
+			armSystem.update(null);
+		}
+		if (HardwareMap.isTestBoardGrabber()) {
+			spinningIntakeFSM.update(null);
+		}
+		if (HardwareMap.isTestBoardGroundMount()) {
+			groundMountFSM.update(null);
+		}
+		if (HardwareMap.isTestBoardArmGrabber()) {
+			armSystem.update(null);
+			spinningIntakeFSM.update(null);
+		}
 	}
 
 	@Override
@@ -115,25 +90,6 @@ public class Robot extends TimedRobot {
 		armSystem.reset();
 		driveSystem.resetTeleop();
 		spinningIntakeFSM.reset();
-		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
-		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.reset();
-		// 	driveSystem.resetTeleop();
-		// 	spinningIntakeFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardArm()) {
-		// 	armSystem.reset();
-		// }
-		// if (HardwareMap.isTestBoardGrabber()) {
-		// 	spinningIntakeFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardGroundMount()) {
-		// 	groundMountFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.reset();
-		// 	spinningIntakeFSM.reset();
-		// }
 	}
 
 
@@ -142,25 +98,6 @@ public class Robot extends TimedRobot {
 		armSystem.update(input);
 		driveSystem.update(input);
 		spinningIntakeFSM.update(input);
-		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
-		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.update(input);
-		// 	driveSystem.update(input);
-		// 	spinningIntakeFSM.update(input);
-		// }
-		// if (HardwareMap.isTestBoardArm()) {
-		// 	armSystem.update(input);
-		// }
-		// if (HardwareMap.isTestBoardGrabber()) {
-		// 	spinningIntakeFSM.update(input);
-		// }
-		// if (HardwareMap.isTestBoardGroundMount()) {
-		// 	groundMountFSM.update(input);
-		// }
-		// if (HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.update(input);
-		// 	spinningIntakeFSM.update(input);
-		// }
 	}
 
 	@Override
