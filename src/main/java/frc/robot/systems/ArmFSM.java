@@ -186,6 +186,7 @@ public class ArmFSM {
 	public void reset() {
 		currentState = FSMState.IDLE;
 		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
+		pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -589,12 +590,8 @@ public class ArmFSM {
 						pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 					}
 				} else {
-					if (pivotEncoderRotationsAfterPivot != 0) {
-						pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
-							CANSparkMax.ControlType.kPosition);
-					} else {
-						pivotMotor.set(0);
-					}
+					pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
+						CANSparkMax.ControlType.kPosition);
 				}
 				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER);
 			} else {
@@ -607,12 +604,8 @@ public class ArmFSM {
 						CANSparkMax.ControlType.kDutyCycle);
 					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else {
-					if (pivotEncoderRotationsAfterPivot != 0) {
-						pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
-							CANSparkMax.ControlType.kPosition);
-					} else {
-						pivotMotor.set(0);
-					}
+					pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
+						CANSparkMax.ControlType.kPosition);
 				}
 				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER_FINE_TUNING);
 			}
