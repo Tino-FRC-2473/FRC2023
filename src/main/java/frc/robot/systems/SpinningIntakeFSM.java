@@ -17,7 +17,7 @@ import frc.robot.HardwareMap;
 public class SpinningIntakeFSM {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
-	public enum FSMState {
+	public enum SpinningIntakeFSMState {
 		START_STATE,
 		IDLE_SPINNING,
 		IDLE_STOP,
@@ -49,9 +49,10 @@ public class SpinningIntakeFSM {
 	//CUBE RGB THRESHOLD VALUES
 	private static final double BLUE_THRESHOLD = 0.23;
 	private double lastBlue = -1;
+	private boolean isMotorAllowed = false;
 
 	/* ======================== Private variables ======================== */
-	private FSMState currentState;
+	private SpinningIntakeFSMState currentState;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -87,7 +88,7 @@ public class SpinningIntakeFSM {
 	 * Return current FSM state.
 	 * @return Current FSM state
 	 */
-	public FSMState getCurrentState() {
+	public SpinningIntakeFSMState getCurrentState() {
 		return currentState;
 	}
 	/**
@@ -99,7 +100,7 @@ public class SpinningIntakeFSM {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		currentState = FSMState.START_STATE;
+		currentState = SpinningIntakeFSMState.START_STATE;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -120,6 +121,10 @@ public class SpinningIntakeFSM {
 		if (input == null) {
 			return;
 		}
+		if (input.isIntakeButtonPressed()) {
+			isMotorAllowed = !isMotorAllowed;
+			spinnerMotor.set(0);
+		}
 		switch (currentState) {
 			case START_STATE:
 				handleStartState();
@@ -136,7 +141,7 @@ public class SpinningIntakeFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		FSMState previousState = currentState;
+		SpinningIntakeFSMState previousState = currentState;
 		currentState = nextState(input);
 		if (previousState != currentState) {
 			System.out.println(currentState);
@@ -144,10 +149,10 @@ public class SpinningIntakeFSM {
 	}
 	/**
 	 * Run given state and return if state is complete.
-	 * @param state FSMState state gives the state that the intakefsm is in
+	 * @param state SpinningIntakeFSMState state gives the state that the intakefsm is in
 	 * @return Boolean that returns if given state is complete
 	 */
-	public boolean updateAutonomous(FSMState state) {
+	public boolean updateAutonomous(SpinningIntakeFSMState state) {
 		//System.out.println(itemType);
 		SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
 		// SmartDashboard.putNumber("r", colorSensor.getColor().red);
@@ -215,32 +220,32 @@ public class SpinningIntakeFSM {
 	 *        the robot is in autonomous mode.
 	 * @return FSM state for the next iteration
 	 */
-	private FSMState nextState(TeleopInput input) {
+	private SpinningIntakeFSMState nextState(TeleopInput input) {
 		if (input == null) {
-			return FSMState.START_STATE;
+			return SpinningIntakeFSMState.START_STATE;
 		}
 		switch (currentState) {
 			case START_STATE:
-				return FSMState.IDLE_SPINNING;
+				return SpinningIntakeFSMState.IDLE_SPINNING;
 			case IDLE_SPINNING:
 				if (input.isReleaseButtonPressed()) {
-					return FSMState.RELEASE;
+					return SpinningIntakeFSMState.RELEASE;
 				}
 				if ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
 					> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE) {
-					return FSMState.IDLE_STOP;
+					return SpinningIntakeFSMState.IDLE_STOP;
 				}
-				return FSMState.IDLE_SPINNING;
+				return SpinningIntakeFSMState.IDLE_SPINNING;
 			case IDLE_STOP:
 				if (input.isReleaseButtonPressed()) {
-					return FSMState.RELEASE;
+					return SpinningIntakeFSMState.RELEASE;
 				}
-				return FSMState.IDLE_STOP;
+				return SpinningIntakeFSMState.IDLE_STOP;
 			case RELEASE:
 				if (!input.isReleaseButtonPressed()) {
-					return FSMState.IDLE_SPINNING;
+					return SpinningIntakeFSMState.IDLE_SPINNING;
 				}
-				return FSMState.RELEASE;
+				return SpinningIntakeFSMState.RELEASE;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -261,13 +266,17 @@ public class SpinningIntakeFSM {
 			updateItem();
 		}
 		lastBlue = newBlue;
-		spinnerMotor.set(INTAKE_SPEED);
+		if (isMotorAllowed) {
+			spinnerMotor.set(INTAKE_SPEED);
+		}
 	}
 	private void handleIdleStopState() {
 		spinnerMotor.set(0);
 	}
 	private void handleReleaseState() {
 		itemType = ItemType.EMPTY;
-		spinnerMotor.set(RELEASE_SPEED);
+		if (isMotorAllowed) {
+			spinnerMotor.set(RELEASE_SPEED);
+		}
 	}
 }
