@@ -161,7 +161,7 @@ public class TeleopInput {
 		return mechJoystick.getRawButtonPressed(FINE_TUNING_BUTTON);
 	}
 
-	/* ------------------------ Right Joystick ------------------------ */
+	///* ------------------------ Right Joystick ------------------------ */
 	/**
 	 * Get X axis of Right Joystick.
 	 * @return Axis value
