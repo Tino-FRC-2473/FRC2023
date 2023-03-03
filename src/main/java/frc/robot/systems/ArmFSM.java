@@ -508,7 +508,9 @@ public class ArmFSM {
 			return false;
 		}
 		return input.isPivotDecreaseButtonPressed() && isMinHeight()
-			|| input.isPivotIncreaseButtonPressed() && isMaxHeight();
+			|| input.isPivotIncreaseButtonPressed() && isMaxHeight()
+			|| -input.getmechJoystickY() > 0
+			&& teleArmMotor.getEncoder().getPosition() >= ARM_ENCODER_MAX_LENGTH_ROTATIONS;
 	}
 
 	private boolean atArmPosition(double pivotTarget, double armTarget) {
