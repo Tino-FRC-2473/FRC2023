@@ -6,12 +6,17 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import org.opencv.core.Mat;
+
 import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.VisionConstants;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.MjpegServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import frc.robot.Constants;
 import frc.robot.HardwareMap;
 import frc.robot.PhotonCameraWrapper;
@@ -43,6 +48,7 @@ public class DriveFSMSystem {
 		P1N1,
 		P1N2,
 		P1N3,
+		AUTO_STATE_BALANCE,
 
 		P2N1,
 		P2N2,
@@ -91,6 +97,7 @@ public class DriveFSMSystem {
 	private boolean isNotForwardEnough = false;
 	private boolean isAligned = false;
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
+	private CameraServer cam;
 	private CvSink cvSink;
 	private CvSource outputStrem;
 	static final int TURN_RIGHT_OPT = 4;
@@ -127,15 +134,18 @@ public class DriveFSMSystem {
 		leftPower = 0;
 		rightPower = 0;
 
-
 		finishedTurning = false;
 
 		gyro = new AHRS(SPI.Port.kMXP);
 
-		CameraServer.startAutomaticCapture();
-		cvSink = CameraServer.getVideo();
-		outputStrem = CameraServer.putVideo("CAM", Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+		UsbCamera usb = CameraServer.startAutomaticCapture();
+		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
+		// Creates the CvSink and connects it to the UsbCamera
+		cvSink = CameraServer.getVideo();
+		// Creates the CvSource and MjpegServer [2] and connects them
+		outputStrem = CameraServer.putVideo("RobotFrontCamera",
+		Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
 		// Reset state machine
 		resetAutonomous();
@@ -171,7 +181,7 @@ public class DriveFSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.P1N1;
+		currentState = FSMState.P2N1;
 		System.out.println("current dtstrz; " + currentState);
 
 		roboXPos = 0;
@@ -202,6 +212,7 @@ public class DriveFSMSystem {
 		System.out.println("X: " + roboXPos);
 		System.out.println("Y: " + roboYPos);
 
+
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -222,6 +233,9 @@ public class DriveFSMSystem {
 
 		updateLineOdometryTele(gyroAngleForOdo);
 		SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
+
+		System.out.println("x Pos: " + roboXPos);
+		System.out.println("y Pos: " + roboYPos);
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -244,6 +258,10 @@ public class DriveFSMSystem {
 				break;
 
 			case TELE_STATE_BALANCE:
+				handleTeleOpBalanceState(input);
+				break;
+
+			case AUTO_STATE_BALANCE:
 				handleTeleOpBalanceState(input);
 				break;
 
@@ -371,6 +389,10 @@ public class DriveFSMSystem {
 				}
 				return getCVState(input);
 			case TELE_STATE_MECANUM: return FSMState.TELE_STATE_MECANUM;
+
+			case AUTO_STATE_BALANCE:
+				return FSMState.AUTO_STATE_BALANCE;
+
 			case TURNING_STATE:
 				if (finishedTurning) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
@@ -410,26 +432,32 @@ public class DriveFSMSystem {
 				return FSMState.P1N1;
 			case P1N2:
 				if (Math.abs(roboX - Constants.P1X2) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+					&& Math.abs(roboY) <= 20) {
 					return FSMState.P1N3;
 				}
 				return FSMState.P1N2;
 			case P1N3:
 				if (Math.abs(roboX - Constants.P1X3) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					return null;
+					&& Math.abs(roboY) <= 20) {
+					return FSMState.AUTO_STATE_BALANCE;
 				}
 				return FSMState.P1N3;
 			case P2N1:
 				if (Math.abs(roboX - Constants.P2X1) <= Constants.AUTONOMUS_MOVE_THRESHOLD
 					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					return FSMState.P2N2;
+					leftMotorFront.set(0);
+					leftMotorBack.set(0);
+					rightMotorBack.set(0);
+					rightMotorFront.set(0);
+					if (Constants.finishedDeposit) {
+						return FSMState.P2N2;
+					}
 				}
 				return FSMState.P2N1;
 			case P2N2:
 				if (Math.abs(roboX - Constants.P2X2) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					return null;
+					&& Math.abs(roboY) <= 20) {
+					return FSMState.AUTO_STATE_BALANCE;
 				}
 				return FSMState.P2N2;
 			case P3N1:

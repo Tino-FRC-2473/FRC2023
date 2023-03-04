@@ -5,6 +5,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.cameraserver.CameraServer;
 // Systems
 import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
@@ -37,7 +38,7 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-
+		CameraServer.startAutomaticCapture();
 		driveSystem = new DriveFSMSystem();
 		armSystem = new ArmFSM();
 		spinningIntakeFSM = new SpinningIntakeFSM();
@@ -105,13 +106,17 @@ public class Robot extends TimedRobot {
 		// move the arm to lower state to push in cube
 		if (driveSystem.getCurrentState() == (FSMState.P1N1)
 			|| driveSystem.getCurrentState() == (FSMState.P2N1)) {
-			armSystem.updateAuto(ArmFSMState.SHOOT_LOW_FORWARD);
+			boolean done = armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_FORWARD);
+			boolean released = false;
+			if (done) {
+				released = spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+			}
+			Constants.finishedDeposit = released;
 		// shoot out the cube, then set the arm to idle state and stop the spinning intake
 		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)
 			|| driveSystem.getCurrentState() == (FSMState.P2N2)) {
-			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-			armSystem.updateAuto(ArmFSMState.IDLE);
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
+			armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
 		}
 
 		// move the arm to shoot to the high node backwards

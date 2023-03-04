@@ -30,6 +30,7 @@ public class SpinningIntakeFSM {
 		EMPTY
 	}
 	//FIX VALUES
+	private static final double CUBE_KEEP_SPEED = 0.07;
 	private static final double INTAKE_SPEED = 0.2;
 	private static final double RELEASE_SPEED = -0.2; //DONT FORGET -
 	//arbitrary constants for cube and cone
@@ -264,7 +265,11 @@ public class SpinningIntakeFSM {
 		}
 	}
 	private void handleIdleStopState() {
-		spinnerMotor.set(0);
+		if (itemType == ItemType.CUBE) {
+			spinnerMotor.set(CUBE_KEEP_SPEED);
+		} else {
+			spinnerMotor.set(0);
+		}
 	}
 	private void handleReleaseState() {
 		itemType = ItemType.EMPTY;

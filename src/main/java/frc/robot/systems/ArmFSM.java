@@ -37,11 +37,11 @@ public class ArmFSM {
 	//starts at 71 inches to 33 inches
 	//encoder over angle
 	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = -203.641 / 121;
-	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 333 / 25;
+	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 246 / 21;
 	private static final float TELEARM_MOTOR_POWER = 1.0f;
 	private static final float TELEARM_MOTOR_POWER_FINE_TUNING = 0.05f;
-	private static final float PIVOT_MOTOR_POWER = 0.3f;
-	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.1f;
+	private static final float PIVOT_MOTOR_POWER = 0.5f;
+	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.15f;
 	private static final float PIVOT_MOTOR_POWER_FINE_TUNING = 0.05f;
 
 	//20 inches
@@ -49,10 +49,10 @@ public class ArmFSM {
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 
 	//19 inches
-	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 25
+	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 21
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//11 inches
-	private static final double ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS = 25
+	private static final double ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS = 21
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//12 inches
 	private static final double ARM_ENCODER_HIGH_BACKWARD_ROTATIONS = 25
@@ -107,14 +107,14 @@ public class ArmFSM {
 	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS =
 		(125 + 13) * ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 
-	private static final double PID_PIVOT_MAX_POWER = 0.3;
-	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.1;
-	private static final double ERROR_ARM_ROTATIONS = 0.3;
+	private static final double PID_PIVOT_MAX_POWER = 0.5;
+	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.15;
+	private static final double ERROR_ARM_ROTATIONS = 1.0;
 	private static final double PID_CONSTANT_PIVOT_P = 0.00018f;
 	private static final double PID_CONSTANT_PIVOT_I = 0.000055f;
 	private static final double PID_CONSTANT_PIVOT_D = 0.000008f;
-	private static final double PID_CONSTANT_ARM_P = 0.00012f;
-	private static final double PID_CONSTANT_ARM_I = 0.000040f;
+	private static final double PID_CONSTANT_ARM_P = 0.00009f;
+	private static final double PID_CONSTANT_ARM_I = 0.00001f;
 	private static final double PID_CONSTANT_ARM_D = 0.000010f;
 	private static final double PID_ARM_MAX_POWER = 1.0;
 	private static final double JOYSTICK_DRIFT_Y = 0.03;
@@ -185,7 +185,7 @@ public class ArmFSM {
 	 * On robot start set the start to IDLE state. Resets robot to original state.
 	 */
 	public void reset() {
-		currentState = ArmFSMState.UNHOMED_STATE;
+		currentState = ArmFSMState.IDLE;
 		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 		pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 		// Call one tick of update to ensure outputs reflect start state
@@ -388,6 +388,9 @@ public class ArmFSM {
 					return ArmFSMState.SUBSTATION_PICKUP_BACKWARD;
 				} else if (!isMovingAtLimit(input) && isArmMovementInputPressed(input)) {
 					return ArmFSMState.ARM_MOVEMENT;
+				} else if (input.isHomingButtonPressed()
+					&& !atArmPosition(ARM_ENCODER_STARTING_ANGLE_ROTATIONS, 0)) {
+					return ArmFSMState.HOMING_STATE;
 				}
 				return ArmFSMState.IDLE;
 			case HOMING_STATE:
@@ -396,7 +399,7 @@ public class ArmFSM {
 				} else if (input.isHomingButtonPressed()) {
 					return ArmFSMState.HOMING_STATE;
 				}
-				return ArmFSMState.UNHOMED_STATE;
+				return ArmFSMState.IDLE;
 			case MOVING_TO_START_STATE:
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					ARM_ENCODER_STARTING_ANGLE_ROTATIONS)) {
@@ -404,7 +407,7 @@ public class ArmFSM {
 				} else if (input.isHomingButtonPressed()) {
 					return ArmFSMState.MOVING_TO_START_STATE;
 				}
-				return ArmFSMState.UNHOMED_STATE;
+				return ArmFSMState.IDLE;
 			case ARM_MOVEMENT:
 				if (isArmMovementInputPressed(input) && !isMovingAtLimit(input)
 					&& !isShootOrPickupButtonPressed(input)) {

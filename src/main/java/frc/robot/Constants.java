@@ -43,11 +43,13 @@ public class Constants {
 	public static final double AUTONOMUS_MOVE_THRESHOLD = 1.5;
 	public static final double POWER_TO_HOLD_ROBO_ON_TILTED_CS = 0.03;
 
+
+	public static boolean finishedDeposit = false;
 	// Path points
 	public static final double P1X1 = 28.271;
-	public static final double P1X2 = -108.947;
+	public static final double P1X2 = -130.947;
 	public static final double P1X3 = -53.342;
-	public static final double P2X1 = 42.751;
+	public static final double P2X1 = 28.271; //42.751;
 	public static final double P2X2 = -47.7;
 	public static final double P3X1 = -186.645;
 	public static final double P3X2 = -9;
@@ -145,5 +147,9 @@ public class Constants {
 		public static final double APRILTAG_8_Y_METERS = Units.inchesToMeters(42.19);
 		public static final double APRILTAG_8_HEIGHT_METERS = Units.inchesToMeters(18.22);
 		public static final double APRILTAG_8_ANGLE_RADIANS = Units.degreesToRadians(0);
+	}
+
+	public void setBooleanConstant(boolean B, boolean b) {
+		B = b;
 	}
 }
