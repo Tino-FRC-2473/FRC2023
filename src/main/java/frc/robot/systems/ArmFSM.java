@@ -207,8 +207,8 @@ public class ArmFSM {
 		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
 		SmartDashboard.putBoolean("At Min Height", isMinHeight());
 		SmartDashboard.putBoolean("At Arm Min", teleArmLimitSwitch.isPressed());
-		SmartDashboard.putBoolean("Is going Forward", input.isThrottleForward());
-		SmartDashboard.putNumber("Throttle Value", input.getThrottle());
+		//SmartDashboard.putBoolean("Is going Forward", input.isThrottleForward());
+		//SmartDashboard.putNumber("Throttle Value", input.getThrottle());
 		SmartDashboard.putNumber("Extension Fraction", teleArmMotor.getEncoder().getPosition()
 			/ ARM_ENCODER_MAX_LENGTH_ROTATIONS);
 		//System.out.println(pivotMotor.getEncoder().getPosition());

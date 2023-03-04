@@ -39,8 +39,9 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 
 		driveSystem = new DriveFSMSystem();
-		armSystem = new ArmFSM();
-		spinningIntakeFSM = new SpinningIntakeFSM();
+		// armSystem = new ArmFSM();
+		// spinningIntakeFSM = new SpinningIntakeFSM();
+		System.gc();
 
 		// // Instantiate all systems here
 		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
@@ -153,9 +154,10 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 
-		armSystem.reset();
+		System.gc();
+		// armSystem.reset();
 		driveSystem.resetTeleop();
-		spinningIntakeFSM.reset();
+		// spinningIntakeFSM.reset();
 		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
 		// 	armSystem.reset();
@@ -181,9 +183,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 
-		armSystem.update(input);
+		// armSystem.update(input);
 		driveSystem.update(input);
-		spinningIntakeFSM.update(input);
+		// spinningIntakeFSM.update(input);
 		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
 		// 	armSystem.update(input);

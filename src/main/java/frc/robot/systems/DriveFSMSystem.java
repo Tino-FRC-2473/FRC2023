@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.VisionConstants;
 import edu.wpi.first.math.util.Units;
-
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import frc.robot.Constants;
@@ -132,8 +132,14 @@ public class DriveFSMSystem {
 
 		gyro = new AHRS(SPI.Port.kMXP);
 
+		CameraServer.startAutomaticCapture();
+		cvSink = CameraServer.getVideo();
+		outputStrem = CameraServer.putVideo("CAM", Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+
+
 		// Reset state machine
 		resetAutonomous();
+		resetTeleop();
 
 	}
 
@@ -208,6 +214,8 @@ public class DriveFSMSystem {
 	public void update(TeleopInput input) {
 		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
 
+		System.out.println("current state: " + currentState);
+
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
@@ -236,6 +244,8 @@ public class DriveFSMSystem {
 
 			case TELE_STATE_BALANCE:
 				handleTeleOpBalanceState(input);
+				break;
+
 			case TELE_STATE_HOLD_WHILE_TILTED:
 				handleTeleOpHoldWhileTiltedState(input);
 				break;
@@ -498,6 +508,8 @@ public class DriveFSMSystem {
 	}
 
 	private FSMState getCVState(TeleopInput input) {
+
+
 		if (input != null && input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
 			isAligned = false; isNotForwardEnough = true; return FSMState.CV_LOW_TAPE_ALIGN;
 		} else if (input != null && input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
@@ -506,6 +518,7 @@ public class DriveFSMSystem {
 		} else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
 			isAligned = false; isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
 		}
+
 		return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 	}
 
@@ -519,6 +532,7 @@ public class DriveFSMSystem {
 		if (input == null) {
 			return;
 		}
+
 
 		if (isInArcadeDrive) {
 
@@ -570,6 +584,8 @@ public class DriveFSMSystem {
 			SmartDashboard.putNumber("left motor get", rightMotorFront.get());
 			SmartDashboard.putNumber("right motor get", leftMotorFront.get());
 
+
+
 		}
 
 	}
@@ -599,14 +615,15 @@ public class DriveFSMSystem {
 				/ Constants.CHARGING_STATION_BALANCE_CONSTANT_PID_P;
 		}
 
-		System.out.println("motor power: " + rightPower);
-
 		rightMotorFront.set(rightPower);
 		leftMotorFront.set(-leftPower);
 		rightMotorBack.set(rightPower);
 		leftMotorBack.set(-leftPower);
 
-		System.out.println("get " + rightMotorFront.get());
+		System.out.println("right front " + rightMotorFront.get());
+		System.out.println("left front " + leftMotorFront.get());
+		System.out.println("right back " + rightMotorBack.get());
+		System.out.println("left back " + leftMotorBack.get());
 	}
 
 	/**
@@ -615,6 +632,8 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleTeleOpHoldWhileTiltedState(TeleopInput input) {
+
+
 
 		if (Constants.HALF_REVOLUTION_DEGREES - Math.abs(gyro.getRoll())
 			< Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES && Constants.HALF_REVOLUTION_DEGREES

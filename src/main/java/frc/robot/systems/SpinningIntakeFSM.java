@@ -69,13 +69,8 @@ public class SpinningIntakeFSM {
 	 */
 	public SpinningIntakeFSM() {
 		// Perform hardware init
-		if (HardwareMap.isTestBoardGrabber()) {
-			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
+		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
-		} else {
-			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
-										CANSparkMax.MotorType.kBrushless);
-		}
 		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
 		colorSensor = new ColorSensorV3(Port.kOnboard);
 
@@ -112,11 +107,11 @@ public class SpinningIntakeFSM {
 	 */
 	public void update(TeleopInput input) {
 		//System.out.println(itemType);
-		SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
-		SmartDashboard.putNumber("r", colorSensor.getColor().red);
-		SmartDashboard.putNumber("g", colorSensor.getColor().green);
-		SmartDashboard.putNumber("b", colorSensor.getColor().blue);
-		SmartDashboard.putString("item type", itemType.toString());
+		// SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
+		// SmartDashboard.putNumber("r", colorSensor.getColor().red);
+		// SmartDashboard.putNumber("g", colorSensor.getColor().green);
+		// SmartDashboard.putNumber("b", colorSensor.getColor().blue);
+		// SmartDashboard.putString("item type", itemType.toString());
 		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		if (input == null) {
 			return;
@@ -154,12 +149,12 @@ public class SpinningIntakeFSM {
 	 */
 	public boolean updateAutonomous(SpinningIntakeFSMState state) {
 		//System.out.println(itemType);
-		SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
-		// SmartDashboard.putNumber("r", colorSensor.getColor().red);
-		// SmartDashboard.putNumber("g", colorSensor.getColor().green);
-		SmartDashboard.putNumber("b", colorSensor.getColor().blue);
-		SmartDashboard.putString("item type", itemType.toString());
-		SmartDashboard.putNumber("Blue threshold", BLUE_THRESHOLD);
+		// SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
+		// // SmartDashboard.putNumber("r", colorSensor.getColor().red);
+		// // SmartDashboard.putNumber("g", colorSensor.getColor().green);
+		// SmartDashboard.putNumber("b", colorSensor.getColor().blue);
+		// SmartDashboard.putString("item type", itemType.toString());
+		// SmartDashboard.putNumber("Blue threshold", BLUE_THRESHOLD);
 		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		switch (state) {
 			case START_STATE:
@@ -202,7 +197,6 @@ public class SpinningIntakeFSM {
 	}
 	private void updateItem() {
 		double b = colorSensor.getColor().blue;
-		System.out.println(b + " " + distanceSensorObject.getValue());
 		if (b > BLUE_THRESHOLD) {
 			itemType = ItemType.CUBE;
 		} else {
@@ -262,7 +256,6 @@ public class SpinningIntakeFSM {
 		if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
 			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE
 			&& lastBlue != newBlue) {
-			System.out.println(distanceSensorObject.getValue());
 			updateItem();
 		}
 		lastBlue = newBlue;
