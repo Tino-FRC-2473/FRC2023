@@ -41,7 +41,7 @@ public class ArmFSM {
 	private static final float TELEARM_MOTOR_POWER = 1.0f;
 	private static final float TELEARM_MOTOR_POWER_FINE_TUNING = 0.05f;
 	private static final float PIVOT_MOTOR_POWER = 0.3f;
-	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.05f;
+	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_POWER_FINE_TUNING = 0.05f;
 
 	//20 inches
@@ -108,7 +108,7 @@ public class ArmFSM {
 		(125 + 13) * ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 
 	private static final double PID_PIVOT_MAX_POWER = 0.3;
-	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.05;
+	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.1;
 	private static final double ERROR_ARM_ROTATIONS = 0.3;
 	private static final double PID_CONSTANT_PIVOT_P = 0.00018f;
 	private static final double PID_CONSTANT_PIVOT_I = 0.000055f;
@@ -185,7 +185,7 @@ public class ArmFSM {
 	 * On robot start set the start to IDLE state. Resets robot to original state.
 	 */
 	public void reset() {
-		currentState = ArmFSMState.IDLE;
+		currentState = ArmFSMState.UNHOMED_STATE;
 		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 		pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 		// Call one tick of update to ensure outputs reflect start state
@@ -198,7 +198,7 @@ public class ArmFSM {
 	 */
 	public void update(TeleopInput input) {
 		if (input == null) {
-			handleIdleState();
+			handleIdleState(input);
 			return;
 		}
 		SmartDashboard.putString("Current State", " " + currentState);
@@ -237,7 +237,7 @@ public class ArmFSM {
 				handleUnhomedState();
 				break;
 			case IDLE:
-				handleIdleState();
+				handleIdleState(input);
 				break;
 			case HOMING_STATE:
 				handleHomingState(input);
@@ -309,7 +309,7 @@ public class ArmFSM {
 		}
 		switch (state) {
 			case IDLE:
-				handleIdleState();
+				handleIdleState(null);
 				return true;
 			case AUTONOMOUS_RETRACT:
 				handleAutonomousRetractState(null);
@@ -529,10 +529,12 @@ public class ArmFSM {
 	/*
 	 * What to do when in the IDLE state
 	 */
-	private void handleIdleState() {
-		teleArmMotor.set(0);
-		pidControllerPivot.setReference(pivotEncoderRotationsIntoIdle,
-			CANSparkMax.ControlType.kPosition);
+	private void handleIdleState(TeleopInput input) {
+		if (input != null) {
+			teleArmMotor.set(0);
+			pidControllerPivot.setReference(pivotEncoderRotationsIntoIdle,
+				CANSparkMax.ControlType.kPosition);
+		}
 	}
 
 	private void handleAutonomousRetractState(TeleopInput input) {
@@ -846,6 +848,7 @@ public class ArmFSM {
 				}
 			}
 		} else {
+			System.out.println(pivotMotor.getEncoder().getPosition());
 			if (withinError(pivotMotor.getEncoder().getPosition(),
 				SHOOT_LOW_ANGLE_ENCODER_ROTATIONS)) {
 				pivotMotor.set(0);

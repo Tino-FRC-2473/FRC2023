@@ -39,8 +39,8 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 
 		driveSystem = new DriveFSMSystem();
-		// armSystem = new ArmFSM();
-		// spinningIntakeFSM = new SpinningIntakeFSM();
+		armSystem = new ArmFSM();
+		spinningIntakeFSM = new SpinningIntakeFSM();
 		System.gc();
 
 		// // Instantiate all systems here
@@ -97,6 +97,10 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
+
+		armSystem.update(null);
+		driveSystem.update(null);
+		spinningIntakeFSM.update(null);
 
 		// move the arm to lower state to push in cube
 		if (driveSystem.getCurrentState() == (FSMState.P1N1)
@@ -155,9 +159,9 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Teleop Init --------");
 
 		System.gc();
-		// armSystem.reset();
+		armSystem.reset();
 		driveSystem.resetTeleop();
-		// spinningIntakeFSM.reset();
+		spinningIntakeFSM.reset();
 		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
 		// 	armSystem.reset();
@@ -183,9 +187,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 
-		// armSystem.update(input);
+		armSystem.update(input);
 		driveSystem.update(input);
-		// spinningIntakeFSM.update(input);
+		spinningIntakeFSM.update(input);
 		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
 		// 	armSystem.update(input);

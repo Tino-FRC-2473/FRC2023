@@ -172,6 +172,7 @@ public class DriveFSMSystem {
 		gyroAngleForOdo = 0;
 
 		currentState = FSMState.P1N1;
+		System.out.println("current dtstrz; " + currentState);
 
 		roboXPos = 0;
 		roboYPos = 0;
@@ -260,10 +261,12 @@ public class DriveFSMSystem {
 			// path 1
 
 			case P1N1:
+				System.out.println("here");
 				moveState(input, true, Constants.P1X1, 0);
 				break;
 
 			case P1N2:
+				System.out.println("2");
 				moveState(input, false, Constants.P1X2, 0);
 				break;
 
@@ -620,10 +623,10 @@ public class DriveFSMSystem {
 		rightMotorBack.set(rightPower);
 		leftMotorBack.set(-leftPower);
 
-		System.out.println("right front " + rightMotorFront.get());
-		System.out.println("left front " + leftMotorFront.get());
-		System.out.println("right back " + rightMotorBack.get());
-		System.out.println("left back " + leftMotorBack.get());
+		// System.out.println("right front " + rightMotorFront.get());
+		// System.out.println("left front " + leftMotorFront.get());
+		// System.out.println("right back " + rightMotorBack.get());
+		// System.out.println("left back " + leftMotorBack.get());
 	}
 
 	/**
@@ -762,6 +765,7 @@ public class DriveFSMSystem {
 		}
 		if (Math.abs(roboX - x) <= Constants.AUTONOMUS_MOVE_THRESHOLD
 			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+			System.out.println("DONE");
 			leftMotorFront.set(0);
 			rightMotorFront.set(0);
 			leftMotorBack.set(0);
