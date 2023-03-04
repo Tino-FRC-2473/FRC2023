@@ -6,7 +6,7 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.opencv.core.Mat;
+//import org.opencv.core.Mat;
 
 import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.VisionConstants;
@@ -14,14 +14,15 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.cscore.MjpegServer;
+//import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.cscore.VideoMode.PixelFormat;
+//import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import frc.robot.Constants;
 import frc.robot.HardwareMap;
 import frc.robot.PhotonCameraWrapper;
 // Robot Imports
 import frc.robot.TeleopInput;
+import frc.robot.Robot;
 import frc.robot.drive.DriveFunctions;
 import frc.robot.drive.DriveModes;
 import frc.robot.drive.DrivePower;
@@ -40,6 +41,7 @@ public class DriveFSMSystem {
 		TELE_STATE_MECANUM,
 		PURE_PURSUIT,
 		TURNING_STATE,
+		AUTO_STATE_BALANCE,
 		CV_LOW_TAPE_ALIGN,
 		CV_HIGH_TAPE_ALIGN,
 		CV_TAG_ALIGN,
@@ -48,26 +50,14 @@ public class DriveFSMSystem {
 		P1N1,
 		P1N2,
 		P1N3,
-		AUTO_STATE_BALANCE,
 
 		P2N1,
 		P2N2,
 
 		P3N1,
 		P3N2,
-		P3N3,
-		P3N4,
-		P3N5,
-		P3N6,
 
-		P4N1,
-		P4N2,
-		P4N3,
-		P4N4,
-		P4N5,
-		P4N6,
-		P4N7,
-		P4N8,
+		P4N1
 	}
 
 	/* ======================== Private variables ======================== */
@@ -83,8 +73,6 @@ public class DriveFSMSystem {
 	private double leftPower;
 	private double rightPower;
 
-	private boolean finishedTurning;
-
 	private boolean isInArcadeDrive = true;
 
 	private double roboXPos = 0;
@@ -93,6 +81,9 @@ public class DriveFSMSystem {
 	private double prevEncoderPos = 0;
 	private double gyroAngleForOdo = 0;
 	private AHRS gyro;
+
+	private boolean completedPoint = false;
+	private boolean finishedTurning; // only for turn state
 
 	private boolean isNotForwardEnough = false;
 	private boolean isAligned = false;
@@ -182,7 +173,8 @@ public class DriveFSMSystem {
 		gyroAngleForOdo = 0;
 
 		currentState = FSMState.P2N1;
-		System.out.println("current dtstrz; " + currentState);
+		Robot.resetFinishedDeposit();
+		Robot.setNode(-1); // -1 is none, 0 is low, 1, mid, 2 is high
 
 		roboXPos = 0;
 		roboYPos = 0;
@@ -268,6 +260,7 @@ public class DriveFSMSystem {
 			case TELE_STATE_HOLD_WHILE_TILTED:
 				handleTeleOpHoldWhileTiltedState(input);
 				break;
+
 			case IDLE:
 				handleIdleState(input);
 				break;
@@ -276,15 +269,13 @@ public class DriveFSMSystem {
 				handleTurnState(input, Constants.HALF_REVOLUTION_DEGREES);
 				break;
 
-			// path 1
+			// path 1 (push in, out of communuty, charge station)
 
 			case P1N1:
-				System.out.println("here");
 				moveState(input, true, Constants.P1X1, 0);
 				break;
 
 			case P1N2:
-				System.out.println("2");
 				moveState(input, false, Constants.P1X2, 0);
 				break;
 
@@ -292,7 +283,7 @@ public class DriveFSMSystem {
 				moveState(input, true, Constants.P1X3, 0);
 				break;
 
-			// path 2
+			// path 2 (push in, charge station)
 
 			case P2N1:
 				moveState(input, true, Constants.P2X1, 0);
@@ -302,7 +293,7 @@ public class DriveFSMSystem {
 				moveState(input, false, Constants.P2X2, 0);
 				break;
 
-			// path 3
+			// path 3 (push in, out of community)
 
 			case P3N1:
 				moveState(input, true, Constants.P3X1, 0);
@@ -312,53 +303,10 @@ public class DriveFSMSystem {
 				moveState(input, false, Constants.P3X2, 0);
 				break;
 
-			case P3N3:
-				handleTurnState(input, Constants.P3A3);
-				break;
+			// path 4 (just push in)
 
-			case P3N4:
-				moveState(input, false, Constants.P3X4, Constants.P3Y4);
-				break;
-
-			case P3N5:
-				handleTurnState(input, Constants.P3A5);
-				break;
-
-			case P3N6:
-				moveState(input, false, Constants.P3X6, Constants.P3Y6);
-				break;
-
-			// path 4
 			case P4N1:
-				handleTurnState(input, Constants.P4A1);
-				break;
-
-			case P4N2:
-				moveState(input, true, Constants.P4X2,  Constants.P4Y2);
-				break;
-
-			case P4N3:
-				handleTurnState(input, Constants.P4A3);
-				break;
-
-			case P4N4:
-				moveState(input, true, Constants.P4X4, Constants.P4Y4);
-				break;
-
-			case P4N5:
-				moveState(input, false, Constants.P4X5, Constants.P4Y5);
-				break;
-
-			case P4N6:
-				handleTurnState(input, Constants.P4A6);
-				break;
-
-			case P4N7:
-				moveState(input, true, 0, Constants.P4Y7);
-				break;
-
-			case P4N8:
-				handleTurnState(input, Constants.P4A6);
+				moveState(input, true, Constants.P4X1, 0);
 				break;
 
 			default:
@@ -378,8 +326,6 @@ public class DriveFSMSystem {
 	 * @return FSM state for the next iteration
 	 */
 	private FSMState nextState(TeleopInput input) {
-		double roboX = -roboXPos;
-		double roboY = roboYPos;
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
@@ -425,116 +371,56 @@ public class DriveFSMSystem {
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 			case P1N1:
-				if (Math.abs(roboX - Constants.P1X1) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+				if (completedPoint && Robot.getFinishedDeposit()) {
+					Robot.resetFinishedDeposit();
+					completedPoint = false;
 					return FSMState.P1N2;
 				}
 				return FSMState.P1N1;
 			case P1N2:
-				if (Math.abs(roboX - Constants.P1X2) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY) <= 20) {
+				if (completedPoint) {
+					completedPoint = false;
 					return FSMState.P1N3;
 				}
 				return FSMState.P1N2;
 			case P1N3:
-				if (Math.abs(roboX - Constants.P1X3) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY) <= 20) {
+				if (completedPoint) {
+					completedPoint = false;
 					return FSMState.AUTO_STATE_BALANCE;
 				}
 				return FSMState.P1N3;
 			case P2N1:
-				if (Math.abs(roboX - Constants.P2X1) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					leftMotorFront.set(0);
-					leftMotorBack.set(0);
-					rightMotorBack.set(0);
-					rightMotorFront.set(0);
-					if (Constants.finishedDeposit) {
-						return FSMState.P2N2;
-					}
+				if (completedPoint && Robot.getFinishedDeposit()) {
+					Robot.resetFinishedDeposit();
+					completedPoint = false;
+					return FSMState.P2N2;
 				}
 				return FSMState.P2N1;
 			case P2N2:
-				if (Math.abs(roboX - Constants.P2X2) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY) <= 20) {
+				if (completedPoint) {
+					completedPoint = false;
 					return FSMState.AUTO_STATE_BALANCE;
 				}
 				return FSMState.P2N2;
 			case P3N1:
-				if (Math.abs(roboX - Constants.P3X1) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+				if (completedPoint && Robot.getFinishedDeposit()) {
+					Robot.resetFinishedDeposit();
+					completedPoint = false;
 					return FSMState.P3N2;
 				}
-				return FSMState.P3N1;
+				return FSMState.P2N1;
 			case P3N2:
-				if (Math.abs(roboX - Constants.P3X2) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					return FSMState.P3N3;
+				if (completedPoint) {
+					completedPoint = false;
+					return FSMState.IDLE;
 				}
 				return FSMState.P3N2;
-			case P3N3:
-				if (finishedTurning) {
-					return FSMState.P3N4;
-				}
-				return FSMState.P3N3;
-			case P3N4:
-				if (Math.abs(roboX - Constants.P3X4) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY - Constants.P3Y4) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					return FSMState.P3N5;
-				}
-				return FSMState.P3N4;
-			case P3N5:
-				if (finishedTurning) {
-					return FSMState.P3N6;
-				}
-				return FSMState.P3N5;
-			case P3N6:
-				if (Math.abs(roboX - Constants.P3X6) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY - Constants.P3Y6) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					return null;
-				}
-				return FSMState.P3N6;
 			case P4N1:
-				if (finishedTurning) {
-					return FSMState.P4N2;
+				if (completedPoint && Robot.getFinishedDeposit()) {
+					Robot.resetFinishedDeposit();
+					completedPoint = false;
+					return FSMState.IDLE;
 				}
-				return FSMState.P4N1;
-			case P4N2:
-				if (Math.abs(roboX - Constants.P4X2) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY - Constants.P4Y2) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					return FSMState.P4N3;
-				}
-				return FSMState.P4N2;
-			case P4N3:
-				if (finishedTurning) {
-					return FSMState.P4N4;
-				}
-				return FSMState.P4N3;
-			case P4N4:
-				if (Math.abs(roboX - Constants.P4X4) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY - Constants.P4Y4) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					return FSMState.P4N5;
-				}
-				return FSMState.P4N4;
-			case P4N5:
-				if (Math.abs(roboX - Constants.P4X5) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY - Constants.P4Y5) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					return FSMState.P4N6;
-				}
-				return FSMState.P4N5;
-			case P4N6:
-				if (finishedTurning) {
-					return FSMState.P4N7;
-				}
-				return FSMState.P3N6;
-			case P4N7:
-				if (Math.abs(roboX) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-					&& Math.abs(roboY - Constants.P4Y7) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
-					return FSMState.P4N8;
-				}
-				return FSMState.P4N7;
-			case P4N8:
-				return finishedTurning ? null : FSMState.P4N8;
 			default: throw new IllegalStateException("Invalid state: " + currentState.toString()); }
 	}
 
@@ -615,8 +501,6 @@ public class DriveFSMSystem {
 			SmartDashboard.putNumber("left motor get", rightMotorFront.get());
 			SmartDashboard.putNumber("right motor get", leftMotorFront.get());
 
-
-
 		}
 
 	}
@@ -684,15 +568,6 @@ public class DriveFSMSystem {
 		leftMotorFront.set(-leftPower);
 		rightMotorBack.set(rightPower);
 		leftMotorBack.set(-leftPower);
-	}
-
-	/**
-	 * Handle behavior in TELE_STATE_CV_ALIGN.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 */
-	private void handleCVAlignState(TeleopInput input) {
-
 	}
 
 	/**
@@ -780,20 +655,24 @@ public class DriveFSMSystem {
 		System.out.println("x: " + roboX);
 		System.out.println("y: " + roboY);
 
-		if (forwards) {
-			leftMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
-			rightMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
-			leftMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
-			rightMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
-		} else {
-			leftMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
-			rightMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
-			leftMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
-			rightMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
+		if (!completedPoint) {
+			if (forwards) {
+				leftMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
+				rightMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
+				leftMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
+				rightMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
+			} else {
+				leftMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
+				rightMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
+				leftMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
+				rightMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
+			}
 		}
-		if (Math.abs(roboX - x) <= Constants.AUTONOMUS_MOVE_THRESHOLD
-			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_MOVE_THRESHOLD) {
+
+		if (Math.abs(roboX - x) <= Constants.AUTONOMUS_X_MOVE_THRESHOLD
+			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_Y_MOVE_THRESHOLD) {
 			System.out.println("DONE");
+			completedPoint = true;
 			leftMotorFront.set(0);
 			rightMotorFront.set(0);
 			leftMotorBack.set(0);

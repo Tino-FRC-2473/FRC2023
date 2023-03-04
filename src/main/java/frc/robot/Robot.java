@@ -30,6 +30,26 @@ public class Robot extends TimedRobot {
 	private SpinningIntakeFSM spinningIntakeFSM;
 	private GroundMountFSM groundMountFSM;
 
+	// autonomus
+	private static boolean finishedDeposit = false;
+	private static int node = -1; // -1 is none, 0 is low, 1, mid, 2 is high
+
+	// /**
+	//  * This function that returns whether or not the robot has finished
+	//  * 	depositing the object in autonomus.
+	//  * @return whether or not the robot has finished depositing the object in autonomus
+	//  */
+	// public static boolean getFinishedDeposit() {
+	// 	return finishedDeposit;
+	// }
+
+	// /**
+	//  * This function that resets finishedDeposit to false when a new point begins.
+	//  */
+	// public static void resetFinishedDeposit() {
+	// 	finishedDeposit = false;
+	// }
+
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -43,29 +63,6 @@ public class Robot extends TimedRobot {
 		armSystem = new ArmFSM();
 		spinningIntakeFSM = new SpinningIntakeFSM();
 		System.gc();
-
-		// // Instantiate all systems here
-		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
-		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-		// 	driveSystem = new DriveFSMSystem();
-		// 	armSystem = new ArmFSM();
-		// 	spinningIntakeFSM = new SpinningIntakeFSM();
-		// }
-		// if (HardwareMap.isTestBoardArm()) {
-		// 	armSystem = new ArmFSM();
-		// }
-
-		// if (HardwareMap.isTestBoardGrabber()) {
-		// 	spinningIntakeFSM = new SpinningIntakeFSM();
-		// }
-
-		// if (HardwareMap.isTestBoardGroundMount()) {
-		// 	groundMountFSM = new GroundMountFSM();
-		// }
-		// if (HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem = new ArmFSM();
-		// 	spinningIntakeFSM = new SpinningIntakeFSM();
-		// }
 	}
 
 	@Override
@@ -75,25 +72,6 @@ public class Robot extends TimedRobot {
 		armSystem.reset();
 		driveSystem.resetAutonomous();
 		spinningIntakeFSM.reset();
-		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
-		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.reset();
-		// 	driveSystem.resetAutonomous();
-		// 	spinningIntakeFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardArm()) {
-		// 	armSystem.reset();
-		// }
-		// if (HardwareMap.isTestBoardGrabber()) {
-		// 	spinningIntakeFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardGroundMount()) {
-		// 	groundMountFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.reset();
-		// 	spinningIntakeFSM.reset();
-		// }
 	}
 
 	@Override
@@ -103,59 +81,76 @@ public class Robot extends TimedRobot {
 		driveSystem.update(null);
 		spinningIntakeFSM.update(null);
 
-		// move the arm to lower state to push in cube
 		if (driveSystem.getCurrentState() == (FSMState.P1N1)
-			|| driveSystem.getCurrentState() == (FSMState.P2N1)) {
-			boolean done = armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_FORWARD);
-			boolean released = false;
-			if (done) {
-				released = spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+			|| driveSystem.getCurrentState() == (FSMState.P2N1)
+			|| driveSystem.getCurrentState() == (FSMState.P3N1)
+			|| driveSystem.getCurrentState() == (FSMState.P3N1)) {
+
+
+			if (node == 2) {
+				if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_FORWARD)) {
+					finishedDeposit =
+						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				}
 			}
-			Constants.finishedDeposit = released;
-		// shoot out the cube, then set the arm to idle state and stop the spinning intake
+			if (node == 1) {
+				if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_FORWARD)) {
+					finishedDeposit =
+						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				}
+			}
+			if (node == 0) {
+				// WRITE CODE TO LEAVE ARM IN HOMING POSITION
+				if (armSystem.updateAuto(ArmFSMState.SHOOT_LOW_FORWARD)) {
+					finishedDeposit =
+						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				}
+			}
+			if (node == -1) {
+				// WRITE CODE TO LEAVE ARM IN HOMING POSITION
+				armSystem.updateAuto(ArmFSMState.HOMING_STATE);
+			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)
-			|| driveSystem.getCurrentState() == (FSMState.P2N2)) {
+			|| driveSystem.getCurrentState() == (FSMState.P2N2)
+			|| driveSystem.getCurrentState() == (FSMState.P3N2)) {
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
 			armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
 		}
 
-		// move the arm to shoot to the high node backwards
-		if (driveSystem.getCurrentState() == (FSMState.P3N1)) {
-			armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_BACKWARD);
-		// shoot the cube, then make the arm go to the lower state to pick up
-		// another game element
-		} else if (driveSystem.getCurrentState() == (FSMState.P3N2)) {
-			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-			armSystem.updateAuto(ArmFSMState.SHOOT_LOW_FORWARD);
-		// set the motors to intake another game element, move arm to shoot in mid
-		// node backwards
-		} else if (driveSystem.getCurrentState() == (FSMState.P3N3)) {
-			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.START_STATE);
-			armSystem.updateAuto(ArmFSMState.SHOOT_MID_BACKWARD);
-		// shoot out the game element, then set arm to idle and stop motors
-		} else if (driveSystem.getCurrentState() == (FSMState.P3N4)) {
-			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-			armSystem.updateAuto(ArmFSMState.IDLE);
-			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
-		}
-		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
-		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.update(null);
-		// 	driveSystem.update(null);
-		// 	spinningIntakeFSM.update(null);
+		// // move the arm to lower state to push in cube
+		// if (driveSystem.getCurrentState() == (FSMState.P1N1)
+		// 	|| driveSystem.getCurrentState() == (FSMState.P2N1)) {
+		// 	boolean done = armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_FORWARD);
+		// 	boolean released = false;
+		// 	if (done) {
+		// 		released = spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+		// 	}
+		// 	Constants.finishedDeposit = released;
+		// // shoot out the cube, then set the arm to idle state and stop the spinning intake
+		// } else if (driveSystem.getCurrentState() == (FSMState.P1N2)
+		// 	|| driveSystem.getCurrentState() == (FSMState.P2N2)) {
+		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
+		// 	armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
 		// }
-		// if (HardwareMap.isTestBoardArm()) {
-		// 	armSystem.update(null);
-		// }
-		// if (HardwareMap.isTestBoardGrabber()) {
-		// 	spinningIntakeFSM.update(null);
-		// }
-		// if (HardwareMap.isTestBoardGroundMount()) {
-		// 	groundMountFSM.update(null);
-		// }
-		// if (HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.update(null);
-		// 	spinningIntakeFSM.update(null);
+
+		// // move the arm to shoot to the high node backwards
+		// if (driveSystem.getCurrentState() == (FSMState.P3N1)) {
+		// 	armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_BACKWARD);
+		// // shoot the cube, then make the arm go to the lower state to pick up
+		// // another game element
+		// } else if (driveSystem.getCurrentState() == (FSMState.P3N2)) {
+		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+		// 	armSystem.updateAuto(ArmFSMState.SHOOT_LOW_FORWARD);
+		// // set the motors to intake another game element, move arm to shoot in mid
+		// // node backwards
+		// } else if (driveSystem.getCurrentState() == (FSMState.P3N3)) {
+		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.START_STATE);
+		// 	armSystem.updateAuto(ArmFSMState.SHOOT_MID_BACKWARD);
+		// // shoot out the game element, then set arm to idle and stop motors
+		// } else if (driveSystem.getCurrentState() == (FSMState.P3N4)) {
+		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+		// 	armSystem.updateAuto(ArmFSMState.IDLE);
+		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
 		// }
 	}
 
@@ -167,25 +162,6 @@ public class Robot extends TimedRobot {
 		armSystem.reset();
 		driveSystem.resetTeleop();
 		spinningIntakeFSM.reset();
-		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
-		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.reset();
-		// 	driveSystem.resetTeleop();
-		// 	spinningIntakeFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardArm()) {
-		// 	armSystem.reset();
-		// }
-		// if (HardwareMap.isTestBoardGrabber()) {
-		// 	spinningIntakeFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardGroundMount()) {
-		// 	groundMountFSM.reset();
-		// }
-		// if (HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.reset();
-		// 	spinningIntakeFSM.reset();
-		// }
 	}
 
 
@@ -195,25 +171,6 @@ public class Robot extends TimedRobot {
 		armSystem.update(input);
 		driveSystem.update(input);
 		spinningIntakeFSM.update(input);
-		// if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
-		// 	&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.update(input);
-		// 	driveSystem.update(input);
-		// 	spinningIntakeFSM.update(input);
-		// }
-		// if (HardwareMap.isTestBoardArm()) {
-		// 	armSystem.update(input);
-		// }
-		// if (HardwareMap.isTestBoardGrabber()) {
-		// 	spinningIntakeFSM.update(input);
-		// }
-		// if (HardwareMap.isTestBoardGroundMount()) {
-		// 	groundMountFSM.update(input);
-		// }
-		// if (HardwareMap.isTestBoardArmGrabber()) {
-		// 	armSystem.update(input);
-		// 	spinningIntakeFSM.update(input);
-		// }
 	}
 
 	@Override
