@@ -86,11 +86,10 @@ public class DriveFSMSystem {
 	private boolean finishedTurning; // only for turn state
 
 	private boolean isNotForwardEnough = false;
-	private boolean isAligned = false;
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
-	private CameraServer cam;
-	private CvSink cvSink;
-	private CvSource outputStrem;
+	// private CameraServer cam;
+	// private CvSink cvSink;
+	// private CvSource outputStrem;
 	static final int TURN_RIGHT_OPT = 4;
 	static final int TURN_LEFT_OPT = 3;
 	static final int MOVE_FORWARD_OPT = 1;
@@ -132,11 +131,11 @@ public class DriveFSMSystem {
 		UsbCamera usb = CameraServer.startAutomaticCapture();
 		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
-		// Creates the CvSink and connects it to the UsbCamera
-		cvSink = CameraServer.getVideo();
-		// Creates the CvSource and MjpegServer [2] and connects them
-		outputStrem = CameraServer.putVideo("RobotFrontCamera",
-		Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+		// // Creates the CvSink and connects it to the UsbCamera
+		// cvSink = CameraServer.getVideo();
+		// // Creates the CvSource and MjpegServer [2] and connects them
+		// outputStrem = CameraServer.putVideo("RobotFrontCamera",
+		// Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
 		// Reset state machine
 		resetAutonomous();
@@ -333,12 +332,19 @@ public class DriveFSMSystem {
 				} else if (input != null && input.isSteeringWheelHoldPressedRaw()) {
 					return FSMState.TELE_STATE_HOLD_WHILE_TILTED;
 				}
-				return getCVState(input);
-			case TELE_STATE_MECANUM: return FSMState.TELE_STATE_MECANUM;
-
+				if (input != null && input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
+					isNotForwardEnough = true; return FSMState.CV_LOW_TAPE_ALIGN;
+				} else if (input != null && input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
+					isNotForwardEnough = true;
+					return FSMState.CV_HIGH_TAPE_ALIGN;
+				} else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
+					isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
+				}
+				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+			case TELE_STATE_MECANUM:
+				return FSMState.TELE_STATE_MECANUM;
 			case AUTO_STATE_BALANCE:
 				return FSMState.AUTO_STATE_BALANCE;
-
 			case TURNING_STATE:
 				if (finishedTurning) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
@@ -424,21 +430,6 @@ public class DriveFSMSystem {
 			default: throw new IllegalStateException("Invalid state: " + currentState.toString()); }
 	}
 
-	private FSMState getCVState(TeleopInput input) {
-
-
-		if (input != null && input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
-			isAligned = false; isNotForwardEnough = true; return FSMState.CV_LOW_TAPE_ALIGN;
-		} else if (input != null && input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
-			isAligned = false; isNotForwardEnough = true;
-			return FSMState.CV_HIGH_TAPE_ALIGN;
-		} else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
-			isAligned = false; isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
-		}
-
-		return FSMState.TELE_STATE_2_MOTOR_DRIVE;
-	}
-
 	/* ------------------------ FSM state handlers ------------------------ */
 	/**
 	 * Handle behavior in TELE_STATE_2_MOTOR_DRIVE.
@@ -449,7 +440,6 @@ public class DriveFSMSystem {
 		if (input == null) {
 			return;
 		}
-
 
 		if (isInArcadeDrive) {
 
@@ -492,7 +482,6 @@ public class DriveFSMSystem {
 			SmartDashboard.putNumber("left motor", leftPower);
 			SmartDashboard.putNumber("right motor", rightPower);
 
-
 			rightMotorFront.set(rightPower);
 			leftMotorFront.set(leftPower);
 			rightMotorBack.set(rightPower);
@@ -502,7 +491,6 @@ public class DriveFSMSystem {
 			SmartDashboard.putNumber("right motor get", leftMotorFront.get());
 
 		}
-
 	}
 
 	/**
@@ -534,11 +522,6 @@ public class DriveFSMSystem {
 		leftMotorFront.set(-leftPower);
 		rightMotorBack.set(rightPower);
 		leftMotorBack.set(-leftPower);
-
-		// System.out.println("right front " + rightMotorFront.get());
-		// System.out.println("left front " + leftMotorFront.get());
-		// System.out.println("right back " + rightMotorBack.get());
-		// System.out.println("left back " + leftMotorBack.get());
 	}
 
 	/**
@@ -547,8 +530,6 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleTeleOpHoldWhileTiltedState(TeleopInput input) {
-
-
 
 		if (Constants.HALF_REVOLUTION_DEGREES - Math.abs(gyro.getRoll())
 			< Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES && Constants.HALF_REVOLUTION_DEGREES
@@ -562,7 +543,6 @@ public class DriveFSMSystem {
 			leftPower = -Constants.POWER_TO_HOLD_ROBO_ON_TILTED_CS;
 			rightPower = -Constants.POWER_TO_HOLD_ROBO_ON_TILTED_CS;
 		}
-
 
 		rightMotorFront.set(rightPower);
 		leftMotorFront.set(-leftPower);
@@ -598,17 +578,18 @@ public class DriveFSMSystem {
 			leftMotorFront.set(0);
 			rightMotorBack.set(0);
 			return;
-		}
-		double power = Math.abs(error) / Constants.TURN_ERROR_POWER_RATIO;
-		if (power < Constants.MIN_TURN_POWER) {
-			power = Constants.MIN_TURN_POWER;
-		}
-		power *= ((error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -1 : 1);
+		} else {
+			double power = Math.abs(error) / Constants.TURN_ERROR_POWER_RATIO;
+			if (power < Constants.MIN_TURN_POWER) {
+				power = Constants.MIN_TURN_POWER;
+			}
+			power *= ((error < 0 && error > -Constants.HALF_REVOLUTION_DEGREES) ? -1 : 1);
 
-		leftMotorFront.set(-power);
-		rightMotorFront.set(-power);
-		leftMotorBack.set(-power);
-		rightMotorBack.set(-power);
+			leftMotorFront.set(-power);
+			rightMotorFront.set(-power);
+			leftMotorBack.set(-power);
+			rightMotorBack.set(-power);
+		}
 		// turning right is positive and left is negative
 	}
 
@@ -639,7 +620,6 @@ public class DriveFSMSystem {
 	}
 
 	/**
-	 * .
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 * @param forwards whether the robot is moving forwards or backwards
@@ -669,8 +649,8 @@ public class DriveFSMSystem {
 			}
 		}
 
-		if (Math.abs(roboX - x) <= Constants.AUTONOMUS_X_MOVE_THRESHOLD
-			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_Y_MOVE_THRESHOLD) {
+		if ((Math.abs(roboX - x) <= Constants.AUTONOMUS_X_MOVE_THRESHOLD
+			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_Y_MOVE_THRESHOLD) || completedPoint) {
 			System.out.println("DONE");
 			completedPoint = true;
 			leftMotorFront.set(0);
@@ -729,7 +709,6 @@ public class DriveFSMSystem {
 		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
 			cvmove(TURN_LEFT_OPT);
 		} else {
-			isAligned = true;
 			if (isNotForwardEnough) {
 				cvmove(MOVE_FORWARD_OPT);
 			} else {
@@ -756,7 +735,6 @@ public class DriveFSMSystem {
 		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
 			cvmove(TURN_LEFT_OPT);
 		} else {
-			isAligned = true;
 			if (isNotForwardEnough) {
 				cvmove(MOVE_FORWARD_OPT);
 			} else {
@@ -775,7 +753,6 @@ public class DriveFSMSystem {
 		double angle = pcw.getEstimatedGlobalPose().getRotation().getAngle();
 		isNotForwardEnough = x > Units.inchesToMeters(Constants.TAG_DRIVEUP_DISTANCE_INCHES);
 		if (Math.abs(angle) < Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			isAligned = true;
 			if (isNotForwardEnough) {
 				cvmove(1);
 				x = pcw.getEstimatedGlobalPose().getX();

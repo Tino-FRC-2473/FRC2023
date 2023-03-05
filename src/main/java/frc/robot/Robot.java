@@ -34,21 +34,30 @@ public class Robot extends TimedRobot {
 	private static boolean finishedDeposit = false;
 	private static int node = -1; // -1 is none, 0 is low, 1, mid, 2 is high
 
-	// /**
-	//  * This function that returns whether or not the robot has finished
-	//  * 	depositing the object in autonomus.
-	//  * @return whether or not the robot has finished depositing the object in autonomus
-	//  */
-	// public static boolean getFinishedDeposit() {
-	// 	return finishedDeposit;
-	// }
+	/**
+	 * This function that returns whether or not the robot has finished
+	 * 	depositing the object in autonomus.
+	 * @return whether or not the robot has finished depositing the object in autonomus
+	 */
+	public static boolean getFinishedDeposit() {
+		return finishedDeposit;
+	}
 
-	// /**
-	//  * This function that resets finishedDeposit to false when a new point begins.
-	//  */
-	// public static void resetFinishedDeposit() {
-	// 	finishedDeposit = false;
-	// }
+	/**
+	 * This function that resets finishedDeposit to false when a new point begins.
+	 */
+	public static void resetFinishedDeposit() {
+		finishedDeposit = false;
+	}
+
+	/**
+	 * This function that sets node to high if 2 is entered, mid if 1 is entered,
+	 * 	low if 0 is entered, and none if 0 is entered.
+	 * @param level the node at which the robot will deposit an object in autonomus
+	 */
+	public static void setNode(int level) {
+		node = level;
+	}
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -116,42 +125,6 @@ public class Robot extends TimedRobot {
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
 			armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
 		}
-
-		// // move the arm to lower state to push in cube
-		// if (driveSystem.getCurrentState() == (FSMState.P1N1)
-		// 	|| driveSystem.getCurrentState() == (FSMState.P2N1)) {
-		// 	boolean done = armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_FORWARD);
-		// 	boolean released = false;
-		// 	if (done) {
-		// 		released = spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-		// 	}
-		// 	Constants.finishedDeposit = released;
-		// // shoot out the cube, then set the arm to idle state and stop the spinning intake
-		// } else if (driveSystem.getCurrentState() == (FSMState.P1N2)
-		// 	|| driveSystem.getCurrentState() == (FSMState.P2N2)) {
-		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
-		// 	armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
-		// }
-
-		// // move the arm to shoot to the high node backwards
-		// if (driveSystem.getCurrentState() == (FSMState.P3N1)) {
-		// 	armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_BACKWARD);
-		// // shoot the cube, then make the arm go to the lower state to pick up
-		// // another game element
-		// } else if (driveSystem.getCurrentState() == (FSMState.P3N2)) {
-		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-		// 	armSystem.updateAuto(ArmFSMState.SHOOT_LOW_FORWARD);
-		// // set the motors to intake another game element, move arm to shoot in mid
-		// // node backwards
-		// } else if (driveSystem.getCurrentState() == (FSMState.P3N3)) {
-		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.START_STATE);
-		// 	armSystem.updateAuto(ArmFSMState.SHOOT_MID_BACKWARD);
-		// // shoot out the game element, then set arm to idle and stop motors
-		// } else if (driveSystem.getCurrentState() == (FSMState.P3N4)) {
-		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-		// 	armSystem.updateAuto(ArmFSMState.IDLE);
-		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
-		// }
 	}
 
 	@Override
