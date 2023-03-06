@@ -25,11 +25,12 @@ public class GroundMountFSM {
 		AUTONOMOUS_IDLE
 	}
 	//arbitrary constants, must test all of these
-	private static final double PIVOT_UP_POWER = 0.07;
-	private static final double MAX_POWER = 0.3;
-	private boolean zeroed = false;
-	private static final double BOTTOM_ENCODER_LIMIT = 65.00; //ARBITRARY VALUE
-	private static final double P_CONSTANT = 0.005;
+	private static final double PIVOT_UP_POWER = 0.08;
+	private static final double MIN_POWER = -0.2;
+	private static final double MAX_POWER = 0.1;
+	private boolean zeroed = true;
+	private static final double BOTTOM_ENCODER_LIMIT = 47.00; //ARBITRARY VALUE
+	private static final double P_CONSTANT = 0.006;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -84,7 +85,8 @@ public class GroundMountFSM {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		zeroed = false;
+		zeroed = true;
+		pivotArmMotor.getEncoder().setPosition(0);
 		currentState = FSMState.START_STATE;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -223,8 +225,8 @@ public class GroundMountFSM {
 	private double capMotorPower(double a) {
 		if (a > MAX_POWER) {
 			return MAX_POWER;
-		} else if (a < -MAX_POWER) {
-			return -MAX_POWER;
+		} else if (a < MIN_POWER) {
+			return MIN_POWER;
 		}
 		return a;
 	}
@@ -234,7 +236,7 @@ public class GroundMountFSM {
 	 * Handle behavior in states.
 	 */
 	private void handleStartState() {
-		pivotArmMotor.set(-PIVOT_UP_POWER);
+		//pivotArmMotor.set(-PIVOT_UP_POWER);
 		if (limitSwitchHigh.isPressed()) {
 			zeroed = true;
 			pivotArmMotor.getEncoder().setPosition(0);
