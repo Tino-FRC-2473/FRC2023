@@ -156,6 +156,7 @@ public class SpinningIntakeFSM {
 		// SmartDashboard.putString("item type", itemType.toString());
 		// SmartDashboard.putNumber("Blue threshold", BLUE_THRESHOLD);
 		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
+		isMotorAllowed = true;
 		switch (state) {
 			case START_STATE:
 				handleStartState();

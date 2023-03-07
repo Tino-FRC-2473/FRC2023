@@ -107,6 +107,7 @@ public class ArmFSM {
 	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS =
 		(125 + 13) * ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 
+	private static final double AUTONOMOUS_UP_ANGLE_ENCODER_ROTATIONS = -158;
 	private static final double PID_PIVOT_MAX_POWER = 0.5;
 	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.15;
 	private static final double ERROR_ARM_ROTATIONS = 1.0;
@@ -117,7 +118,7 @@ public class ArmFSM {
 	private static final double PID_CONSTANT_ARM_I = 0.00001f;
 	private static final double PID_CONSTANT_ARM_D = 0.000010f;
 	private static final double PID_ARM_MAX_POWER = 1.0;
-	private static final double JOYSTICK_DRIFT_Y = 0.03;
+	private static final double JOYSTICK_DRIFT_Y = 0.05;
 
 	/* ======================== Private variables ======================== */
 	private ArmFSMState currentState;
@@ -294,7 +295,6 @@ public class ArmFSM {
 		SmartDashboard.putBoolean("At Min Height", isMinHeight());
 		if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX
 			&& pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN) {
-			System.out.println("HIGH");
 			pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,
 				PID_PIVOT_SLOW_DOWN_MAX_POWER);
 		} else {
@@ -333,6 +333,10 @@ public class ArmFSM {
 			case SHOOT_LOW_FORWARD:
 				handleShootLowState(null);
 				return atArmPosition(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS, ARM_ENCODER_LOW_ROTATIONS);
+			case MOVING_TO_START_STATE:
+				handleMovingToStartState(null);
+				return atArmPosition(ARM_ENCODER_STARTING_ANGLE_ROTATIONS,
+					teleArmMotor.getEncoder().getPosition());
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -344,7 +348,9 @@ public class ArmFSM {
 	 */
 	private ArmFSMState nextState(TeleopInput input) {
 		if (input == null) {
-			return ArmFSMState.IDLE;
+			// return ArmFSMState.IDLE;
+			// WHY?
+			return null;
 		}
 		switch (currentState) {
 			case UNHOMED_STATE:
@@ -562,12 +568,22 @@ public class ArmFSM {
 	}
 
 	private void handleMovingToStartState(TeleopInput input) {
-		if (withinError(pivotMotor.getEncoder().getPosition(),
-			ARM_ENCODER_STARTING_ANGLE_ROTATIONS)) {
-			pivotMotor.set(0);
+		if (input != null) {
+			if (withinError(pivotMotor.getEncoder().getPosition(),
+				ARM_ENCODER_STARTING_ANGLE_ROTATIONS)) {
+				pivotMotor.set(0);
+			} else {
+				pidControllerPivot.setReference(ARM_ENCODER_STARTING_ANGLE_ROTATIONS,
+					CANSparkMax.ControlType.kPosition);
+			}
 		} else {
-			pidControllerPivot.setReference(ARM_ENCODER_STARTING_ANGLE_ROTATIONS,
-				CANSparkMax.ControlType.kPosition);
+			if (withinError(pivotMotor.getEncoder().getPosition(),
+				AUTONOMOUS_UP_ANGLE_ENCODER_ROTATIONS)) {
+				pivotMotor.set(0);
+			} else {
+				pidControllerPivot.setReference(ARM_ENCODER_STARTING_ANGLE_ROTATIONS,
+					CANSparkMax.ControlType.kPosition);
+			}
 		}
 	}
 	/*

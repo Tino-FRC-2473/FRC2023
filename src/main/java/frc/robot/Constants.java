@@ -41,7 +41,7 @@ public class Constants {
 	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 200;
 	public static final double AUTONOMUS_MOVE_POWER = 0.1;
 	public static final double AUTONOMUS_X_MOVE_THRESHOLD = 1.5;
-	public static final double AUTONOMUS_Y_MOVE_THRESHOLD = 1.5;
+	public static final double AUTONOMUS_Y_MOVE_THRESHOLD = 20;
 	public static final double POWER_TO_HOLD_ROBO_ON_TILTED_CS = 0.03;
 
 	// Path points
@@ -61,27 +61,6 @@ public class Constants {
 
 	// push in only
 	public static final double P4X1 = 28.271;
-
-	// public static final double P3X1 = -186.645;
-	// public static final double P3X2 = -9;
-	// public static final double P3X4 = -33.5;
-	// public static final double P3Y4 = 65.37;
-	// public static final double P3X6 = -81.047;
-	// public static final double P3Y6 = 65.37;
-	// public static final double P3A3 = 69.454 * 0.8807; // 69.454
-	// public static final double P3A5 = 9; // 0
-	// public static final double P4A1 = (360 - 6.235); // unchanged
-	// public static final double P4X2 = 146.122;
-	// public static final double P4Y2 = 15.768;
-	// public static final double P4A3 = 0; // back to 0
-	// public static final double P4X4 = 178.07;
-	// public static final double P4Y4 = 15.768;
-	// public static final double P4X5 = 146.122;
-	// public static final double P4Y5 = 15.768;
-	// public static final double P4A6 = (180 + 2.358); // unchanged
-	// public static final double P4Y7 = 21.449;
-	// public static final double P4A8 =  180;
-
 
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;

@@ -12,8 +12,8 @@ import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.VisionConstants;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
+// import edu.wpi.first.cscore.CvSink;
+// import edu.wpi.first.cscore.CvSource;
 //import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.cscore.UsbCamera;
 //import edu.wpi.first.cscore.VideoMode.PixelFormat;
@@ -125,6 +125,10 @@ public class DriveFSMSystem {
 		rightPower = 0;
 
 		finishedTurning = false;
+		completedPoint = false;
+
+		roboXPos = 0;
+		roboYPos = 0;
 
 		gyro = new AHRS(SPI.Port.kMXP);
 
@@ -173,7 +177,8 @@ public class DriveFSMSystem {
 
 		currentState = FSMState.P2N1;
 		Robot.resetFinishedDeposit();
-		Robot.setNode(-1); // -1 is none, 0 is low, 1, mid, 2 is high
+		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
+		completedPoint = false;
 
 		roboXPos = 0;
 		roboYPos = 0;
@@ -203,7 +208,6 @@ public class DriveFSMSystem {
 		System.out.println("X: " + roboXPos);
 		System.out.println("Y: " + roboYPos);
 
-
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -217,7 +221,7 @@ public class DriveFSMSystem {
 	public void update(TeleopInput input) {
 		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
 
-		System.out.println("current state: " + currentState);
+		//System.out.println("current state: " + currentState);
 
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
@@ -225,8 +229,8 @@ public class DriveFSMSystem {
 		updateLineOdometryTele(gyroAngleForOdo);
 		SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
 
-		System.out.println("x Pos: " + roboXPos);
-		System.out.println("y Pos: " + roboYPos);
+		// System.out.println("x Pos: " + roboXPos);
+		// System.out.println("y Pos: " + roboYPos);
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -234,17 +238,14 @@ public class DriveFSMSystem {
 				break;
 
 			case CV_LOW_TAPE_ALIGN:
-				System.out.println("low");
 				handleCVTapeAlignState(true);
 				break;
 
 			case CV_HIGH_TAPE_ALIGN:
-				System.out.println("high");
 				handleCVTapeAlignState(false);
 				break;
 
 			case CV_TAG_ALIGN:
-				System.out.println("tag");
 				handleCVTagAlignState();
 				break;
 
@@ -376,6 +377,8 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_HOLD_WHILE_TILTED;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+
+			// auto paths
 			case P1N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
 					Robot.resetFinishedDeposit();
@@ -476,8 +479,8 @@ public class DriveFSMSystem {
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
 
-			System.out.println("X: " + roboXPos);
-			System.out.println("Y: " + roboYPos);
+			// System.out.println("X: " + roboXPos);
+			// System.out.println("Y: " + roboYPos);
 
 			SmartDashboard.putNumber("left motor", leftPower);
 			SmartDashboard.putNumber("right motor", rightPower);
@@ -499,7 +502,6 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleTeleOpBalanceState(TeleopInput input) {
-
 
 		if (Constants.HALF_REVOLUTION_DEGREES - Math.abs(gyro.getRoll())
 			< Constants.CHARGING_STATION_LEVELED_ERROR_DEGREES && Constants.HALF_REVOLUTION_DEGREES
@@ -630,10 +632,11 @@ public class DriveFSMSystem {
 		if (input != null) {
 			return;
 		}
+
 		double roboX = -roboXPos;
 		double roboY = roboYPos;
-		System.out.println("x: " + roboX);
-		System.out.println("y: " + roboY);
+		// System.out.println("x: " + roboX);
+		// System.out.println("y: " + roboY);
 
 		if (!completedPoint) {
 			if (forwards) {
@@ -651,13 +654,15 @@ public class DriveFSMSystem {
 
 		if ((Math.abs(roboX - x) <= Constants.AUTONOMUS_X_MOVE_THRESHOLD
 			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_Y_MOVE_THRESHOLD) || completedPoint) {
-			System.out.println("DONE");
+			// System.out.println("DONE");
 			completedPoint = true;
 			leftMotorFront.set(0);
 			rightMotorFront.set(0);
 			leftMotorBack.set(0);
 			rightMotorBack.set(0);
 		}
+
+		// System.out.println("completed point " + completedPoint);
 	}
 
 

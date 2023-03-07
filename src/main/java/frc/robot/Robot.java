@@ -10,7 +10,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.SpinningIntakeFSM;
-import frc.robot.systems.GroundMountFSM;
+//import frc.robot.systems.GroundMountFSM;
 
 import frc.robot.systems.ArmFSM.ArmFSMState;
 import frc.robot.systems.DriveFSMSystem.FSMState;
@@ -28,7 +28,7 @@ public class Robot extends TimedRobot {
 	private ArmFSM armSystem;
 	private DriveFSMSystem driveSystem;
 	private SpinningIntakeFSM spinningIntakeFSM;
-	private GroundMountFSM groundMountFSM;
+	//private GroundMountFSM groundMountFSM;
 
 	// autonomus
 	private static boolean finishedDeposit = false;
@@ -77,6 +77,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
+		System.gc();
 
 		armSystem.reset();
 		driveSystem.resetAutonomous();
@@ -90,11 +91,12 @@ public class Robot extends TimedRobot {
 		driveSystem.update(null);
 		spinningIntakeFSM.update(null);
 
+		//System.out.println("finished deposit " + finishedDeposit);
+
 		if (driveSystem.getCurrentState() == (FSMState.P1N1)
 			|| driveSystem.getCurrentState() == (FSMState.P2N1)
 			|| driveSystem.getCurrentState() == (FSMState.P3N1)
-			|| driveSystem.getCurrentState() == (FSMState.P3N1)) {
-
+			|| driveSystem.getCurrentState() == (FSMState.P4N1)) {
 
 			if (node == 2) {
 				if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_FORWARD)) {
@@ -109,7 +111,6 @@ public class Robot extends TimedRobot {
 				}
 			}
 			if (node == 0) {
-				// WRITE CODE TO LEAVE ARM IN HOMING POSITION
 				if (armSystem.updateAuto(ArmFSMState.SHOOT_LOW_FORWARD)) {
 					finishedDeposit =
 						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
@@ -117,13 +118,17 @@ public class Robot extends TimedRobot {
 			}
 			if (node == -1) {
 				// WRITE CODE TO LEAVE ARM IN HOMING POSITION
-				armSystem.updateAuto(ArmFSMState.HOMING_STATE);
+				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+				finishedDeposit = true;
 			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)
+			|| driveSystem.getCurrentState() == (FSMState.P1N3)
 			|| driveSystem.getCurrentState() == (FSMState.P2N2)
 			|| driveSystem.getCurrentState() == (FSMState.P3N2)) {
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
-			armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
+			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
+				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+			}
 		}
 	}
 
