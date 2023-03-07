@@ -38,8 +38,6 @@ public class DriveFSMSystem {
 		TELE_STATE_2_MOTOR_DRIVE,
 		TELE_STATE_BALANCE,
 		TELE_STATE_HOLD_WHILE_TILTED,
-		TELE_STATE_MECANUM,
-		PURE_PURSUIT,
 		TURNING_STATE,
 		AUTO_STATE_BALANCE,
 		CV_LOW_TAPE_ALIGN,
@@ -205,9 +203,6 @@ public class DriveFSMSystem {
 		roboXPos = 0;
 		roboYPos = 0;
 
-		System.out.println("X: " + roboXPos);
-		System.out.println("Y: " + roboYPos);
-
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -221,16 +216,11 @@ public class DriveFSMSystem {
 	public void update(TeleopInput input) {
 		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
 
-		//System.out.println("current state: " + currentState);
-
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
 		updateLineOdometryTele(gyroAngleForOdo);
 		SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
-
-		// System.out.println("x Pos: " + roboXPos);
-		// System.out.println("y Pos: " + roboYPos);
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -342,8 +332,6 @@ public class DriveFSMSystem {
 					isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
-			case TELE_STATE_MECANUM:
-				return FSMState.TELE_STATE_MECANUM;
 			case AUTO_STATE_BALANCE:
 				return FSMState.AUTO_STATE_BALANCE;
 			case TURNING_STATE:
@@ -479,20 +467,10 @@ public class DriveFSMSystem {
 			leftPower = power.getLeftPower();
 			rightPower = power.getRightPower();
 
-			// System.out.println("X: " + roboXPos);
-			// System.out.println("Y: " + roboYPos);
-
-			SmartDashboard.putNumber("left motor", leftPower);
-			SmartDashboard.putNumber("right motor", rightPower);
-
 			rightMotorFront.set(rightPower);
 			leftMotorFront.set(leftPower);
 			rightMotorBack.set(rightPower);
 			leftMotorBack.set(leftPower);
-
-			SmartDashboard.putNumber("left motor get", rightMotorFront.get());
-			SmartDashboard.putNumber("right motor get", leftMotorFront.get());
-
 		}
 	}
 
@@ -571,9 +549,8 @@ public class DriveFSMSystem {
 		if (error < -Constants.HALF_REVOLUTION_DEGREES) {
 			error += Constants.ONE_REVOLUTION_DEGREES;
 		}
-		System.out.println("ERROR: " + error);
+
 		if (Math.abs(error) <= Constants.TURN_ERROR_THRESHOLD_DEGREE) {
-			System.out.println("DONE");
 			finishedTurning = true;
 			leftMotorBack.set(0);
 			rightMotorBack.set(0);
@@ -635,8 +612,6 @@ public class DriveFSMSystem {
 
 		double roboX = -roboXPos;
 		double roboY = roboYPos;
-		// System.out.println("x: " + roboX);
-		// System.out.println("y: " + roboY);
 
 		if (!completedPoint) {
 			if (forwards) {
@@ -654,15 +629,12 @@ public class DriveFSMSystem {
 
 		if ((Math.abs(roboX - x) <= Constants.AUTONOMUS_X_MOVE_THRESHOLD
 			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_Y_MOVE_THRESHOLD) || completedPoint) {
-			// System.out.println("DONE");
 			completedPoint = true;
 			leftMotorFront.set(0);
 			rightMotorFront.set(0);
 			leftMotorBack.set(0);
 			rightMotorBack.set(0);
 		}
-
-		// System.out.println("completed point " + completedPoint);
 	}
 
 
@@ -696,16 +668,13 @@ public class DriveFSMSystem {
 			angle = pcw.getLowerTapeTurnAngle();
 			isNotForwardEnough =  pcw.getLowerTapeDistance()
 				> Constants.LOWER_TAPE_DRIVEUP_DISTANCE_INCHES;
-			System.out.println("distance: " + pcw.getLowerTapeDistance());
 			//drives forward until within 42 inches of lower tape
 		} else {
 			angle = pcw.getHigherTapeTurnAngle();
 			isNotForwardEnough = pcw.getHigherTapeDistance()
 				> Constants.HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES;
-			System.out.println("distance: " + pcw.getHigherTapeDistance());
 			//drives forward until within 65 inches of higher tape
 		}
-		System.out.println("angle: " + angle);
 		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
 			return;
 		}
@@ -727,7 +696,6 @@ public class DriveFSMSystem {
  	* Aligns to april tag and drives up to within 35 inches of it
 	*/
 	public void handleCVTagAlignState() {
-		System.out.println("TAG");
 		double angle = pcw.getTagTurnAngle();
 		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
 			return;
@@ -752,7 +720,6 @@ public class DriveFSMSystem {
 	 */
 	public void handleMidCubeNodeAlignState() {
 		pcw.setPipelineIndex(VisionConstants.THREEDTAG_PIPELINE_INDEX); //3d pipeline
-		System.out.println("CUBE NODE");
 		double x = pcw.getEstimatedGlobalPose().getX();
 		double y = pcw.getEstimatedGlobalPose().getY();
 		double angle = pcw.getEstimatedGlobalPose().getRotation().getAngle();
@@ -822,10 +789,7 @@ public class DriveFSMSystem {
 				rightMotorBack.set(-Constants.CV_TURN_POWER);
 				break;
 			default:
-				System.out.println("ERROR");
 				break;
 		}
 	}
-
-
 }

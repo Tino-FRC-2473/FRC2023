@@ -1,6 +1,5 @@
 package frc.robot.systems;
 
-
 // WPILib Imports
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -31,8 +30,6 @@ public class ArmFSM {
 		SUBSTATION_PICKUP_FORWARD,
 		SUBSTATION_PICKUP_BACKWARD
 	}
-
-
 
 	//starts at 71 inches to 33 inches
 	//encoder over angle
@@ -349,7 +346,6 @@ public class ArmFSM {
 	private ArmFSMState nextState(TeleopInput input) {
 		if (input == null) {
 			// return ArmFSMState.IDLE;
-			// WHY?
 			return null;
 		}
 		switch (currentState) {
