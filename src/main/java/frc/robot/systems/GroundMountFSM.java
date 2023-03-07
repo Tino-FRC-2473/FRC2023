@@ -29,7 +29,7 @@ public class GroundMountFSM {
 	private static final double MIN_POWER = -0.2;
 	private static final double MAX_POWER = 0.1;
 	private boolean zeroed = true;
-	private static final double BOTTOM_ENCODER_LIMIT = 47.00; //ARBITRARY VALUE
+	private static final double BOTTOM_ENCODER_LIMIT = 40.00; //ARBITRARY VALUE
 	private static final double P_CONSTANT = 0.006;
 
 	/* ======================== Private variables ======================== */

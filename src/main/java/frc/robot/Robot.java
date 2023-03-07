@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		groundMountFSM = new GroundMountFSM();
+		spinningIntakeFSM = new SpinningIntakeFSM();
 	}
 
 	@Override
@@ -54,7 +55,7 @@ public class Robot extends TimedRobot {
 			groundMountFSM.reset();
 		}
 		if (HardwareMap.isTestBoardArmGrabber()) {
-			armSystem.reset();
+			groundMountFSM.reset();
 			spinningIntakeFSM.reset();
 		}
 	}
@@ -77,7 +78,7 @@ public class Robot extends TimedRobot {
 			groundMountFSM.update(null);
 		}
 		if (HardwareMap.isTestBoardArmGrabber()) {
-			armSystem.update(null);
+			groundMountFSM.update(null);
 			spinningIntakeFSM.update(null);
 		}
 	}
@@ -86,6 +87,7 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		groundMountFSM.reset();
+		spinningIntakeFSM.reset();
 	}
 
 
@@ -107,7 +109,7 @@ public class Robot extends TimedRobot {
 			groundMountFSM.update(input);
 		}
 		if (HardwareMap.isTestBoardArmGrabber()) {
-			armSystem.update(input);
+			groundMountFSM.update(input);
 			spinningIntakeFSM.update(input);
 		}
 	}
