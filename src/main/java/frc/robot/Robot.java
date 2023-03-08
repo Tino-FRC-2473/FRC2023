@@ -119,10 +119,30 @@ public class Robot extends TimedRobot {
 				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 				finishedDeposit = true;
 			}
+		} else if (driveSystem.getCurrentState() == (FSMState.P5N1)) {
+
+			if (node == 2) {
+				if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_BACKWARD)) {
+					finishedDeposit =
+						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				}
+			}
+			if (node == 1) {
+				if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_BACKWARD)) {
+					finishedDeposit =
+						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				}
+			}
+			if (node == -1) {
+				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+				finishedDeposit = true;
+			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)
 			|| driveSystem.getCurrentState() == (FSMState.P1N3)
 			|| driveSystem.getCurrentState() == (FSMState.P2N2)
-			|| driveSystem.getCurrentState() == (FSMState.P3N2)) {
+			|| driveSystem.getCurrentState() == (FSMState.P3N2)
+			|| driveSystem.getCurrentState() == (FSMState.P5N2)) {
+
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
 			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
 				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
