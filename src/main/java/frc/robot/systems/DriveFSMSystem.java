@@ -332,34 +332,42 @@ public class DriveFSMSystem {
 					isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+
 			case AUTO_STATE_BALANCE:
 				return FSMState.AUTO_STATE_BALANCE;
+
 			case TURNING_STATE:
 				if (finishedTurning) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.TURNING_STATE;
+
 			case CV_LOW_TAPE_ALIGN:
 				if (!input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_LOW_TAPE_ALIGN;
+
 			case CV_HIGH_TAPE_ALIGN:
 				if (!input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_HIGH_TAPE_ALIGN;
+
 			case CV_TAG_ALIGN:
 				if (!input.isDriveJoystickCVTagButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_TAG_ALIGN;
+
 			case IDLE: return FSMState.IDLE;
+
 			case TELE_STATE_BALANCE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
 					return FSMState.TELE_STATE_BALANCE;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+
 			case TELE_STATE_HOLD_WHILE_TILTED:
 				if ((input != null && input.isSteeringWheelHoldPressedRaw())) {
 					return FSMState.TELE_STATE_HOLD_WHILE_TILTED;

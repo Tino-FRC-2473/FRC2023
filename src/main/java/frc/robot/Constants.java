@@ -39,7 +39,7 @@ public class Constants {
 	public static final double GYRO_TURN_MULTIPLER_BELOW_90 = 0.987;
 	public static final double CHARGING_STATION_LEVELED_ERROR_DEGREES = 2;
 	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 200;
-	public static final double AUTONOMUS_MOVE_POWER = 0.1;
+	public static final double AUTONOMUS_MOVE_POWER = 0.2;
 	public static final double AUTONOMUS_X_MOVE_THRESHOLD = 1.5;
 	public static final double AUTONOMUS_Y_MOVE_THRESHOLD = 20;
 	public static final double POWER_TO_HOLD_ROBO_ON_TILTED_CS = 0.03;
@@ -47,12 +47,12 @@ public class Constants {
 	// Path points
 
 	// push in, out of community, charge station
-	public static final double P1X1 = 28.271;
+	public static final double P1X1 = 33.271;
 	public static final double P1X2 = -130.947;
-	public static final double P1X3 = -53.342;
+	public static final double P1X3 = -55.342;
 
 	// push in, charge station
-	public static final double P2X1 = 28.271; //42.751;
+	public static final double P2X1 = 33.271; //42.751;
 	public static final double P2X2 = -53.342; // -47.7;
 
 	// push in, out of community (on edges)
@@ -60,7 +60,7 @@ public class Constants {
 	public static final double P3X2 = -47.7; // fix this point to be close to other objs
 
 	// push in only
-	public static final double P4X1 = 28.271;
+	public static final double P4X1 = 33.271;
 
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;

@@ -90,8 +90,7 @@ public class Robot extends TimedRobot {
 		armSystem.update(null);
 		driveSystem.update(null);
 		spinningIntakeFSM.update(null);
-
-		//System.out.println("finished deposit " + finishedDeposit);
+		System.out.print("finished deposit " + finishedDeposit);
 
 		if (driveSystem.getCurrentState() == (FSMState.P1N1)
 			|| driveSystem.getCurrentState() == (FSMState.P2N1)
@@ -117,7 +116,6 @@ public class Robot extends TimedRobot {
 				}
 			}
 			if (node == -1) {
-				// WRITE CODE TO LEAVE ARM IN HOMING POSITION
 				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 				finishedDeposit = true;
 			}

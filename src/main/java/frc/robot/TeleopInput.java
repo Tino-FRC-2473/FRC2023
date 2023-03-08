@@ -16,8 +16,8 @@ public class TeleopInput {
 	private static final int DRIVE_JOYSTICK_PORT = 1;
 	private static final int STEERING_WHEEL_PORT = 3;
 
-	private static final int PIVOT_INCREASE_BUTTON = 5;
-	private static final int PIVOT_DECREASE_BUTTON = 3;
+	private static final int PIVOT_INCREASE_BUTTON = 3;
+	private static final int PIVOT_DECREASE_BUTTON = 5;
 	private static final int FINE_TUNING_BUTTON = 2;
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;

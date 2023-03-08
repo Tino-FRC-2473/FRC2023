@@ -8,7 +8,7 @@ import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C.Port;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -111,7 +111,7 @@ public class SpinningIntakeFSM {
 		// SmartDashboard.putNumber("r", colorSensor.getColor().red);
 		// SmartDashboard.putNumber("g", colorSensor.getColor().green);
 		// SmartDashboard.putNumber("b", colorSensor.getColor().blue);
-		// SmartDashboard.putString("item type", itemType.toString());
+		SmartDashboard.putString("item type", itemType.toString());
 		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		if (input == null) {
 			return;
