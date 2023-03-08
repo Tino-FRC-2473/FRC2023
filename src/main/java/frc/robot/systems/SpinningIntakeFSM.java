@@ -146,6 +146,7 @@ public class SpinningIntakeFSM {
 		if (previousState != currentState) {
 			System.out.println(currentState);
 		}
+		resetPhantomObjects();
 	}
 	/**
 	 * Run given state and return if state is complete.
@@ -200,6 +201,7 @@ public class SpinningIntakeFSM {
 	public static ItemType getObjectType() {
 		return itemType;
 	}
+
 	private void updateItem() {
 		double b = colorSensor.getColor().blue;
 		System.out.println(b + " " + distanceSensorObject.getValue());
@@ -278,6 +280,13 @@ public class SpinningIntakeFSM {
 		itemType = ItemType.EMPTY;
 		if (isMotorAllowed) {
 			spinnerMotor.set(RELEASE_SPEED);
+		}
+	}
+
+	private void resetPhantomObjects() {
+		if ((getObjectType() == ItemType.CONE || getObjectType()
+			== ItemType.CUBE) && distanceSensorObject.getValue() < MIN_RELEASE_DISTANCE) {
+			itemType = ItemType.EMPTY;
 		}
 	}
 }
