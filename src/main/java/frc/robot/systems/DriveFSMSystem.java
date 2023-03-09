@@ -55,7 +55,16 @@ public class DriveFSMSystem {
 		P3N1,
 		P3N2,
 
-		P4N1
+		P4N1,
+
+		P5N1,
+		P5N2,
+
+		P6N1,
+		P6N2,
+
+		P7N1,
+		P7N2
 	}
 
 	/* ======================== Private variables ======================== */
@@ -299,6 +308,36 @@ public class DriveFSMSystem {
 				moveState(input, true, Constants.P4X1, 0);
 				break;
 
+			// path 5 (deposit backwards, exit community, charge station)
+
+			case P5N1:
+				moveState(input, true, Constants.P5X1, 0);
+				break;
+
+			case P5N2:
+				moveState(input, false, Constants.P5X2, 0);
+				break;
+
+			// path 6 (deposit backwards, charge station)
+
+			case P6N1:
+				moveState(input, false, Constants.P6X1, 0);
+				break;
+
+			case P6N2:
+				moveState(input, true, Constants.P6X1, 0);
+				break;
+
+			// path 7 (deposit backwards, out of community)
+
+			case P7N1:
+				moveState(input, false, Constants.P7X1, 0);
+				break;
+
+			case P7N2:
+				moveState(input, true, Constants.P7X1, 0);
+				break;
+
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -332,42 +371,34 @@ public class DriveFSMSystem {
 					isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
-
 			case AUTO_STATE_BALANCE:
 				return FSMState.AUTO_STATE_BALANCE;
-
 			case TURNING_STATE:
 				if (finishedTurning) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.TURNING_STATE;
-
 			case CV_LOW_TAPE_ALIGN:
 				if (!input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_LOW_TAPE_ALIGN;
-
 			case CV_HIGH_TAPE_ALIGN:
 				if (!input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_HIGH_TAPE_ALIGN;
-
 			case CV_TAG_ALIGN:
 				if (!input.isDriveJoystickCVTagButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_TAG_ALIGN;
-
 			case IDLE: return FSMState.IDLE;
-
 			case TELE_STATE_BALANCE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
 					return FSMState.TELE_STATE_BALANCE;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
-
 			case TELE_STATE_HOLD_WHILE_TILTED:
 				if ((input != null && input.isSteeringWheelHoldPressedRaw())) {
 					return FSMState.TELE_STATE_HOLD_WHILE_TILTED;
@@ -426,6 +457,45 @@ public class DriveFSMSystem {
 					completedPoint = false;
 					return FSMState.IDLE;
 				}
+			case P5N1:
+				if (completedPoint && Robot.getFinishedDeposit()) {
+					Robot.resetFinishedDeposit();
+					completedPoint = false;
+					return FSMState.P5N2;
+				}
+				return FSMState.P5N1;
+			case P5N2:
+				if (completedPoint) {
+					completedPoint = false;
+					return FSMState.AUTO_STATE_BALANCE;
+				}
+				return FSMState.P5N2;
+			case P6N1:
+				if (completedPoint && Robot.getFinishedDeposit()) {
+					Robot.resetFinishedDeposit();
+					completedPoint = false;
+					return FSMState.P6N2;
+				}
+				return FSMState.P6N1;
+			case P6N2:
+				if (completedPoint) {
+					completedPoint = false;
+					return FSMState.AUTO_STATE_BALANCE;
+				}
+				return FSMState.P6N2;
+			case P7N1:
+				if (completedPoint && Robot.getFinishedDeposit()) {
+					Robot.resetFinishedDeposit();
+					completedPoint = false;
+					return FSMState.P6N2;
+				}
+				return FSMState.P6N1;
+			case P7N2:
+				if (completedPoint) {
+					completedPoint = false;
+					return FSMState.IDLE;
+				}
+				return FSMState.P7N2;
 			default: throw new IllegalStateException("Invalid state: " + currentState.toString()); }
 	}
 

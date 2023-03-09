@@ -47,20 +47,32 @@ public class Constants {
 	// Path points
 
 	// push in, out of community, charge station
-	public static final double P1X1 = 33.271;
-	public static final double P1X2 = -130.947;
-	public static final double P1X3 = -55.342;
+	public static final double P1X1 = 33;
+	public static final double P1X2 = -130;
+	public static final double P1X3 = -55;
 
 	// push in, charge station
-	public static final double P2X1 = 33.271; //42.751;
-	public static final double P2X2 = -53.342; // -47.7;
+	public static final double P2X1 = 33; //42.751;
+	public static final double P2X2 = -53; // -47.7;
 
 	// push in, out of community (on edges)
-	public static final double P3X1 = 42.751;
-	public static final double P3X2 = -47.7; // fix this point to be close to other objs
+	public static final double P3X1 = 42;
+	public static final double P3X2 = -60; // fix this point to be close to other objs
 
 	// push in only
-	public static final double P4X1 = 33.271;
+	public static final double P4X1 = 33;
+
+	// deposit backwards, exit community, charge station
+	public static final double P5X1 = 130;
+	public static final double P5X2 = 53;
+
+	// deposit backwards, charge station
+	public static final double P6X1 = -2;
+	public static final double P6X2 = 53;
+
+	// deposit backwards, out of community (on edges)
+	public static final double P7X1 = -2;
+	public static final double P7X2 = 100;
 
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;

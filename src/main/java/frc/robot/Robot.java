@@ -16,7 +16,6 @@ import frc.robot.systems.ArmFSM.ArmFSMState;
 import frc.robot.systems.DriveFSMSystem.FSMState;
 import frc.robot.systems.SpinningIntakeFSM.SpinningIntakeFSMState;
 
-
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation.
@@ -90,7 +89,6 @@ public class Robot extends TimedRobot {
 		armSystem.update(null);
 		driveSystem.update(null);
 		spinningIntakeFSM.update(null);
-		System.out.print("finished deposit " + finishedDeposit);
 
 		if (driveSystem.getCurrentState() == (FSMState.P1N1)
 			|| driveSystem.getCurrentState() == (FSMState.P2N1)
@@ -119,7 +117,9 @@ public class Robot extends TimedRobot {
 				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 				finishedDeposit = true;
 			}
-		} else if (driveSystem.getCurrentState() == (FSMState.P5N1)) {
+		} else if (driveSystem.getCurrentState() == (FSMState.P5N1)
+			|| driveSystem.getCurrentState() == (FSMState.P6N1)
+			|| driveSystem.getCurrentState() == (FSMState.P7N1)) {
 
 			if (node == 2) {
 				if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_BACKWARD)) {
@@ -141,7 +141,9 @@ public class Robot extends TimedRobot {
 			|| driveSystem.getCurrentState() == (FSMState.P1N3)
 			|| driveSystem.getCurrentState() == (FSMState.P2N2)
 			|| driveSystem.getCurrentState() == (FSMState.P3N2)
-			|| driveSystem.getCurrentState() == (FSMState.P5N2)) {
+			|| driveSystem.getCurrentState() == (FSMState.P5N2)
+			|| driveSystem.getCurrentState() == (FSMState.P6N2)
+			|| driveSystem.getCurrentState() == (FSMState.P7N2)) {
 
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
 			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
