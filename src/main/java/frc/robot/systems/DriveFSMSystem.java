@@ -59,6 +59,7 @@ public class DriveFSMSystem {
 
 		P5N1,
 		P5N2,
+		P5N3,
 
 		P6N1,
 		P6N2,
@@ -182,7 +183,7 @@ public class DriveFSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.P2N1;
+		currentState = FSMState.P6N1;
 		Robot.resetFinishedDeposit();
 		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
@@ -311,11 +312,15 @@ public class DriveFSMSystem {
 			// path 5 (deposit backwards, exit community, charge station)
 
 			case P5N1:
-				moveState(input, true, Constants.P5X1, 0);
+				moveState(input, false, Constants.P5X1, 0);
 				break;
 
 			case P5N2:
-				moveState(input, false, Constants.P5X2, 0);
+				moveState(input, true, Constants.P5X2, 0);
+				break;
+
+			case P5N3:
+				moveState(input, false, Constants.P5X3, 0);
 				break;
 
 			// path 6 (deposit backwards, charge station)
@@ -325,7 +330,7 @@ public class DriveFSMSystem {
 				break;
 
 			case P6N2:
-				moveState(input, true, Constants.P6X1, 0);
+				moveState(input, true, Constants.P6X2, 0);
 				break;
 
 			// path 7 (deposit backwards, out of community)
@@ -335,7 +340,7 @@ public class DriveFSMSystem {
 				break;
 
 			case P7N2:
-				moveState(input, true, Constants.P7X1, 0);
+				moveState(input, true, Constants.P7X2, 0);
 				break;
 
 			default:
@@ -355,6 +360,7 @@ public class DriveFSMSystem {
 	 * @return FSM state for the next iteration
 	 */
 	private FSMState nextState(TeleopInput input) {
+		System.out.println(currentState);
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
@@ -404,7 +410,6 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_HOLD_WHILE_TILTED;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
-
 			// auto paths
 			case P1N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
@@ -467,9 +472,15 @@ public class DriveFSMSystem {
 			case P5N2:
 				if (completedPoint) {
 					completedPoint = false;
-					return FSMState.AUTO_STATE_BALANCE;
+					return FSMState.P5N3;
 				}
 				return FSMState.P5N2;
+			case P5N3:
+				if (completedPoint) {
+					completedPoint = false;
+					return FSMState.AUTO_STATE_BALANCE;
+				}
+				return FSMState.P5N3;
 			case P6N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
 					Robot.resetFinishedDeposit();
@@ -487,9 +498,9 @@ public class DriveFSMSystem {
 				if (completedPoint && Robot.getFinishedDeposit()) {
 					Robot.resetFinishedDeposit();
 					completedPoint = false;
-					return FSMState.P6N2;
+					return FSMState.P7N2;
 				}
-				return FSMState.P6N1;
+				return FSMState.P7N1;
 			case P7N2:
 				if (completedPoint) {
 					completedPoint = false;

@@ -113,7 +113,7 @@ public class ArmFSM {
 	private static final double PID_CONSTANT_PIVOT_D = 0.000008f;
 	private static final double PID_CONSTANT_ARM_P = 0.00006f;
 	private static final double PID_CONSTANT_ARM_I = 0.00001f;
-	private static final double PID_CONSTANT_ARM_D = 0.000001f;
+	private static final double PID_CONSTANT_ARM_D = 0.000005f;
 	private static final double PID_ARM_MAX_POWER = 1.0;
 	private static final double JOYSTICK_DRIFT_Y = 0.05;
 
@@ -166,6 +166,7 @@ public class ArmFSM {
 		pidControllerTeleArm.setIZone(0);
 		pidControllerTeleArm.setFF(0);
 		pidControllerTeleArm.setOutputRange(-PID_ARM_MAX_POWER, PID_ARM_MAX_POWER);
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 		// Reset state machine
 		reset();
 	}
@@ -224,6 +225,7 @@ public class ArmFSM {
 		}
 		if (isMinHeight()) {
 			pivotMotor.getEncoder().setPosition(0);
+			pivotEncoderRotationsIntoIdle = 0;
 		}
 		if (teleArmLimitSwitch.isPressed()) {
 			teleArmMotor.getEncoder().setPosition(0);
@@ -232,9 +234,6 @@ public class ArmFSM {
 			pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 		}
 		ArmFSMState state = nextState(input);
-		if (currentState != ArmFSMState.IDLE) {
-			pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
-		}
 		switch (currentState) {
 			case UNHOMED_STATE:
 				handleUnhomedState();
@@ -564,6 +563,7 @@ public class ArmFSM {
 		} else {
 			teleArmMotor.set(-TELEARM_MOTOR_POWER);
 		}
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 	}
 
 	private void handleMovingToStartState(TeleopInput input) {
@@ -584,6 +584,7 @@ public class ArmFSM {
 					CANSparkMax.ControlType.kPosition);
 			}
 		}
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 	}
 	/*
 	 * What to do when in the ARM_MOVEMENT state
@@ -639,6 +640,7 @@ public class ArmFSM {
 			teleArmMotor.set(0);
 			pivotMotor.set(0);
 		}
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 	}
 
 	private void handleShootHighForwardState(TeleopInput input) {
@@ -712,6 +714,7 @@ public class ArmFSM {
 				}
 			}
 		}
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 	}
 
 	private void handleShootHighBackwardState(TeleopInput input) {
@@ -755,6 +758,7 @@ public class ArmFSM {
 					CANSparkMax.ControlType.kPosition);
 			}
 		}
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 	}
 
 
@@ -801,6 +805,7 @@ public class ArmFSM {
 				}
 			}
 		}
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 	}
 
 	private void handleShootMidBackwardState(TeleopInput input) {
@@ -844,6 +849,7 @@ public class ArmFSM {
 					CANSparkMax.ControlType.kPosition);
 			}
 		}
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 	}
 
 	private void handleShootLowState(TeleopInput input) {
@@ -888,6 +894,7 @@ public class ArmFSM {
 					CANSparkMax.ControlType.kPosition);
 			}
 		}
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 	}
 
 
@@ -921,6 +928,7 @@ public class ArmFSM {
 			teleArmMotor.set(0);
 			pivotMotor.set(0);
 		}
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 	}
 
 	private void handleSubstationPickupBackwardState(TeleopInput input) {
@@ -952,5 +960,6 @@ public class ArmFSM {
 			teleArmMotor.set(0);
 			pivotMotor.set(0);
 		}
+		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 	}
 }

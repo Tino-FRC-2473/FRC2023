@@ -39,7 +39,7 @@ public class Constants {
 	public static final double GYRO_TURN_MULTIPLER_BELOW_90 = 0.987;
 	public static final double CHARGING_STATION_LEVELED_ERROR_DEGREES = 2;
 	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 200;
-	public static final double AUTONOMUS_MOVE_POWER = 0.2;
+	public static final double AUTONOMUS_MOVE_POWER = 0.1;
 	public static final double AUTONOMUS_X_MOVE_THRESHOLD = 1.5;
 	public static final double AUTONOMUS_Y_MOVE_THRESHOLD = 20;
 	public static final double POWER_TO_HOLD_ROBO_ON_TILTED_CS = 0.03;
@@ -57,21 +57,22 @@ public class Constants {
 
 	// push in, out of community (on edges)
 	public static final double P3X1 = 42;
-	public static final double P3X2 = -60; // fix this point to be close to other objs
+	public static final double P3X2 = -80; // fix this point to be close to other objs
 
 	// push in only
 	public static final double P4X1 = 33;
 
 	// deposit backwards, exit community, charge station
-	public static final double P5X1 = 130;
-	public static final double P5X2 = 53;
+	public static final double P5X1 = -33;
+	public static final double P5X2 = 130;
+	public static final double P5X3 = 53;
 
 	// deposit backwards, charge station
-	public static final double P6X1 = -2;
+	public static final double P6X1 = -33;
 	public static final double P6X2 = 53;
 
 	// deposit backwards, out of community (on edges)
-	public static final double P7X1 = -2;
+	public static final double P7X1 = -33;
 	public static final double P7X2 = 100;
 
 	// ODO Constants

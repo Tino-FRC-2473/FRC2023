@@ -90,6 +90,8 @@ public class Robot extends TimedRobot {
 		driveSystem.update(null);
 		spinningIntakeFSM.update(null);
 
+		System.out.println(finishedDeposit);
+
 		if (driveSystem.getCurrentState() == (FSMState.P1N1)
 			|| driveSystem.getCurrentState() == (FSMState.P2N1)
 			|| driveSystem.getCurrentState() == (FSMState.P3N1)
@@ -142,6 +144,7 @@ public class Robot extends TimedRobot {
 			|| driveSystem.getCurrentState() == (FSMState.P2N2)
 			|| driveSystem.getCurrentState() == (FSMState.P3N2)
 			|| driveSystem.getCurrentState() == (FSMState.P5N2)
+			|| driveSystem.getCurrentState() == (FSMState.P5N3)
 			|| driveSystem.getCurrentState() == (FSMState.P6N2)
 			|| driveSystem.getCurrentState() == (FSMState.P7N2)) {
 
