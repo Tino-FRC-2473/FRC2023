@@ -32,6 +32,7 @@ public class TeleopInput {
 	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
 
 	private static final int GROUND_MOUNT_BUTTON = 4;
+	private static final int INTAKE_BUTTON = 6;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -142,7 +143,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isThrottleForward() {
-		return mechJoystick.getThrottle() <= 0 ? false : true;
+		return mechJoystick.getThrottle() <= 0;
 	}
 
 	/**
@@ -159,6 +160,14 @@ public class TeleopInput {
 	 */
 	public boolean isFineTuningButtonPressed() {
 		return mechJoystick.getRawButtonPressed(FINE_TUNING_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Intake button.
+	 * @return True if the button is pressed
+	 */
+	public boolean isIntakeButtonPressed() {
+		return mechJoystick.getRawButtonPressed(INTAKE_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
