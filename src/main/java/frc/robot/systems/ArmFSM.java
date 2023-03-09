@@ -109,7 +109,7 @@ public class ArmFSM {
 	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.15;
 	private static final double ERROR_ARM_ROTATIONS = 1.0;
 	private static final double PID_CONSTANT_PIVOT_P = 0.00014f;
-	private static final double PID_CONSTANT_PIVOT_I = 0.000055f;
+	private static final double PID_CONSTANT_PIVOT_I = 0.000030f;
 	private static final double PID_CONSTANT_PIVOT_D = 0.000008f;
 	private static final double PID_CONSTANT_ARM_P = 0.00006f;
 	private static final double PID_CONSTANT_ARM_I = 0.00001f;
