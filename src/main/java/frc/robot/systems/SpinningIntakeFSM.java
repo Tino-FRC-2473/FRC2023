@@ -49,7 +49,6 @@ public class SpinningIntakeFSM {
 	//CUBE RGB THRESHOLD VALUES
 	private static final double BLUE_THRESHOLD = 0.23;
 	private double lastBlue = -1;
-	private boolean isMotorAllowed = false;
 
 	/* ======================== Private variables ======================== */
 	private SpinningIntakeFSMState currentState;
