@@ -673,7 +673,6 @@ public class DriveFSMSystem {
 		rightMotorBack.set(0);
 	}
 
-
 	/**
 	* Gets the heading from the gyro.
 	* @return the gyro heading
