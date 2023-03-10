@@ -183,7 +183,7 @@ public class DriveFSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.P5N1;
+		currentState = FSMState.P6N1;
 		Robot.resetFinishedDeposit();
 		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
@@ -712,6 +712,15 @@ public class DriveFSMSystem {
 				leftMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
 				rightMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
 			}
+		}
+
+		if ((currentState == FSMState.P5N2 || currentState == FSMState.P6N2
+			|| currentState == FSMState.P7N2) && roboX > Constants.MAX_AUTONOMUS_DISTANCE) {
+			completedPoint = true;
+			leftMotorFront.set(0);
+			rightMotorFront.set(0);
+			leftMotorBack.set(0);
+			rightMotorBack.set(0);
 		}
 
 		if ((Math.abs(roboX - x) <= Constants.AUTONOMUS_X_MOVE_THRESHOLD

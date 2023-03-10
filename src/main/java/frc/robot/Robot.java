@@ -150,9 +150,15 @@ public class Robot extends TimedRobot {
 
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
 			armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
+<<<<<<< HEAD
 			// if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
 			// 	armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 			// }
+=======
+// 			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
+// 				//armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+// 			}
+>>>>>>> a3106b68d6de2e7773f2986eb9db2e055a35ee35
 		}
 	}
 

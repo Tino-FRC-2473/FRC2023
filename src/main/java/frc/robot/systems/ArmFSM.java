@@ -42,7 +42,9 @@ public class ArmFSM {
 	private static final float PIVOT_MOTOR_POWER_FINE_TUNING = 0.05f;
 
 	//20 inches
-	private static final double ARM_ENCODER_MAX_LENGTH_ROTATIONS = 33
+	private static double armEncoderMaxLengthRotations = 198;
+
+	private static final double ARM_ENCODER_MAX_LENGTH_HORIZONTAL = 18
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 
 	//19 inches
@@ -80,7 +82,7 @@ public class ArmFSM {
 	private static final double ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS = (90 + 13)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//111.8 degrees
-	private static final double ARM_ENCODER_STARTING_ANGLE_ROTATIONS = (113 + 13)
+	private static final double ARM_ENCODER_STARTING_ANGLE_ROTATIONS = (111 + 13)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//36.762 degrees
 	private static final double SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS = (39 + 13)
@@ -187,6 +189,7 @@ public class ArmFSM {
 		currentState = ArmFSMState.IDLE;
 		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 		pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
+		armEncoderMaxLengthRotations = 198 / Math.abs(Math.cos(Math.toRadians(-pivotMotor.getEncoder().getPosition() / ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT)));
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -209,7 +212,7 @@ public class ArmFSM {
 		//SmartDashboard.putBoolean("Is going Forward", input.isThrottleForward());
 		//SmartDashboard.putNumber("Throttle Value", input.getThrottle());
 		SmartDashboard.putNumber("Extension Fraction", teleArmMotor.getEncoder().getPosition()
-			/ ARM_ENCODER_MAX_LENGTH_ROTATIONS);
+			/ armEncoderMaxLengthRotations);
 		SmartDashboard.putBoolean("Is In Fine Tuning", isFineTuning);
 		//System.out.println(pivotMotor.getEncoder().getPosition());
 		if (input.isFineTuningButtonPressed()) {
@@ -233,6 +236,8 @@ public class ArmFSM {
 		if (!withinError(pivotMotor.getEncoder().getPosition(), pivotEncoderRotationsAfterPivot)) {
 			pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 		}
+		armEncoderMaxLengthRotations = 198 / Math.abs(Math.cos(Math.toRadians(-pivotMotor.getEncoder().getPosition() / ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT)));
+
 		ArmFSMState state = nextState(input);
 		switch (currentState) {
 			case UNHOMED_STATE:
@@ -519,9 +524,7 @@ public class ArmFSM {
 			return false;
 		}
 		return input.isPivotDecreaseButtonPressed() && isMinHeight()
-			|| input.isPivotIncreaseButtonPressed() && isMaxHeight()
-			|| -input.getmechJoystickY() > JOYSTICK_DRIFT_Y
-			&& teleArmMotor.getEncoder().getPosition() >= ARM_ENCODER_MAX_LENGTH_ROTATIONS;
+			|| input.isPivotIncreaseButtonPressed() && isMaxHeight();
 	}
 
 	private boolean atArmPosition(double pivotTarget, double armTarget) {
@@ -620,7 +623,11 @@ public class ArmFSM {
 					pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
 						CANSparkMax.ControlType.kPosition);
 				}
-				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER);
+				if (teleArmMotor.getEncoder().getPosition() >= armEncoderMaxLengthRotations) {
+					teleArmMotor.set(-0.2);
+				} else {
+					teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER);
+				}
 			} else {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
 					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER_FINE_TUNING,
@@ -637,6 +644,7 @@ public class ArmFSM {
 				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER_FINE_TUNING);
 			}
 		} else {
+
 			teleArmMotor.set(0);
 			pivotMotor.set(0);
 		}

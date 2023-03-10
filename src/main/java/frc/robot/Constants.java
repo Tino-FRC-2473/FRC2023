@@ -43,6 +43,7 @@ public class Constants {
 	public static final double AUTONOMUS_X_MOVE_THRESHOLD = 2;
 	public static final double AUTONOMUS_Y_MOVE_THRESHOLD = 20;
 	public static final double POWER_TO_HOLD_ROBO_ON_TILTED_CS = 0.03;
+	public static final double MAX_AUTONOMUS_DISTANCE = 150;
 
 	// Path points
 
@@ -85,7 +86,7 @@ public class Constants {
 	public static final double QUARTER_PI = Math.PI / 4;
 
 	public static class VisionConstants {
-		public static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
+		public static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(10);
 		public static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(-3.5);
 		public static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.75);
 		public static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
