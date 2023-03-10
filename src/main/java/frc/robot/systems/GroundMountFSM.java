@@ -25,12 +25,14 @@ public class GroundMountFSM {
 		AUTONOMOUS_IDLE
 	}
 	//arbitrary constants, must test all of these
-	private static final double PIVOT_UP_POWER = 0.08;
+	private static final double PIVOT_UP_POWER = -0.04;
 	private static final double MIN_POWER = -0.2;
 	private static final double MAX_POWER = 0.1;
-	private boolean zeroed = true;
-	private static final double BOTTOM_ENCODER_LIMIT = 40.00; //ARBITRARY VALUE
+	private boolean zeroed = false;
+	private static final double BOTTOM_ENCODER_LIMIT = 44.00; //ARBITRARY VALUE
+	private static final double HOME_ENCODER_CONSTANT = -4;
 	private static final double P_CONSTANT = 0.006;
+	private static final double P_UP_CONSTANT = 0.009;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -85,7 +87,7 @@ public class GroundMountFSM {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		zeroed = true;
+		zeroed = false;
 		pivotArmMotor.getEncoder().setPosition(0);
 		currentState = FSMState.START_STATE;
 		// Call one tick of update to ensure outputs reflect start state
@@ -236,19 +238,19 @@ public class GroundMountFSM {
 	 * Handle behavior in states.
 	 */
 	private void handleStartState() {
-		//pivotArmMotor.set(-PIVOT_UP_POWER);
+		pivotArmMotor.set(PIVOT_UP_POWER);
 		if (limitSwitchHigh.isPressed()) {
 			zeroed = true;
-			pivotArmMotor.getEncoder().setPosition(0);
+			pivotArmMotor.getEncoder().setPosition(HOME_ENCODER_CONSTANT);
 		}
 	}
 	private void handlePivotedUpState() {
-		pivotArmMotor.set(capMotorPower(-pivotArmMotor.getEncoder().getPosition() * P_CONSTANT));
-		System.out.println(-pivotArmMotor.getEncoder().getPosition() * P_CONSTANT);
+		pivotArmMotor.set(capMotorPower(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
+		System.out.println(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT);
 	}
 	private void handlePivotingUpState() {
-		pivotArmMotor.set(capMotorPower(-pivotArmMotor.getEncoder().getPosition() * P_CONSTANT));
-		System.out.println(-pivotArmMotor.getEncoder().getPosition() * P_CONSTANT);
+		pivotArmMotor.set(capMotorPower(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
+		System.out.println(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT);
 	}
 	private void handlePivotedDownState() {
 		pivotArmMotor.set(capMotorPower((BOTTOM_ENCODER_LIMIT
@@ -267,7 +269,7 @@ public class GroundMountFSM {
 	}
 
 	private void handleAutonomousUpState() {
-		pivotArmMotor.set(capMotorPower(-pivotArmMotor.getEncoder().getPosition() * P_CONSTANT));
+		pivotArmMotor.set(capMotorPower(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
 	}
 
 	private void handleAutonomousIdleState() {

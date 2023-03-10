@@ -41,8 +41,9 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Autonomous Init --------");
 		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 			&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-			armSystem.reset();
+			//armSystem.reset();
 			//driveSystem.resetAutonomous();
+			groundMountFSM.reset();
 			spinningIntakeFSM.reset();
 		}
 		if (HardwareMap.isTestBoardArm()) {
@@ -64,9 +65,10 @@ public class Robot extends TimedRobot {
 	public void autonomousPeriodic() {
 		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 			&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-			armSystem.update(null);
+			//armSystem.update(null);
 			//driveSystem.update(null);
 			spinningIntakeFSM.update(null);
+			groundMountFSM.update(null);
 		}
 		if (HardwareMap.isTestBoardArm()) {
 			armSystem.update(null);
@@ -95,8 +97,9 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		if (!HardwareMap.isTestBoardArm() && !HardwareMap.isTestBoardGrabber()
 			&& !HardwareMap.isTestBoardGroundMount() && !HardwareMap.isTestBoardArmGrabber()) {
-			armSystem.update(input);
+			//armSystem.update(input);
 			//driveSystem.update(input);
+			groundMountFSM.update(input);
 			spinningIntakeFSM.update(input);
 		}
 		if (HardwareMap.isTestBoardArm()) {
