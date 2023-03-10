@@ -149,9 +149,10 @@ public class Robot extends TimedRobot {
 			|| driveSystem.getCurrentState() == (FSMState.P7N2)) {
 
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
-			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
-				//armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
-			}
+			armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
+// 			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
+// 				//armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+// 			}
 		}
 	}
 
