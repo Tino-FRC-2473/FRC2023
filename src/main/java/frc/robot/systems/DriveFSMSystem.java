@@ -183,7 +183,7 @@ public class DriveFSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.P6N1;
+		currentState = FSMState.P5N1;
 		Robot.resetFinishedDeposit();
 		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
@@ -360,7 +360,6 @@ public class DriveFSMSystem {
 	 * @return FSM state for the next iteration
 	 */
 	private FSMState nextState(TeleopInput input) {
-		System.out.println(currentState);
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {

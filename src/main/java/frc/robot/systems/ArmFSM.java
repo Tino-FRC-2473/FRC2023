@@ -42,7 +42,7 @@ public class ArmFSM {
 	private static final float PIVOT_MOTOR_POWER_FINE_TUNING = 0.05f;
 
 	//20 inches
-	private static final double ARM_ENCODER_MAX_LENGTH_ROTATIONS = 32
+	private static final double ARM_ENCODER_MAX_LENGTH_ROTATIONS = 33
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 
 	//19 inches
@@ -52,13 +52,13 @@ public class ArmFSM {
 	private static final double ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS = 21
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//12 inches
-	private static final double ARM_ENCODER_HIGH_BACKWARD_ROTATIONS = 25
+	private static final double ARM_ENCODER_HIGH_BACKWARD_ROTATIONS = 26
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//3 inches
 	private static final double ARM_ENCODER_MID_FORWARD_ROTATIONS = 14.5
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//4 inches
-	private static final double ARM_ENCODER_MID_BACKWARD_ROTATIONS = 15
+	private static final double ARM_ENCODER_MID_BACKWARD_ROTATIONS = 14
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//0 inches(retracted)
 	private static final double ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS = 0
@@ -92,7 +92,7 @@ public class ArmFSM {
 	private static final double SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS = (140 + 13)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//147.976 degrees
-	private static final double SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS = (130 + 13)
+	private static final double SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS = (135 + 13)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//-12.837 degrees
 	private static final double SHOOT_LOW_ANGLE_ENCODER_ROTATIONS = 0.163
@@ -580,7 +580,7 @@ public class ArmFSM {
 				AUTONOMOUS_UP_ANGLE_ENCODER_ROTATIONS)) {
 				pivotMotor.set(0);
 			} else {
-				pidControllerPivot.setReference(ARM_ENCODER_STARTING_ANGLE_ROTATIONS,
+				pidControllerPivot.setReference(AUTONOMOUS_UP_ANGLE_ENCODER_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
 		}
@@ -710,7 +710,6 @@ public class ArmFSM {
 				} else {
 					pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
-					System.out.println(teleArmMotor.getEncoder().getPosition());
 				}
 			}
 		}
