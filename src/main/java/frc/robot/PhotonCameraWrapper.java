@@ -175,7 +175,6 @@ public class PhotonCameraWrapper {
 	 */
 	public double getHigherTapeDistance() {
 		photonCamera.setPipelineIndex(VisionConstants.HIGHERTAPE_PIPELINE_INDEX);
-		System.out.println("index: " + photonCamera.getPipelineIndex());
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
 			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
