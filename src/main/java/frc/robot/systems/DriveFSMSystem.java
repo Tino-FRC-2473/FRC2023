@@ -11,11 +11,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.VisionConstants;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.cameraserver.CameraServer;
+// import edu.wpi.first.cameraserver.CameraServer;
 // import edu.wpi.first.cscore.CvSink;
 // import edu.wpi.first.cscore.CvSource;
 //import edu.wpi.first.cscore.MjpegServer;
-import edu.wpi.first.cscore.UsbCamera;
+// import edu.wpi.first.cscore.UsbCamera;
 //import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import frc.robot.Constants;
 import frc.robot.HardwareMap;
@@ -140,8 +140,8 @@ public class DriveFSMSystem {
 
 		gyro = new AHRS(SPI.Port.kMXP);
 
-		UsbCamera usb = CameraServer.startAutomaticCapture();
-		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+		// UsbCamera usb = CameraServer.startAutomaticCapture();
+		// usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
 		// // Creates the CvSink and connects it to the UsbCamera
 		// cvSink = CameraServer.getVideo();
