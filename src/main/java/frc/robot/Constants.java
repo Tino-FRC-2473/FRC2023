@@ -138,4 +138,5 @@ public class Constants {
 		public static final double APRILTAG_8_HEIGHT_METERS = Units.inchesToMeters(18.22);
 		public static final double APRILTAG_8_ANGLE_RADIANS = Units.degreesToRadians(0);
 	}
+    public static double CUBE_DRIVEUP_DISTANCE_INCHES;
 }

@@ -3,6 +3,7 @@ package frc.robot;
 import java.io.IOException;
 
 import org.photonvision.PhotonCamera;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -25,15 +26,21 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
  * with its coordinates.
  */
 public class PhotonCameraWrapper {
+	public static final double FIELD_WIDTH_METERS = 500;
+	public static final double FIELD_LENGTH_METERS = 500;
+	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
+	final double ANGULAR_P = 0.1; //need to change value
+    final double ANGULAR_D = 0.0; //need to change value
+
 		/** PhotonCamera object representing a camera that is
 		 * connected to PhotonVision.*/
 	private PhotonCamera photonCamera;
 		/** RobotPoseEstimator object to estimate position of robot.*/
 	private PhotonPoseEstimator robotPoseEstimator;
+		/** PIDController object to implement PID for robot turning.*/
+	private PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
 
-	public static final double FIELD_WIDTH_METERS = 500;
-	public static final double FIELD_LENGTH_METERS = 500;
-	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
+
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
 		AprilTagFieldLayout atfl = null;
@@ -127,14 +134,20 @@ public class PhotonCameraWrapper {
 	 * Returns the angle for the robot to turn to align with the grid april tag.
 	 * @return an angle that tells the robot how much to turn to align in degrees
 	 */
-	public double getTagTurnAngle() {
+	public double getTagTurnRotation() {
 		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
+		double rotationSpeed;
+
 		if (result.hasTargets()) {
-			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
-				VisionConstants.CAM_OFFSET_INCHES / getTagDistance()));
+			// Calculate angular turn power
+			// -1.0 required to ensure positive PID controller effort _increases_ yaw
+			rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
+		} else {
+			// If we have no targets, stay still.
+			rotationSpeed = 0;
 		}
-		return Constants.INVALID_TURN_RETURN_DEGREES;
+		return rotationSpeed;
 	}
 	/**
 	 * Returns the distance to the grid april tag.
@@ -211,7 +224,7 @@ public class PhotonCameraWrapper {
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cone
  * and 360 if there are no cones.*/
-	public double getTurnAngleToCone() {
+	public double getConeTurnAngle() {
 		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
@@ -221,7 +234,7 @@ public class PhotonCameraWrapper {
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cube
  * and 360 if there are no cubes.*/
-	public double getTurnAngleToCube() {
+	public double getCubeTurnAngle() {
 		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
