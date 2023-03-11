@@ -185,7 +185,7 @@ public class DriveFSMSystem {
 
 		currentState = FSMState.P5N1;
 		Robot.resetFinishedDeposit();
-		Robot.setNode(-1); // -1 is none, 0 is low, 1, mid, 2 is high
+		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
 
 		roboXPos = 0;
@@ -694,39 +694,33 @@ public class DriveFSMSystem {
 	 */
 	public void moveState(TeleopInput input, boolean forwards, double x, double y) {
 		if (input != null) {
-            return;
-        }
-        double roboX = -roboXPos;
-        double roboY = roboYPos;
-        if (!completedPoint) {
-            if (forwards) {
-                leftMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
-                rightMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
-                leftMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
-                rightMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
-            } else {
-                leftMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
-                rightMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
-                leftMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
-                rightMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
-            }
-        }
-        if ((currentState == FSMState.P5N2 || currentState == FSMState.P6N2
-            || currentState == FSMState.P7N2) && Math.abs(roboX)
-            > 160) {
-            completedPoint = true;
-            leftMotorFront.set(0);
-            rightMotorFront.set(0);
-            leftMotorBack.set(0);
-            rightMotorBack.set(0);
-        }
-        if ((Math.abs(roboX - x) <= Constants.AUTONOMUS_X_MOVE_THRESHOLD
-            && Math.abs(roboY - y) <= Constants.AUTONOMUS_Y_MOVE_THRESHOLD) || completedPoint) {
-            completedPoint = true;
-            leftMotorFront.set(0);
-            rightMotorFront.set(0);
-            leftMotorBack.set(0);
-            rightMotorBack.set(0);
+			return;
+		}
+
+		double roboX = -roboXPos;
+		double roboY = roboYPos;
+
+		if (!completedPoint) {
+			if (forwards) {
+				leftMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
+				rightMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
+				leftMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
+				rightMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
+			} else {
+				leftMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
+				rightMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
+				leftMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
+				rightMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
+			}
+		}
+
+		if ((Math.abs(roboX - x) <= Constants.AUTONOMUS_X_MOVE_THRESHOLD
+			&& Math.abs(roboY - y) <= Constants.AUTONOMUS_Y_MOVE_THRESHOLD) || completedPoint) {
+			completedPoint = true;
+			leftMotorFront.set(0);
+			rightMotorFront.set(0);
+			leftMotorBack.set(0);
+			rightMotorBack.set(0);
 		}
 	}
 
