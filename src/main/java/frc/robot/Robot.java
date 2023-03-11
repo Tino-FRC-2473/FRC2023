@@ -6,7 +6,7 @@ package frc.robot;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.cameraserver.CameraServer;
+// import edu.wpi.first.cameraserver.CameraServer;
 // Systems
 import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-		CameraServer.startAutomaticCapture();
+		// CameraServer.startAutomaticCapture();
 		driveSystem = new DriveFSMSystem();
 		armSystem = new ArmFSM();
 		spinningIntakeFSM = new SpinningIntakeFSM();
