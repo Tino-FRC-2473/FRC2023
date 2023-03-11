@@ -9,7 +9,7 @@ import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Timer;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -56,7 +56,7 @@ public class SpinningIntakeFSM {
 
 	/* ======================== Private variables ======================== */
 	private SpinningIntakeFSMState currentState;
-	//private Timer timer;
+	private Timer timer;
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotor;
@@ -110,7 +110,8 @@ public class SpinningIntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		System.out.println("start time spinning intake: " + Timer.getFPGATimestamp());
+		System.out.println("start time spinning intake: "
+			+ Timer.getFPGATimestamp() + " " + currentState.toString());
 		//System.out.println(itemType);
 		// SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
 		// SmartDashboard.putNumber("r", colorSensor.getColor().red);
