@@ -26,7 +26,7 @@ public class GroundMountFSM {
 		AUTONOMOUS_IDLE
 	}
 	//arbitrary constants, must test all of these
-	private static final double PIVOT_UP_POWER = -0.04;
+	private static final double PIVOT_UP_POWER = -0.1;
 	private static final double MIN_POWER = -0.2;
 	private static final double MAX_POWER = 0.1;
 	private boolean zeroed = false;
