@@ -107,7 +107,7 @@ public class GroundMountFSM {
 		SmartDashboard.putNumber("power", pivotArmMotor.get());
 		SmartDashboard.putBoolean("limit switch low", isLimitSwitchLowPressed());
 		SmartDashboard.putBoolean("limit switch high", isLimitSwitchHighPressed());
-
+		SmartDashboard.putString("state", state.toString());
 		switch (state) {
 			case AUTONOMOUS_UP:
 				handleAutonomousUpState();
