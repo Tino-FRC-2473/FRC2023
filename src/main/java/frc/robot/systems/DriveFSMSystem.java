@@ -183,7 +183,7 @@ public class DriveFSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.P5N1;
+		currentState = FSMState.P6N1;
 		Robot.resetFinishedDeposit();
 		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
