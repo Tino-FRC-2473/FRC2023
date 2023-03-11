@@ -9,9 +9,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import org.opencv.core.Mat;
 
 import com.kauailabs.navx.frc.AHRS;
-// import frc.robot.Constants.VisionConstants;
-// import edu.wpi.first.math.util.Units;
-import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.VisionConstants;
+import edu.wpi.first.math.util.Units;
+// import edu.wpi.first.cameraserver.CameraServer;
 // import edu.wpi.first.cscore.CvSink;
 // import edu.wpi.first.cscore.CvSource;
 //import edu.wpi.first.cscore.MjpegServer;
@@ -226,8 +227,8 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+		System.out.println("start time drive: " + Timer.getFPGATimestamp());
 
-		SmartDashboard.putString("Current State", " " + currentState);
 		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
 
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
@@ -351,6 +352,7 @@ public class DriveFSMSystem {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
+		System.out.println("end time drive: " + Timer.getFPGATimestamp());
 	}
 
 	/* ======================== Private methods ======================== */
