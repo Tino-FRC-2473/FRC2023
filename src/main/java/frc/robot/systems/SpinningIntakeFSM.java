@@ -9,6 +9,7 @@ import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.Timer;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -50,10 +51,12 @@ public class SpinningIntakeFSM {
 	private static final double BLUE_THRESHOLD = 0.23;
 	private double lastBlue = -1;
 	private boolean isMotorAllowed = false;
+	private boolean hasReset = false;
+
 
 	/* ======================== Private variables ======================== */
 	private SpinningIntakeFSMState currentState;
-
+	//private Timer timer;
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotor;
@@ -69,6 +72,7 @@ public class SpinningIntakeFSM {
 	 */
 	public SpinningIntakeFSM() {
 		// Perform hardware init
+		//timer = new Timer();
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
@@ -112,6 +116,7 @@ public class SpinningIntakeFSM {
 		// SmartDashboard.putNumber("g", colorSensor.getColor().green);
 		// SmartDashboard.putNumber("b", colorSensor.getColor().blue);
 		SmartDashboard.putString("item type", itemType.toString());
+		SmartDashboard.putBoolean("Intake Motor Spinning", isMotorAllowed);
 		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		if (input == null) {
 			return;
@@ -177,12 +182,14 @@ public class SpinningIntakeFSM {
 			case START_STATE:
 				return true;
 			case IDLE_SPINNING:
-				return ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
-					> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE);
+				return true;
+				//return ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
+				//	> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE);
 			case IDLE_STOP:
 				return true;
 			case RELEASE:
 				return distanceSensorObject.getValue() < MIN_RELEASE_DISTANCE;
+				//return timer.hasElapsed(0.25);
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -226,6 +233,7 @@ public class SpinningIntakeFSM {
 				if (input.isReleaseButtonPressed()) {
 					return SpinningIntakeFSMState.RELEASE;
 				}
+				//driver must make it stop
 				if ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
 					> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE) {
 					return SpinningIntakeFSMState.IDLE_STOP;
@@ -253,7 +261,14 @@ public class SpinningIntakeFSM {
 	private void handleStartState() {
 	}
 	private void handleIdleSpinningState() {
+		/*if (input.isConeButtonPressed()) {
+			itemType = ItemType.CONE;
+		}
+		else if (input.isCubeButtonPressed()) {
+
+		}*/
 		double newBlue = colorSensor.getColor().blue;
+		//distance and color sensor not used
 		if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
 			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE
 			&& lastBlue != newBlue) {
@@ -272,9 +287,13 @@ public class SpinningIntakeFSM {
 		}
 	}
 	private void handleReleaseState() {
-		itemType = ItemType.EMPTY;
-		if (isMotorAllowed) {
-			spinnerMotor.set(RELEASE_SPEED);
+		if (!hasReset) {
+			//timer.reset();
+			//timer.start();
+			hasReset = true;
 		}
+		itemType = ItemType.EMPTY;
+		spinnerMotor.set(RELEASE_SPEED);
+		isMotorAllowed = true;
 	}
 }

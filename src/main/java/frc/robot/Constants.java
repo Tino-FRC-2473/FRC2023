@@ -53,8 +53,8 @@ public class Constants {
 	public static final double P1X3 = -55;
 
 	// push in, charge station
-	public static final double P2X1 = 32;
-	public static final double P2X2 = -53;
+	public static final double P2X1 = 2;
+	public static final double P2X2 = -83;
 
 	// push in, out of community (on edges)
 	public static final double P3X1 = 32;
@@ -69,8 +69,8 @@ public class Constants {
 	public static final double P5X3 = 56;
 
 	// deposit backwards, charge station
-	public static final double P6X1 = -32;
-	public static final double P6X2 = 56;
+	public static final double P6X1 = -1; //-32
+	public static final double P6X2 = 90; //56
 
 	// deposit backwards, out of community (on edges)
 	public static final double P7X1 = -32;
