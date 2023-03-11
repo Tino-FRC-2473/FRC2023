@@ -5,6 +5,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.cameraserver.CameraServer;
 // Systems
 import frc.robot.systems.ArmFSM;
@@ -169,10 +170,13 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
+		System.out.println("Loop start: " + Timer.getFPGATimestamp());
 
-		armSystem.update(input);
+		// armSystem.update(input);
 		driveSystem.update(input);
-		spinningIntakeFSM.update(input);
+		// spinningIntakeFSM.update(input);
+
+		System.out.println("Loop end: " + Timer.getFPGATimestamp());
 	}
 
 	@Override
