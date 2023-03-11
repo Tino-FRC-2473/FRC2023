@@ -116,7 +116,7 @@ public class Robot extends TimedRobot {
 				}
 			}
 			if (node == -1) {
-				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+				//armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 				finishedDeposit = true;
 			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P5N1)
@@ -136,7 +136,7 @@ public class Robot extends TimedRobot {
 				}
 			}
 			if (node == -1) {
-				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+				//armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 				finishedDeposit = true;
 			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)
