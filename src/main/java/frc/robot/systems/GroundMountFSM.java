@@ -34,7 +34,7 @@ public class GroundMountFSM {
 	private static final double HOME_ENCODER_CONSTANT = -4;
 	private static final double P_CONSTANT = 0.006;
 	private static final double P_UP_CONSTANT = 0.009;
-	private static final double ERROR = 2;
+	private static final double ERROR = 20;
 
 	/* ======================== Private variables ======================== */
 	private GroundMountFSMState currentState;
