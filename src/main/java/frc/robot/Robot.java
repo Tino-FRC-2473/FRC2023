@@ -172,9 +172,9 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		System.out.println("Loop start: " + Timer.getFPGATimestamp());
 
-		// armSystem.update(input);
+		armSystem.update(input);
 		driveSystem.update(input);
-		// spinningIntakeFSM.update(input);
+		spinningIntakeFSM.update(input);
 
 		System.out.println("Loop end: " + Timer.getFPGATimestamp());
 	}
