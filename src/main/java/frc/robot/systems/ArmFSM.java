@@ -2,6 +2,7 @@ package frc.robot.systems;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
@@ -196,6 +197,8 @@ public class ArmFSM {
 	 * @param input TeleopInput
 	 */
 	public void update(TeleopInput input) {
+		System.out.println("start time Arm: " + Timer.getFPGATimestamp());
+
 		if (input == null) {
 			//handleIdleState(input);
 			return;
@@ -275,6 +278,7 @@ public class ArmFSM {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = state;
+		System.out.println("start end Arm: " + Timer.getFPGATimestamp());
 	}
 
 	/**
