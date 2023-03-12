@@ -111,42 +111,46 @@ public class SpinningIntakeFSM {
 	 */
 	public void update(TeleopInput input) {
 		System.out.println("start time spinning intake: "
-			+ Timer.getFPGATimestamp() + " " + currentState.toString());
-		//System.out.println(itemType);
-		// SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
-		// SmartDashboard.putNumber("r", colorSensor.getColor().red);
-		// SmartDashboard.putNumber("g", colorSensor.getColor().green);
-		// SmartDashboard.putNumber("b", colorSensor.getColor().blue);
-		SmartDashboard.putString("item type", itemType.toString());
-		SmartDashboard.putBoolean("Intake Motor Spinning", isMotorAllowed);
-		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
+				+ Timer.getFPGATimestamp() + " " + currentState.toString());
 		if (input == null) {
 			return;
 		}
-		if (input.isIntakeButtonPressed()) {
-			isMotorAllowed = !isMotorAllowed;
-			spinnerMotor.set(0);
-		}
-		switch (currentState) {
-			case START_STATE:
-				handleStartState();
-				break;
-			case IDLE_SPINNING:
-				handleIdleSpinningState();
-				break;
-			case IDLE_STOP:
-				handleIdleStopState();
-				break;
-			case RELEASE:
-				handleReleaseState();
-				break;
-			default:
-				throw new IllegalStateException("Invalid state: " + currentState.toString());
-		}
-		SpinningIntakeFSMState previousState = currentState;
-		currentState = nextState(input);
-		if (previousState != currentState) {
-			System.out.println(currentState);
+		if (input.isUpdatePressed()) {
+			//System.out.println(itemType);
+			// SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
+			// SmartDashboard.putNumber("r", colorSensor.getColor().red);
+			// SmartDashboard.putNumber("g", colorSensor.getColor().green);
+			// SmartDashboard.putNumber("b", colorSensor.getColor().blue);
+			SmartDashboard.putString("item type", itemType.toString());
+			SmartDashboard.putBoolean("Intake Motor Spinning", isMotorAllowed);
+			//System.out.println(distanceSensorObject.getValue() + " " + itemType);
+			if (input.isIntakeButtonPressed()) {
+				isMotorAllowed = !isMotorAllowed;
+				spinnerMotor.set(0);
+			}
+			switch (currentState) {
+				case START_STATE:
+					handleStartState();
+					break;
+				case IDLE_SPINNING:
+					handleIdleSpinningState();
+					break;
+				case IDLE_STOP:
+					handleIdleStopState();
+					break;
+				case RELEASE:
+					handleReleaseState();
+					break;
+				default:
+					throw new IllegalStateException("Invalid state: " + currentState.toString());
+			}
+			SpinningIntakeFSMState previousState = currentState;
+			currentState = nextState(input);
+			if (previousState != currentState) {
+				System.out.println(currentState);
+			}
+		} else {
+			System.out.println("Update disabled");
 		}
 		System.out.println("end time spinning intake: " + Timer.getFPGATimestamp());
 	}

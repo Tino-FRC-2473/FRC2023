@@ -27,6 +27,7 @@ public class TeleopInput {
 	private static final int AIM_LOW_BUTTON = 11;
 	private static final int SUBSTATION_PICKUP_BUTTON = 8;
 	private static final int HOMING_BUTTON = 10;
+	private static final int UPDATE_BUTTON = 12;
 	private static final int CV_ALIGN_BUTTON_LEFT_NODE = 4;
 	private static final int CV_ALIGN_BUTTON_MIDDLE_NODE = 3;
 	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
@@ -168,6 +169,18 @@ public class TeleopInput {
 	 */
 	public boolean isIntakeButtonPressed() {
 		return mechJoystick.getRawButtonPressed(INTAKE_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Intake button.
+	 * @return True if the button is pressed
+	 */
+	public boolean isIntakeEPressed() {
+		return mechJoystick.getRawButtonPressed(INTAKE_BUTTON);
+	}
+
+	public boolean isUpdatePressed() {
+		return mechJoystick.getRawButton(UPDATE_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */

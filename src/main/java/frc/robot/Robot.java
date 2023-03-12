@@ -180,7 +180,7 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		//armSystem.update(input);
 		driveSystem.update(input);
-		// spinningIntakeFSM.update(input);
+		spinningIntakeFSM.update(input);
 		groundMountFSM.update(input);
 	}
 
