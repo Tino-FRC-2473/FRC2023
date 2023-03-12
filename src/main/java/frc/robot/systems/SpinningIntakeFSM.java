@@ -114,6 +114,7 @@ public class SpinningIntakeFSM {
 		if (input.isDisableUpdatedPressed()) {
 			toggleUpdate = !toggleUpdate;
 		}
+		SmartDashboard.putBoolean("is update enabledq	", toggleUpdate);
 		if (toggleUpdate) {
 			//System.out.println(itemType);
 			// SmartDashboard.putNumber("distance", distanceSensorObject.getValue());

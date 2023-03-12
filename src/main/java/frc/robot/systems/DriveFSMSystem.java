@@ -186,7 +186,7 @@ public class DriveFSMSystem {
 
 		currentState = FSMState.P6N1;
 		Robot.resetFinishedDeposit();
-		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
+		Robot.setNode(-1); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
 
 		roboXPos = 0;
@@ -748,7 +748,7 @@ public class DriveFSMSystem {
 		prevEncoderPos = this.currentEncoderPos;
 	}
 
-	/**.
+	/*
  	* Aligns with reflective tape (higher or lower tape is dependent on boolean passed in)
 		and drives within 42 inches (lower) or 65 inches (higher)
 		@param lower lower of higher tape
@@ -784,7 +784,7 @@ public class DriveFSMSystem {
 	// }
 
 	// /**.
- 	// * Aligns to april tag and drives up to within 35 inches of it
+	// * Aligns to april tag and drives up to within 35 inches of it
 	// */
 	// public void handleCVTagAlignState() {
 	// 	double angle = pcw.getTagTurnAngle();
@@ -806,7 +806,7 @@ public class DriveFSMSystem {
 	// 		}
 	// 	}
 	// }
-	/**
+	/*
 	 * Aligns to the high cube node (the one without an april tag).
 	 */
 	// public void handleMidCubeNodeAlignState() {
@@ -838,7 +838,7 @@ public class DriveFSMSystem {
 	// 		}
 	// 	}
 	// }
-	/**
+	/*
 	 * Basic moving commands for CV.
 	 * @param opt how you want to move: forward, backwards, turn left, turn right, or idle.
 	 */
