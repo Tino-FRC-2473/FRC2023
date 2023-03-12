@@ -135,7 +135,7 @@ public class Robot extends TimedRobot {
 				}
 			}
 			if (node == -1) {
-				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+				//armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 				finishedDeposit = true;
 			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)
@@ -148,7 +148,6 @@ public class Robot extends TimedRobot {
 			|| driveSystem.getCurrentState() == (FSMState.P7N2)) {
 
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
-			armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
 			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
 				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 			}
@@ -159,7 +158,7 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 
-		//armSystem.reset();
+		armSystem.reset();
 		driveSystem.resetTeleop();
 		spinningIntakeFSM.reset();
 	}
@@ -169,7 +168,7 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		System.out.println("Loop start: " + Timer.getFPGATimestamp());
 
-		//armSystem.update(input);
+		armSystem.update(input);
 		driveSystem.update(input);
 		spinningIntakeFSM.update(input);
 
