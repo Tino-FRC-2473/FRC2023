@@ -31,7 +31,7 @@ public class SpinningIntakeFSM {
 	}
 	//FIX VALUES
 	private static final double CUBE_KEEP_SPEED = 0.07;
-	private static final double INTAKE_SPEED = 0.3;
+	private static final double INTAKE_SPEED = 0.6;
 	private static final double RELEASE_SPEED = -0.2; //DONT FORGET -
 	//arbitrary constants for cube and cone
 	//6 inches
