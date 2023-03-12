@@ -4,7 +4,7 @@ package frc.robot.systems;
 import edu.wpi.first.wpilibj.Timer;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ColorSensorV3;
+// import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C.Port;
@@ -60,7 +60,7 @@ public class SpinningIntakeFSM {
 	private CANSparkMax spinnerMotor;
 	//private DigitalInput limitSwitchCone;
 	private AnalogInput distanceSensorObject;
-	private ColorSensorV3 colorSensor;
+	// private ColorSensorV3 colorSensor;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -73,7 +73,7 @@ public class SpinningIntakeFSM {
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
-		colorSensor = new ColorSensorV3(Port.kOnboard);
+		// colorSensor = new ColorSensorV3(Port.kOnboard);
 
 		// Reset state machine
 		reset();
@@ -132,7 +132,7 @@ public class SpinningIntakeFSM {
 					handleStartState();
 					break;
 				case IDLE_SPINNING:
-					handleIdleSpinningState();
+					handleIdleSpinningState(input);
 					break;
 				case IDLE_STOP:
 					handleIdleStopState();
@@ -171,7 +171,7 @@ public class SpinningIntakeFSM {
 				handleStartState();
 				break;
 			case IDLE_SPINNING:
-				handleIdleSpinningState();
+				handleIdleSpinningState(null);
 				break;
 			case IDLE_STOP:
 				handleIdleStopState();
@@ -205,13 +205,18 @@ public class SpinningIntakeFSM {
 	public static ItemType getObjectType() {
 		return itemType;
 	}
-	private void updateItem() {
-		double b = colorSensor.getColor().blue;
-		if (b > BLUE_THRESHOLD) {
-			itemType = ItemType.CUBE;
-		} else {
+	private void updateItem(TeleopInput input) {
+		if (input.isSliderForward()) {
 			itemType = ItemType.CONE;
+		} else {
+			itemType = ItemType.CUBE;
 		}
+		// double b = colorSensor.getColor().blue;
+		// if (b > BLUE_THRESHOLD) {
+		// 	itemType = ItemType.CUBE;
+		// } else {
+		// 	itemType = ItemType.CONE;
+		// }
 	}
 
 	/* ======================== Private methods ======================== */
@@ -261,14 +266,18 @@ public class SpinningIntakeFSM {
 	 */
 	private void handleStartState() {
 	}
-	private void handleIdleSpinningState() {
-		double newBlue = colorSensor.getColor().blue;
+	private void handleIdleSpinningState(TeleopInput input) {
 		if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
-			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE
-			&& lastBlue != newBlue) {
-			updateItem();
+			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE) {
+			updateItem(input);
 		}
-		lastBlue = newBlue;
+		// double newBlue = colorSensor.getColor().blue;
+		// if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
+		// 	&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE
+		// 	&& lastBlue != newBlue) {
+		// 	updateItem();
+		// }
+		// lastBlue = newBlue;
 		if (isMotorAllowed) {
 			spinnerMotor.set(INTAKE_SPEED);
 		}
