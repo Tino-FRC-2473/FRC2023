@@ -186,7 +186,7 @@ public class DriveFSMSystem {
 
 		currentState = FSMState.P6N1;
 		Robot.resetFinishedDeposit();
-		Robot.setNode(-1); // -1 is none, 0 is low, 1, mid, 2 is high
+		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
 
 		roboXPos = 0;
