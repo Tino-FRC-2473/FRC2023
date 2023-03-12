@@ -141,8 +141,8 @@ public class DriveFSMSystem {
 
 		gyro = new AHRS(SPI.Port.kMXP);
 
-		UsbCamera usb = CameraServer.startAutomaticCapture();
-		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+		//UsbCamera usb = CameraServer.startAutomaticCapture();
+		//usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
 		// // Creates the CvSink and connects it to the UsbCamera
 		// cvSink = CameraServer.getVideo();
@@ -199,15 +199,14 @@ public class DriveFSMSystem {
 	 * A.
 	 */
 	public void resetTeleop() {
-
-		System.gc();
-
 		rightMotorFront.getEncoder().setPosition(0);
 		leftMotorBack.getEncoder().setPosition(0);
 		rightMotorBack.getEncoder().setPosition(0);
 		leftMotorFront.getEncoder().setPosition(0);
 
-		gyro.reset();
+		//System.out.println("gyro reset" + Timer.getFPGATimestamp());
+		//gyro.reset();
+		//System.out.println("gyro reset done" + Timer.getFPGATimestamp());
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 

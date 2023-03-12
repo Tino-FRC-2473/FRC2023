@@ -34,7 +34,7 @@ public class GroundMountFSM {
 	private static final double HOME_ENCODER_CONSTANT = -4;
 	private static final double P_CONSTANT = 0.006;
 	private static final double P_UP_CONSTANT = 0.009;
-	private static final double ERROR = 20;
+	private static final double ERROR = 5;
 
 	/* ======================== Private variables ======================== */
 	private GroundMountFSMState currentState;
@@ -114,7 +114,8 @@ public class GroundMountFSM {
 				return withinError(pivotArmMotor.getEncoder().getPosition(), 0);
 			case AUTONOMOUS_DOWN:
 				handleAutonomousDownState();
-				return withinError(pivotArmMotor.getEncoder().getPosition(), BOTTOM_ENCODER_LIMIT);
+				return withinError(pivotArmMotor.getEncoder().getPosition(), BOTTOM_ENCODER_LIMIT)
+					|| limitSwitchLow.isPressed();
 			case AUTONOMOUS_IDLE:
 				handleAutonomousIdleState();
 				return true;
