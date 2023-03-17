@@ -9,7 +9,7 @@ import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Timer;
+//import edu.wpi.first.wpilibj.Timer;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -31,7 +31,7 @@ public class SpinningIntakeFSM {
 	}
 	//FIX VALUES
 	private static final double CUBE_KEEP_SPEED = 0.07;
-	private static final double INTAKE_SPEED = 0.6;
+	private static final double INTAKE_SPEED = 0.2;
 	private static final double RELEASE_SPEED = -0.2; //DONT FORGET -
 	//arbitrary constants for cube and cone
 	//6 inches
@@ -56,7 +56,6 @@ public class SpinningIntakeFSM {
 
 	/* ======================== Private variables ======================== */
 	private SpinningIntakeFSMState currentState;
-	private Timer timer;
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotor;
@@ -274,7 +273,11 @@ public class SpinningIntakeFSM {
 		else if (input.isCubeButtonPressed()) {
 
 		}*/
+		System.out.println("start time get color: "
+				+ Timer.getFPGATimestamp() + " " + currentState.toString());
 		double newBlue = colorSensor.getColor().blue;
+		System.out.println("end time get color: "
+				+ Timer.getFPGATimestamp() + " " + currentState.toString());
 		//distance and color sensor not used
 		if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
 			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE
