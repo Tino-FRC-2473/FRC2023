@@ -12,8 +12,8 @@ import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.VisionConstants;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.cameraserver.CameraServer;
-// import edu.wpi.first.cscore.CvSink;
-// import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
 //import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.cscore.UsbCamera;
 //import edu.wpi.first.cscore.VideoMode.PixelFormat;
@@ -87,9 +87,9 @@ public class DriveFSMSystem {
 
 	private boolean isNotForwardEnough = false;
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
-	// private CameraServer cam;
-	// private CvSink cvSink;
-	// private CvSource outputStrem;
+	private CameraServer cam;
+	private CvSink cvSink;
+	private CvSource outputStrem;
 	static final int STOP_OPT = 0;
 	static final int MOVE_FORWARD_OPT = 1;
 	static final int MOVE_BACKWARD_OPT = 2;
@@ -136,11 +136,11 @@ public class DriveFSMSystem {
 		UsbCamera usb = CameraServer.startAutomaticCapture();
 		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
-		// // Creates the CvSink and connects it to the UsbCamera
-		// cvSink = CameraServer.getVideo();
-		// // Creates the CvSource and MjpegServer [2] and connects them
-		// outputStrem = CameraServer.putVideo("RobotFrontCamera",
-		// Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+		// Creates the CvSink and connects it to the UsbCamera
+		cvSink = CameraServer.getVideo();
+		// Creates the CvSource and MjpegServer [2] and connects them
+		outputStrem = CameraServer.putVideo("RobotFrontCamera",
+		Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
 		// Reset state machine
 		resetAutonomous();
@@ -367,7 +367,7 @@ public class DriveFSMSystem {
 					return FSMState.CV_HIGH_TAPE_ALIGN;
 				} else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
 					isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
-				}
+				} 
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 			case AUTO_STATE_BALANCE:
 				return FSMState.AUTO_STATE_BALANCE;
@@ -392,12 +392,12 @@ public class DriveFSMSystem {
 				}
 				return FSMState.CV_TAG_ALIGN;
 			case CV_CUBE_ALIGN:
-				if(!input.is) {
+				if(!input.isDriveJoystickCVCubeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_CUBE_ALIGN;
 			case CV_CONE_ALIGN:
-				if(!input.is) {
+				if(!input.isDriveJoystickCVConeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_CONE_ALIGN;
