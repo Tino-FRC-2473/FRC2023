@@ -5,7 +5,8 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.Timer;
+// import edu.wpi.first.cameraserver.CameraServer;
 // Systems
 import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
@@ -15,7 +16,6 @@ import frc.robot.systems.SpinningIntakeFSM;
 import frc.robot.systems.ArmFSM.ArmFSMState;
 import frc.robot.systems.DriveFSMSystem.FSMState;
 import frc.robot.systems.SpinningIntakeFSM.SpinningIntakeFSMState;
-
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -67,17 +67,15 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-		CameraServer.startAutomaticCapture();
+		// CameraServer.startAutomaticCapture();
 		driveSystem = new DriveFSMSystem();
 		armSystem = new ArmFSM();
 		spinningIntakeFSM = new SpinningIntakeFSM();
-		System.gc();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		System.gc();
 
 		armSystem.reset();
 		driveSystem.resetAutonomous();
@@ -91,7 +89,7 @@ public class Robot extends TimedRobot {
 		driveSystem.update(null);
 		spinningIntakeFSM.update(null);
 
-		//System.out.println("finished deposit " + finishedDeposit);
+		System.out.println(finishedDeposit);
 
 		if (driveSystem.getCurrentState() == (FSMState.P1N1)
 			|| driveSystem.getCurrentState() == (FSMState.P2N1)
@@ -117,14 +115,38 @@ public class Robot extends TimedRobot {
 				}
 			}
 			if (node == -1) {
-				// WRITE CODE TO LEAVE ARM IN HOMING POSITION
-				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+				//armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+				finishedDeposit = true;
+			}
+		} else if (driveSystem.getCurrentState() == (FSMState.P5N1)
+			|| driveSystem.getCurrentState() == (FSMState.P6N1)
+			|| driveSystem.getCurrentState() == (FSMState.P7N1)) {
+
+			if (node == 2) {
+				if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_BACKWARD)) {
+					finishedDeposit =
+						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				}
+			}
+			if (node == 1) {
+				if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_BACKWARD)) {
+					finishedDeposit =
+						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				}
+			}
+			if (node == -1) {
+				//armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 				finishedDeposit = true;
 			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)
 			|| driveSystem.getCurrentState() == (FSMState.P1N3)
 			|| driveSystem.getCurrentState() == (FSMState.P2N2)
-			|| driveSystem.getCurrentState() == (FSMState.P3N2)) {
+			|| driveSystem.getCurrentState() == (FSMState.P3N2)
+			|| driveSystem.getCurrentState() == (FSMState.P5N2)
+			|| driveSystem.getCurrentState() == (FSMState.P5N3)
+			|| driveSystem.getCurrentState() == (FSMState.P6N2)
+			|| driveSystem.getCurrentState() == (FSMState.P7N2)) {
+
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
 			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
 				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
@@ -136,7 +158,6 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 
-		System.gc();
 		armSystem.reset();
 		driveSystem.resetTeleop();
 		spinningIntakeFSM.reset();
@@ -145,10 +166,13 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
+		System.out.println("Loop start: " + Timer.getFPGATimestamp());
 
 		armSystem.update(input);
 		driveSystem.update(input);
 		spinningIntakeFSM.update(input);
+
+		System.out.println("Loop end: " + Timer.getFPGATimestamp());
 	}
 
 	@Override

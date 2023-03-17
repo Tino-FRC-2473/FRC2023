@@ -4,18 +4,19 @@ package frc.robot.systems;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //import org.opencv.core.Mat;
 
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.VisionConstants;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.cameraserver.CameraServer;
+// import edu.wpi.first.cameraserver.CameraServer;
 // import edu.wpi.first.cscore.CvSink;
 // import edu.wpi.first.cscore.CvSource;
 //import edu.wpi.first.cscore.MjpegServer;
-import edu.wpi.first.cscore.UsbCamera;
+// import edu.wpi.first.cscore.UsbCamera;
 //import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import frc.robot.Constants;
 import frc.robot.HardwareMap;
@@ -55,7 +56,17 @@ public class DriveFSMSystem {
 		P3N1,
 		P3N2,
 
-		P4N1
+		P4N1,
+
+		P5N1,
+		P5N2,
+		P5N3,
+
+		P6N1,
+		P6N2,
+
+		P7N1,
+		P7N2
 	}
 
 	/* ======================== Private variables ======================== */
@@ -130,8 +141,8 @@ public class DriveFSMSystem {
 
 		gyro = new AHRS(SPI.Port.kMXP);
 
-		UsbCamera usb = CameraServer.startAutomaticCapture();
-		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+		// UsbCamera usb = CameraServer.startAutomaticCapture();
+		// usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
 		// // Creates the CvSink and connects it to the UsbCamera
 		// cvSink = CameraServer.getVideo();
@@ -173,7 +184,7 @@ public class DriveFSMSystem {
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
-		currentState = FSMState.P2N1;
+		currentState = FSMState.P6N1;
 		Robot.resetFinishedDeposit();
 		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
@@ -194,7 +205,7 @@ public class DriveFSMSystem {
 		rightMotorBack.getEncoder().setPosition(0);
 		leftMotorFront.getEncoder().setPosition(0);
 
-		gyro.reset();
+		// gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
@@ -214,13 +225,15 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+		System.out.println("start time drive: " + Timer.getFPGATimestamp());
+
 		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
 
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
 		updateLineOdometryTele(gyroAngleForOdo);
-		SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
+		// SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -299,10 +312,45 @@ public class DriveFSMSystem {
 				moveState(input, true, Constants.P4X1, 0);
 				break;
 
+			// path 5 (deposit backwards, exit community, charge station)
+
+			case P5N1:
+				moveState(input, false, Constants.P5X1, 0);
+				break;
+
+			case P5N2:
+				moveState(input, true, Constants.P5X2, 0);
+				break;
+
+			case P5N3:
+				moveState(input, false, Constants.P5X3, 0);
+				break;
+
+			// path 6 (deposit backwards, charge station)
+
+			case P6N1:
+				moveState(input, false, Constants.P6X1, 0);
+				break;
+
+			case P6N2:
+				moveState(input, true, Constants.P6X2, 0);
+				break;
+
+			// path 7 (deposit backwards, out of community)
+
+			case P7N1:
+				moveState(input, false, Constants.P7X1, 0);
+				break;
+
+			case P7N2:
+				moveState(input, true, Constants.P7X2, 0);
+				break;
+
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
+		System.out.println("end time drive: " + Timer.getFPGATimestamp());
 	}
 
 	/* ======================== Private methods ======================== */
@@ -365,7 +413,6 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_HOLD_WHILE_TILTED;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
-
 			// auto paths
 			case P1N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
@@ -418,6 +465,51 @@ public class DriveFSMSystem {
 					completedPoint = false;
 					return FSMState.IDLE;
 				}
+			case P5N1:
+				if (completedPoint && Robot.getFinishedDeposit()) {
+					Robot.resetFinishedDeposit();
+					completedPoint = false;
+					return FSMState.P5N2;
+				}
+				return FSMState.P5N1;
+			case P5N2:
+				if (completedPoint) {
+					completedPoint = false;
+					return FSMState.P5N3;
+				}
+				return FSMState.P5N2;
+			case P5N3:
+				if (completedPoint) {
+					completedPoint = false;
+					return FSMState.AUTO_STATE_BALANCE;
+				}
+				return FSMState.P5N3;
+			case P6N1:
+				if (completedPoint && Robot.getFinishedDeposit()) {
+					Robot.resetFinishedDeposit();
+					completedPoint = false;
+					return FSMState.P6N2;
+				}
+				return FSMState.P6N1;
+			case P6N2:
+				if (completedPoint) {
+					completedPoint = false;
+					return FSMState.AUTO_STATE_BALANCE;
+				}
+				return FSMState.P6N2;
+			case P7N1:
+				if (completedPoint && Robot.getFinishedDeposit()) {
+					Robot.resetFinishedDeposit();
+					completedPoint = false;
+					return FSMState.P7N2;
+				}
+				return FSMState.P7N1;
+			case P7N2:
+				if (completedPoint) {
+					completedPoint = false;
+					return FSMState.IDLE;
+				}
+				return FSMState.P7N2;
 			default: throw new IllegalStateException("Invalid state: " + currentState.toString()); }
 	}
 
@@ -584,7 +676,6 @@ public class DriveFSMSystem {
 		rightMotorBack.set(0);
 	}
 
-
 	/**
 	* Gets the heading from the gyro.
 	* @return the gyro heading
@@ -693,7 +784,7 @@ public class DriveFSMSystem {
 	}
 
 	/**.
- 	* Aligns to april tag and drives up to within 35 inches of it
+	* Aligns to april tag and drives up to within 35 inches of it
 	*/
 	public void handleCVTagAlignState() {
 		double angle = pcw.getTagTurnAngle();
@@ -715,7 +806,7 @@ public class DriveFSMSystem {
 			}
 		}
 	}
-	/**
+	/**.
 	 * Aligns to the high cube node (the one without an april tag).
 	 */
 	public void handleMidCubeNodeAlignState() {
@@ -747,7 +838,7 @@ public class DriveFSMSystem {
 			}
 		}
 	}
-	/**
+	/**.
 	 * Basic moving commands for CV.
 	 * @param opt how you want to move: forward, backwards, turn left, turn right, or idle.
 	 */
