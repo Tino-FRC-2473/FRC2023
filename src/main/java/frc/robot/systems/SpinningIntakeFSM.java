@@ -51,7 +51,8 @@ public class SpinningIntakeFSM {
 	private static final double BLUE_THRESHOLD = 0.23;
 	private double lastBlue = -1;
 	private boolean isMotorAllowed = false;
-	private boolean hasReset = false;
+	private boolean toggleUpdate = true;
+	private boolean needsReset = true;
 
 
 	/* ======================== Private variables ======================== */
@@ -62,7 +63,7 @@ public class SpinningIntakeFSM {
 	//private DigitalInput limitSwitchCone;
 	private AnalogInput distanceSensorObject;
 	private ColorSensorV3 colorSensor;
-
+	private Timer timer;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -71,7 +72,7 @@ public class SpinningIntakeFSM {
 	 */
 	public SpinningIntakeFSM() {
 		// Perform hardware init
-		//timer = new Timer();
+		timer = new Timer();
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
@@ -113,7 +114,11 @@ public class SpinningIntakeFSM {
 		if (input == null) {
 			return;
 		}
-		if (input.isUpdatePressed()) {
+		if (input.isDisableUpdatedPressed()) {
+			toggleUpdate = !toggleUpdate;
+		}
+		if (toggleUpdate) {
+			SmartDashboard.putBoolean("disabled", false);
 			//System.out.println(itemType);
 			SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
 			//SmartDashboard.putNumber("applied output", spinnerMotor.getAppliedOutput());
@@ -151,6 +156,7 @@ public class SpinningIntakeFSM {
 			}
 		} else {
 			System.out.println("Update disabled");
+			SmartDashboard.putBoolean("disabled", true);
 		}
 		System.out.println("end time spinning intake: " + Timer.getFPGATimestamp());
 	}
@@ -210,7 +216,7 @@ public class SpinningIntakeFSM {
 	public static ItemType getObjectType() {
 		return itemType;
 	}
-	private void updateItem(TeleopInput input) {
+	private void updateItem() {
 		/*if (input.isSliderForward()) {
 			itemType = ItemType.CONE;
 		} else {
@@ -240,6 +246,7 @@ public class SpinningIntakeFSM {
 		if (input == null) {
 			return SpinningIntakeFSMState.START_STATE;
 		}
+		System.out.println(spinnerMotor.getOutputCurrent());
 		switch (currentState) {
 			case START_STATE:
 				return SpinningIntakeFSMState.IDLE_SPINNING;
@@ -247,7 +254,15 @@ public class SpinningIntakeFSM {
 				if (input.isReleaseButtonPressed()) {
 					return SpinningIntakeFSMState.RELEASE;
 				}
-				//driver must make it stop
+				if (needsReset && isMotorAllowed && toggleUpdate)
+				{
+					timer.reset();
+					timer.start();
+					needsReset = false;
+				}
+				if (timer.hasElapsed(0.5) && spinnerMotor.getOutputCurrent() > 15) {
+					return SpinningIntakeFSMState.IDLE_STOP;
+				}
 				if ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
 					> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE) {
 					return SpinningIntakeFSMState.IDLE_STOP;
@@ -259,7 +274,9 @@ public class SpinningIntakeFSM {
 				}
 				return SpinningIntakeFSMState.IDLE_STOP;
 			case RELEASE:
+				System.out.println("release");
 				if (!input.isReleaseButtonPressed()) {
+					needsReset = true;
 					return SpinningIntakeFSMState.IDLE_SPINNING;
 				}
 				return SpinningIntakeFSMState.RELEASE;
@@ -305,11 +322,6 @@ public class SpinningIntakeFSM {
 		}
 	}
 	private void handleReleaseState() {
-		if (!hasReset) {
-			//timer.reset();
-			//timer.start();
-			hasReset = true;
-		}
 		itemType = ItemType.EMPTY;
 		spinnerMotor.set(RELEASE_SPEED);
 		isMotorAllowed = true;

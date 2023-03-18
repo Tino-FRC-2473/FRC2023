@@ -179,7 +179,7 @@ public class TeleopInput {
 		return mechJoystick.getRawButtonPressed(INTAKE_BUTTON);
 	}
 
-	public boolean isUpdatePressed() {
+	public boolean isDisableUpdatedPressed() {
 		return mechJoystick.getRawButton(UPDATE_BUTTON);
 	}
 
