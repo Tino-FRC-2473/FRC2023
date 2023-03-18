@@ -109,17 +109,18 @@ public class SpinningIntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		System.out.println("start time spinning intake: "
-				+ Timer.getFPGATimestamp() + " " + currentState.toString());
+		double lagRobot = colorSensor.getColor().blue;
 		if (input == null) {
 			return;
 		}
 		if (input.isUpdatePressed()) {
 			//System.out.println(itemType);
-			// SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
+			SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
+			//SmartDashboard.putNumber("applied output", spinnerMotor.getAppliedOutput());
+			SmartDashboard.putNumber("output current", spinnerMotor.getOutputCurrent());
 			// SmartDashboard.putNumber("r", colorSensor.getColor().red);
 			// SmartDashboard.putNumber("g", colorSensor.getColor().green);
-			// SmartDashboard.putNumber("b", colorSensor.getColor().blue);
+			SmartDashboard.putBoolean("is cube color", colorSensor.getColor().blue > BLUE_THRESHOLD);
 			SmartDashboard.putString("item type", itemType.toString());
 			SmartDashboard.putBoolean("Intake Motor Spinning", isMotorAllowed);
 			//System.out.println(distanceSensorObject.getValue() + " " + itemType);
@@ -209,13 +210,20 @@ public class SpinningIntakeFSM {
 	public static ItemType getObjectType() {
 		return itemType;
 	}
-	private void updateItem() {
+	private void updateItem(TeleopInput input) {
+		/*if (input.isSliderForward()) {
+			itemType = ItemType.CONE;
+		} else {
+			itemType = ItemType.CUBE;
+		}*/
+		/*System.out.println("start time get color: " + Timer.getFPGATimestamp());
 		double b = colorSensor.getColor().blue;
+		System.out.println("end time get color: " + Timer.getFPGATimestamp());
 		if (b > BLUE_THRESHOLD) {
 			itemType = ItemType.CUBE;
 		} else {
 			itemType = ItemType.CONE;
-		}
+		}*/
 	}
 
 	/* ======================== Private methods ======================== */
