@@ -12,12 +12,12 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.VisionConstants;
 import edu.wpi.first.math.util.Units;
-// import edu.wpi.first.cameraserver.CameraServer;
-// import edu.wpi.first.cscore.CvSink;
-// import edu.wpi.first.cscore.CvSource;
-//import edu.wpi.first.cscore.MjpegServer;
-// import edu.wpi.first.cscore.UsbCamera;
-//import edu.wpi.first.cscore.VideoMode.PixelFormat;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.MjpegServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import frc.robot.Constants;
 import frc.robot.HardwareMap;
 import frc.robot.PhotonCameraWrapper;
@@ -96,9 +96,9 @@ public class DriveFSMSystem {
 
 	private boolean isNotForwardEnough = false;
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
-	// private CameraServer cam;
-	// private CvSink cvSink;
-	// private CvSource outputStrem;
+	private CameraServer cam;
+	private CvSink cvSink;
+	private CvSource outputStrem;
 	static final int TURN_RIGHT_OPT = 4;
 	static final int TURN_LEFT_OPT = 3;
 	static final int MOVE_FORWARD_OPT = 1;
@@ -141,14 +141,14 @@ public class DriveFSMSystem {
 
 		gyro = new AHRS(SPI.Port.kMXP);
 
-		// UsbCamera usb = CameraServer.startAutomaticCapture();
-		// usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+		UsbCamera usb = CameraServer.startAutomaticCapture();
+		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
-		// // Creates the CvSink and connects it to the UsbCamera
-		// cvSink = CameraServer.getVideo();
-		// // Creates the CvSource and MjpegServer [2] and connects them
-		// outputStrem = CameraServer.putVideo("RobotFrontCamera",
-		// Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+		// Creates the CvSink and connects it to the UsbCamera
+		cvSink = CameraServer.getVideo();
+		// Creates the CvSource and MjpegServer [2] and connects them
+		outputStrem = CameraServer.putVideo("RobotFrontCamera",
+		Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
 		// Reset state machine
 		resetAutonomous();
@@ -272,7 +272,7 @@ public class DriveFSMSystem {
 				handleTurnState(input, Constants.HALF_REVOLUTION_DEGREES);
 				break;
 
-			// path 1 (push in, out of communuty, charge station)
+			// path 1 (push in, out of community, charge station)
 
 			case P1N1:
 				moveState(input, true, Constants.P1X1, 0);
