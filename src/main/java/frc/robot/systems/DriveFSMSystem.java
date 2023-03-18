@@ -172,10 +172,34 @@ public class DriveFSMSystem {
 		gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
+		int path = (int) SmartDashboard.getNumber("Auto Path", -1);
+		String pathString = "" + path;
+		switch (pathString) {
+			case "1":
+				currentState = FSMState.P1N1;
+				break;
+			case "2":
+				currentState = FSMState.P2N1;
+				break;
+			case "3":
+				currentState = FSMState.P3N1;
+				break;
+			case "4":
+				currentState = FSMState.P4N1;
+				break;
+			default:
+				throw new IllegalStateException("Invalid path: " + pathString);
+		}
 
-		currentState = FSMState.P2N1;
+		//currentState = FSMState.P2N1;
 		Robot.resetFinishedDeposit();
-		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
+		int node = (int) SmartDashboard.getNumber("Node", -1);
+		if (node >= -1 && node <= 2) {
+			Robot.setNode(node); // -1 is none, 0 is low, 1, mid, 2 is high
+		} else {
+			Robot.setNode(-1);
+		}
+		//Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
 
 		roboXPos = 0;
@@ -221,6 +245,8 @@ public class DriveFSMSystem {
 
 		updateLineOdometryTele(gyroAngleForOdo);
 		SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
+		SmartDashboard.putNumber("Auto Path", -1);
+		SmartDashboard.putNumber("Node", -1);
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
