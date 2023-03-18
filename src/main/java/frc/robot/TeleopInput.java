@@ -16,9 +16,9 @@ public class TeleopInput {
 	private static final int DRIVE_JOYSTICK_PORT = 1;
 	private static final int STEERING_WHEEL_PORT = 3;
 
-	private static final int PIVOT_INCREASE_BUTTON = 5;
-	private static final int PIVOT_DECREASE_BUTTON = 3;
-	private static final int FINE_TUNING_BUTTON = 2;
+	private static final int PIVOT_INCREASE_BUTTON = 3;
+	private static final int PIVOT_DECREASE_BUTTON = 5;
+	private static final int FINE_TUNING_BUTTON = 12;
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
 	private static final int BALANCE_BUTTON = 2;
@@ -30,6 +30,7 @@ public class TeleopInput {
 	private static final int CV_ALIGN_BUTTON_LEFT_NODE = 4;
 	private static final int CV_ALIGN_BUTTON_MIDDLE_NODE = 3;
 	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
+	private static final int DISABLE_UPDATE_BUTTON = 2;
 
 	private static final int GROUND_MOUNT_BUTTON = 4;
 	private static final int INTAKE_BUTTON = 6;
@@ -168,6 +169,14 @@ public class TeleopInput {
 	 */
 	public boolean isIntakeButtonPressed() {
 		return mechJoystick.getRawButtonPressed(INTAKE_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Disable Intake button.
+	 * @return True if the button is pressed
+	 */
+	public boolean isToggleIntakeUpdatePressed() {
+		return mechJoystick.getRawButtonPressed(DISABLE_UPDATE_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
