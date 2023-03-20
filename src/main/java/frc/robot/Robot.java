@@ -67,7 +67,6 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-		// CameraServer.startAutomaticCapture();
 		driveSystem = new DriveFSMSystem();
 		armSystem = new ArmFSM();
 		spinningIntakeFSM = new SpinningIntakeFSM();
@@ -115,7 +114,6 @@ public class Robot extends TimedRobot {
 				}
 			}
 			if (node == -1) {
-				//armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 				finishedDeposit = true;
 			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P5N1)
@@ -135,7 +133,6 @@ public class Robot extends TimedRobot {
 				}
 			}
 			if (node == -1) {
-				//armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 				finishedDeposit = true;
 			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)

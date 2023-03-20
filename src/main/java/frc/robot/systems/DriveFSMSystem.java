@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.SPI;
 //import org.opencv.core.Mat;
 
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.VisionConstants;
 import edu.wpi.first.math.util.Units;
 // import edu.wpi.first.cameraserver.CameraServer;
@@ -32,7 +31,6 @@ import frc.robot.drive.DrivePower;
 // Java Imports
 
 public class DriveFSMSystem {
-
 
 	// FSM state definitions
 	public enum FSMState {
@@ -96,9 +94,7 @@ public class DriveFSMSystem {
 
 	private boolean isNotForwardEnough = false;
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
-	// private CameraServer cam;
-	// private CvSink cvSink;
-	// private CvSource outputStrem;
+
 	static final int TURN_RIGHT_OPT = 4;
 	static final int TURN_LEFT_OPT = 3;
 	static final int MOVE_FORWARD_OPT = 1;
@@ -122,9 +118,6 @@ public class DriveFSMSystem {
 		rightMotorBack = new CANSparkMax(HardwareMap.CAN_ID_SPARK_DRIVE_RIGHT_BACK,
 										CANSparkMax.MotorType.kBrushless);
 
-		// leftMotorBack.follow(leftMotorFront);
-		// rightMotorBack.follow(rightMotorBack);
-
 		rightMotorFront.getEncoder().setPosition(0);
 		leftMotorBack.getEncoder().setPosition(0);
 		rightMotorBack.getEncoder().setPosition(0);
@@ -140,15 +133,6 @@ public class DriveFSMSystem {
 		roboYPos = 0;
 
 		gyro = new AHRS(SPI.Port.kMXP);
-
-		// UsbCamera usb = CameraServer.startAutomaticCapture();
-		// usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
-
-		// // Creates the CvSink and connects it to the UsbCamera
-		// cvSink = CameraServer.getVideo();
-		// // Creates the CvSource and MjpegServer [2] and connects them
-		// outputStrem = CameraServer.putVideo("RobotFrontCamera",
-		// Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
 		// Reset state machine
 		resetAutonomous();
@@ -225,7 +209,6 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		System.out.println("start time drive: " + Timer.getFPGATimestamp());
 
 		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
 
@@ -233,7 +216,6 @@ public class DriveFSMSystem {
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
 		updateLineOdometryTele(gyroAngleForOdo);
-		// SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -350,7 +332,6 @@ public class DriveFSMSystem {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
-		System.out.println("end time drive: " + Timer.getFPGATimestamp());
 	}
 
 	/* ======================== Private methods ======================== */
@@ -792,8 +773,6 @@ public class DriveFSMSystem {
 			return;
 		}
 		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
-		System.out.println(pcw.getTagDistance());
-		System.out.println(pcw.getTagTurnAngle());
 		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
 			cvmove(TURN_RIGHT_OPT);
 		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
@@ -819,7 +798,6 @@ public class DriveFSMSystem {
 			if (isNotForwardEnough) {
 				cvmove(1);
 				x = pcw.getEstimatedGlobalPose().getX();
-				System.out.println("pose x: " + pcw.getEstimatedGlobalPose().getX());
 			} else {
 				cvmove(0);
 				pcw.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX); //2d pipeline

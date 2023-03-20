@@ -106,13 +106,6 @@ public class SpinningIntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		//System.out.println(itemType);
-		// SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
-		// SmartDashboard.putNumber("r", colorSensor.getColor().red);
-		// SmartDashboard.putNumber("g", colorSensor.getColor().green);
-		// SmartDashboard.putNumber("b", colorSensor.getColor().blue);
-		// SmartDashboard.putString("item type", itemType.toString());
-		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		if (input == null) {
 			return;
 		}
@@ -149,14 +142,6 @@ public class SpinningIntakeFSM {
 	 * @return Boolean that returns if given state is complete
 	 */
 	public boolean updateAutonomous(SpinningIntakeFSMState state) {
-		//System.out.println(itemType);
-		// SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
-		// // SmartDashboard.putNumber("r", colorSensor.getColor().red);
-		// // SmartDashboard.putNumber("g", colorSensor.getColor().green);
-		// SmartDashboard.putNumber("b", colorSensor.getColor().blue);
-		// SmartDashboard.putString("item type", itemType.toString());
-		// SmartDashboard.putNumber("Blue threshold", BLUE_THRESHOLD);
-		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		isMotorAllowed = true;
 		switch (state) {
 			case START_STATE:
