@@ -1,7 +1,6 @@
 package frc.robot.systems;
 
 // WPILib Imports
-
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,7 +13,7 @@ import com.revrobotics.SparkMaxLimitSwitch;
 public class GroundMountFSM {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
-	public enum FSMState {
+	public enum GroundMountFSMState {
 		START_STATE,
 		PIVOTING_UP,
 		PIVOTED_UP,
@@ -25,17 +24,18 @@ public class GroundMountFSM {
 		AUTONOMOUS_IDLE
 	}
 	//arbitrary constants, must test all of these
-	private static final double PIVOT_UP_POWER = -0.04;
+	private static final double PIVOT_UP_POWER = -0.1;
 	private static final double MIN_POWER = -0.2;
 	private static final double MAX_POWER = 0.1;
 	private boolean zeroed = false;
-	private static final double BOTTOM_ENCODER_LIMIT = 44.00; //ARBITRARY VALUE
+	private static final double BOTTOM_ENCODER_LIMIT = 50.00; //ARBITRARY VALUE
 	private static final double HOME_ENCODER_CONSTANT = -4;
 	private static final double P_CONSTANT = 0.006;
 	private static final double P_UP_CONSTANT = 0.009;
+	private static final double ERROR = 5;
 
 	/* ======================== Private variables ======================== */
-	private FSMState currentState;
+	private GroundMountFSMState currentState;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -75,7 +75,7 @@ public class GroundMountFSM {
 	 * Return current FSM state.
 	 * @return Current FSM state
 	 */
-	public FSMState getCurrentState() {
+	public GroundMountFSMState getCurrentState() {
 		return currentState;
 	}
 	/**
@@ -89,28 +89,31 @@ public class GroundMountFSM {
 	public void reset() {
 		zeroed = false;
 		pivotArmMotor.getEncoder().setPosition(0);
-		currentState = FSMState.START_STATE;
+		currentState = GroundMountFSMState.START_STATE;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
-
+	private boolean withinError(double a, double b) {
+		return Math.abs(a - b) < ERROR;
+	}
 	/**
 	 * updateAutonomous function.
 	 * @param state that the autonomous is in.
 	 * @return a boolean
 	 */
-	public boolean updateAutonomous(FSMState state) {
+	public boolean updateAutonomous(GroundMountFSMState state) {
 		SmartDashboard.putNumber("power", pivotArmMotor.get());
 		SmartDashboard.putBoolean("limit switch low", isLimitSwitchLowPressed());
 		SmartDashboard.putBoolean("limit switch high", isLimitSwitchHighPressed());
-
+		SmartDashboard.putString("state", state.toString());
 		switch (state) {
 			case AUTONOMOUS_UP:
 				handleAutonomousUpState();
-				return isLimitSwitchHighPressed();
+				return withinError(pivotArmMotor.getEncoder().getPosition(), 0);
 			case AUTONOMOUS_DOWN:
 				handleAutonomousDownState();
-				return isLimitSwitchLowPressed();
+				return withinError(pivotArmMotor.getEncoder().getPosition(), BOTTOM_ENCODER_LIMIT)
+					|| limitSwitchLow.isPressed();
 			case AUTONOMOUS_IDLE:
 				handleAutonomousIdleState();
 				return true;
@@ -124,6 +127,8 @@ public class GroundMountFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+		//System.out.println("start time ground mount: " + Timer.getFPGATimestamp());
+		//System.out.println(itemType);
 		SmartDashboard.putNumber("encoder", pivotArmMotor.getEncoder().getPosition());
 		SmartDashboard.putString("state", currentState.toString());
 		SmartDashboard.putNumber("power", pivotArmMotor.get());
@@ -152,6 +157,7 @@ public class GroundMountFSM {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
+		//System.out.println("end time ground mount: " + Timer.getFPGATimestamp());
 	}
 	/* ======================== Private methods ======================== */
 	/**
@@ -163,54 +169,54 @@ public class GroundMountFSM {
 	 *        the robot is in autonomous mode.
 	 * @return FSM state for the next iteration
 	 */
-	private FSMState nextState(TeleopInput input) {
+	private GroundMountFSMState nextState(TeleopInput input) {
 		if (input == null) {
-			return FSMState.START_STATE;
+			return GroundMountFSMState.START_STATE;
 		}
 
 		switch (currentState) {
 			case START_STATE:
 				if (zeroed) {
-					return FSMState.PIVOTED_UP;
+					return GroundMountFSMState.PIVOTED_UP;
 				} else {
-					return FSMState.START_STATE;
+					return GroundMountFSMState.START_STATE;
 				}
 			case PIVOTING_UP:
 				if (input.isPivotButtonPressed()) {
-					return FSMState.PIVOTING_DOWN;
+					return GroundMountFSMState.PIVOTING_DOWN;
 				}
 				if (isLimitSwitchHighPressed()) {
-					return FSMState.PIVOTED_UP;
+					return GroundMountFSMState.PIVOTED_UP;
 				}
 				//means pivot button is not pressed and limit switch not activated, stay in state
-				return FSMState.PIVOTING_UP;
+				return GroundMountFSMState.PIVOTING_UP;
 			case PIVOTED_UP:
 				if (input.isPivotButtonPressed()) {
-					return FSMState.PIVOTING_DOWN;
+					return GroundMountFSMState.PIVOTING_DOWN;
 				}
 				if (!input.isPivotButtonPressed() && !isLimitSwitchHighPressed()) {
-					return FSMState.PIVOTING_UP;
+					return GroundMountFSMState.PIVOTING_UP;
 				}
 				//means pivot button not pressed and limit switch activated, stay in state
-				return FSMState.PIVOTED_UP;
+				return GroundMountFSMState.PIVOTED_UP;
 			case PIVOTING_DOWN:
 				if (!input.isPivotButtonPressed()) {
-					return FSMState.PIVOTING_UP;
+					return GroundMountFSMState.PIVOTING_UP;
 				}
 				if (isLimitSwitchLowPressed() && input.isPivotButtonPressed()) {
-					return FSMState.PIVOTED_DOWN;
+					return GroundMountFSMState.PIVOTED_DOWN;
 				}
 				//means limit switch low not activated and pivot button still pressed, stay in state
-				return FSMState.PIVOTING_DOWN;
+				return GroundMountFSMState.PIVOTING_DOWN;
 			case PIVOTED_DOWN:
 				if (!input.isPivotButtonPressed()) {
-					return FSMState.PIVOTING_UP;
+					return GroundMountFSMState.PIVOTING_UP;
 				}
 				if (input.isPivotButtonPressed() && !isLimitSwitchLowPressed()) {
-					return FSMState.PIVOTING_DOWN;
+					return GroundMountFSMState.PIVOTING_DOWN;
 				}
 				//means pivot button is pressed and limit switch low active, stay in state
-				return FSMState.PIVOTED_DOWN;
+				return GroundMountFSMState.PIVOTED_DOWN;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
