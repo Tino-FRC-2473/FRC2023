@@ -387,24 +387,7 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				System.out.println(currentState);
-				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
-					return FSMState.TELE_STATE_BALANCE;
-				} else if (input != null && input.isSteeringWheelHoldPressedRaw()) {
-					return FSMState.TELE_STATE_HOLD_WHILE_TILTED;
-				}
-				if (input != null && input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
-					isNotForwardEnough = true; return FSMState.CV_LOW_TAPE_ALIGN;
-				} else if (input != null && input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
-					isNotForwardEnough = true;
-					return FSMState.CV_HIGH_TAPE_ALIGN;
-				} else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
-					isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
-				} else if (input != null && input.isDriveJoystickCVConeButtonPressedRaw()) {
-					return FSMState.CV_CONE_ALIGN;
-				} else if (input != null && input.isDriveJoystickCVCubeButtonPressedRaw()) {
-					return FSMState.CV_CUBE_ALIGN;
-				}
-				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+				return getCVState(input);
 			case AUTO_STATE_BALANCE:
 				return FSMState.AUTO_STATE_BALANCE;
 			case TURNING_STATE:
@@ -548,6 +531,26 @@ public class DriveFSMSystem {
 			default: throw new IllegalStateException("Invalid state: " + currentState.toString()); }
 	}
 
+	private FSMState getCVState(TeleopInput input) {
+		if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
+			return FSMState.TELE_STATE_BALANCE;
+		} else if (input != null && input.isSteeringWheelHoldPressedRaw()) {
+			return FSMState.TELE_STATE_HOLD_WHILE_TILTED;
+		}
+		if (input != null && input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
+			isNotForwardEnough = true; return FSMState.CV_LOW_TAPE_ALIGN;
+		} else if (input != null && input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
+			isNotForwardEnough = true;
+			return FSMState.CV_HIGH_TAPE_ALIGN;
+		} else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
+			isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
+		} else if (input != null && input.isDriveJoystickCVConeButtonPressedRaw()) {
+			return FSMState.CV_CONE_ALIGN;
+		} else if (input != null && input.isDriveJoystickCVCubeButtonPressedRaw()) {
+			return FSMState.CV_CUBE_ALIGN;
+		}
+		return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+	}
 	/* ------------------------ FSM state handlers ------------------------ */
 	/**
 	 * Handle behavior in TELE_STATE_2_MOTOR_DRIVE.
