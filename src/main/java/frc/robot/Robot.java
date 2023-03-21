@@ -154,7 +154,7 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 
-    armSystem.reset();
+		armSystem.reset();
 		driveSystem.resetTeleop();
 		//spinningIntakeFSM.reset();
 	}
