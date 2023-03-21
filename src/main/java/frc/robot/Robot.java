@@ -6,6 +6,8 @@ package frc.robot;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 // Systems
 import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
@@ -33,7 +35,8 @@ public class Robot extends TimedRobot {
 	// autonomus
 	private static boolean finishedDeposit = false;
 	private static int node = -1; // -1 is none, 0 is low, 1, mid, 2 is high
-
+	private static SendableChooser<FSMState> autoPathChooser;
+	private static SendableChooser<Integer> nodeChooser;
 	/**
 	 * This function that returns whether or not the robot has finished
 	 * 	depositing the object in autonomus.
@@ -60,6 +63,21 @@ public class Robot extends TimedRobot {
 	}
 
 	/**
+	 * This function returns the chooser object for the auto path for the robot.
+	 * @return The chooser object which contains information on which auto path was selected.
+	 */
+	public static SendableChooser<FSMState> getAutoChooser() {
+		return autoPathChooser;
+	}
+
+	/**
+	 * This function returns the chooser object for the node for the auto path.
+	 * @return The chooser object which contains information on the node for the auto path.
+	 */
+	public static SendableChooser<Integer> getNodeChooser() {
+		return nodeChooser;
+	}
+	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
 	 */
@@ -68,6 +86,22 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		CameraServer.startAutomaticCapture();
+		SmartDashboard.putBoolean("Enable Drive", true);
+		SmartDashboard.putBoolean("Enable Arm", true);
+		SmartDashboard.putBoolean("Enable Intake", true);
+		SmartDashboard.putBoolean("Enable Ground Mount", true);
+		autoPathChooser = new SendableChooser<>();
+		autoPathChooser.setDefaultOption("Path 1", FSMState.P1N1);
+		autoPathChooser.addOption("Path 2", FSMState.P2N1);
+		autoPathChooser.addOption("Path 3", FSMState.P3N1);
+		autoPathChooser.addOption("Path 4", FSMState.P4N1);
+		SmartDashboard.putData("Auto Path", autoPathChooser);
+		nodeChooser = new SendableChooser<>();
+		nodeChooser.setDefaultOption("Low", 0);
+		nodeChooser.addOption("Mid", 1);
+		nodeChooser.addOption("High", 2);
+		nodeChooser.addOption("None", -1);
+		SmartDashboard.putData("Node", nodeChooser);
 		driveSystem = new DriveFSMSystem();
 		armSystem = new ArmFSM();
 		spinningIntakeFSM = new SpinningIntakeFSM();
@@ -78,7 +112,6 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		System.gc();
-
 		armSystem.reset();
 		driveSystem.resetAutonomous();
 		spinningIntakeFSM.reset();
