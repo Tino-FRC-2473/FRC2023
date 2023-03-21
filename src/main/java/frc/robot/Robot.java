@@ -110,7 +110,6 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		System.gc();
-
 		armSystem.reset();
 		driveSystem.resetAutonomous();
 		spinningIntakeFSM.reset();
