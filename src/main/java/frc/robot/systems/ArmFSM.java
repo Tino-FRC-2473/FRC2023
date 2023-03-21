@@ -196,7 +196,6 @@ public class ArmFSM {
 	 */
 	public void update(TeleopInput input) {
 		if (input == null) {
-			//handleIdleState(input);
 			return;
 		}
 		SmartDashboard.putString("Current State", " " + currentState);

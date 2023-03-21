@@ -1,7 +1,7 @@
 package frc.robot.systems;
 
 // WPILib Imports
-//import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Timer;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
@@ -110,7 +110,7 @@ public class SpinningIntakeFSM {
 		if (input == null) {
 			return;
 		}
-		//System.out.println("start time spinning intake: " + Timer.getFPGATimestamp());
+		System.out.println("start time spinning intake: " + Timer.getFPGATimestamp());
 		if (input.isToggleIntakeUpdatePressed()) {
 			toggleUpdate = !toggleUpdate;
 		}
@@ -143,7 +143,7 @@ public class SpinningIntakeFSM {
 				System.out.println(currentState);
 			}
 		}
-		//System.out.println("end time spinning intake: " + Timer.getFPGATimestamp());
+		System.out.println("end time spinning intake: " + Timer.getFPGATimestamp());
 	}
 	/**
 	 * Run given state and return if state is complete.

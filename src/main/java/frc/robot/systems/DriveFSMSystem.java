@@ -194,7 +194,6 @@ public class DriveFSMSystem {
 		rightMotorBack.getEncoder().setPosition(0);
 		leftMotorFront.getEncoder().setPosition(0);
 
-		// gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
 
