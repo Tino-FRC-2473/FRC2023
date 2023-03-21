@@ -29,10 +29,8 @@ public class PhotonCameraWrapper {
 	public static final double FIELD_WIDTH_METERS = 500;
 	public static final double FIELD_LENGTH_METERS = 500;
 	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
-	final double ANGULAR_P = 0.01; //need to change value
-    final double ANGULAR_D = 0; //need to change value
-	double lastTs = 0;
-
+	public static final double ANGULAR_P = 0.01; //need to change value
+	public static final double ANGULAR_D = 0; //need to change value
 		/** PhotonCamera object representing a camera that is
 		 * connected to PhotonVision.*/
 	private PhotonCamera photonCamera;
@@ -41,6 +39,8 @@ public class PhotonCameraWrapper {
 		/** PIDController object to implement PID for robot turning.*/
 	private PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
 
+		/** Last timestamp holder to check if code is running faster than limelight.*/
+	private double lastTs = 0;
 
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
@@ -131,24 +131,38 @@ public class PhotonCameraWrapper {
 		}
 		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
+
 	/**
 	 * Returns the angle for the robot to turn to align with the grid april tag.
+	 * @return an angle that tells the robot how much to turn to align in degrees
+	 */
+	public double getTagTurnAngle() {
+		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
+				VisionConstants.CAM_OFFSET_INCHES / getTagDistance()));
+		}
+		return Constants.INVALID_TURN_RETURN_DEGREES;
+	}
+
+	/**
+	 * Returns the rotation power for the robot to turn to align with the grid april tag (uses pid).
 	 * @return an angle that tells the robot how much to turn to align in degrees
 	 */
 	public double getTagTurnRotation() {
 		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		double rotationSpeed;
-
-
-		if (result.hasTargets() && (lastTs == 0 || photonCamera.getLatestResult().getTimestampSeconds() != lastTs)) {
-			System.out.println("angle: " +  (result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
-				VisionConstants.CAM_OFFSET_INCHES / getTagDistance()))));
+		double curTs = photonCamera.getLatestResult().getTimestampSeconds();
+		//compare curTs to lastTs: check if code is running faster than limelight (causes overshoot)
+		if (result.hasTargets() && (lastTs == 0 || curTs != lastTs)) {
+			System.out.println("angle: " +  (result.getBestTarget().getYaw() + Math.toDegrees(
+				Math.atan(VisionConstants.CAM_OFFSET_INCHES / getTagDistance()))));
 			System.out.println("distance: " + getTagDistance());
 			// Calculate angular turn power
-			// -1.0 required to ensure positive PID controller effort _increases_ yaw
-			rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
-				VisionConstants.CAM_OFFSET_INCHES / getTagDistance())), 0);
+			// -1.0 required to ensure positive PID controller effort increases yaw
+			rotationSpeed = -turnController.calculate(getTagTurnAngle(), 0);
 		} else {
 			// If we have no targets, stay still.
 			rotationSpeed = 0;
@@ -172,8 +186,6 @@ public class PhotonCameraWrapper {
 		} else {
 			return -1;
 		}
-		
-
 	}
 
 	/**

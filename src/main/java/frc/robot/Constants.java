@@ -12,6 +12,7 @@ public class Constants {
 	public static final double HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES = 67;
 	public static final double LOWER_TAPE_DRIVEUP_DISTANCE_INCHES = 45;
 	public static final double TAG_DRIVEUP_DISTANCE_INCHES = 32;
+	public static final double CUBE_DRIVEUP_DISTANCE_INCHES = 45;
 	public static final int WEBCAM_PIXELS_WIDTH = 480;
 	public static final int WEBCAM_PIXELS_HEIGHT = 480;
 	public static final double WHEEL_DIAMETER_INCHES = 6.0; //7.65
@@ -138,5 +139,4 @@ public class Constants {
 		public static final double APRILTAG_8_HEIGHT_METERS = Units.inchesToMeters(18.22);
 		public static final double APRILTAG_8_ANGLE_RADIANS = Units.degreesToRadians(0);
 	}
-    public static double CUBE_DRIVEUP_DISTANCE_INCHES;
 }

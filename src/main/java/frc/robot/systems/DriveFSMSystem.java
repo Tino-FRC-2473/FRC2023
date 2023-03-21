@@ -96,8 +96,6 @@ public class DriveFSMSystem {
 	static final int MOVE_BACKWARD_OPT = 2;
 	static final int TURN_LEFT_OPT = 3;
 	static final int TURN_RIGHT_OPT = 4;
-	
-	
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -246,7 +244,6 @@ public class DriveFSMSystem {
 			case CV_CUBE_ALIGN:
 				handleCVCubeAlignState();
 				break;
-			
 			case CV_CONE_ALIGN:
 				handleCVConeAlignState();
 				break;
@@ -398,12 +395,12 @@ public class DriveFSMSystem {
 				}
 				return FSMState.CV_TAG_ALIGN;
 			case CV_CUBE_ALIGN:
-				if(!input.isDriveJoystickCVCubeButtonPressedRaw()) {
+				if (!input.isDriveJoystickCVCubeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_CUBE_ALIGN;
 			case CV_CONE_ALIGN:
-				if(!input.isDriveJoystickCVConeButtonPressedRaw()) {
+				if (!input.isDriveJoystickCVConeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_CONE_ALIGN;
@@ -751,22 +748,12 @@ public class DriveFSMSystem {
 	public void handleCVTagAlignState() {
 		double power = pcw.getTagTurnRotation();
 		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
-		// System.out.println(pcw.getTagDistance());
-		// System.out.println(pcw.getTagTurnRotation());
-		// if(power > 0.3) power = 0.3;
-		// else if (power < -0.3) power = -0.3;
-
-		power = MathUtil.clamp(power, -0.08, 0.08);
-
-		// System.out.println(power);
-		//may be positive power
-		
+		power = MathUtil.clamp(
+			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
 		leftMotorFront.set(-power);
 		rightMotorFront.set(-power);
 		leftMotorBack.set(-power);
-		rightMotorBack.set(-power); 
-
-		//System.out.println(leftMotorFront.get());
+		rightMotorBack.set(-power);
 	}
 	/**
 	 * Aligns to the high cube node (the one without an april tag).

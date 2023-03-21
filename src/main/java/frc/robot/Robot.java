@@ -7,14 +7,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.cameraserver.CameraServer;
 // Systems
-//import frc.robot.systems.ArmFSM;
+import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
-//import frc.robot.systems.SpinningIntakeFSM;
-//import frc.robot.systems.GroundMountFSM;
+import frc.robot.systems.SpinningIntakeFSM;
+import frc.robot.systems.GroundMountFSM;
 
-//import frc.robot.systems.ArmFSM.ArmFSMState;
+import frc.robot.systems.ArmFSM.ArmFSMState;
 import frc.robot.systems.DriveFSMSystem.FSMState;
-//import frc.robot.systems.SpinningIntakeFSM.SpinningIntakeFSMState;
+import frc.robot.systems.SpinningIntakeFSM.SpinningIntakeFSMState;
 
 
 /**
@@ -25,10 +25,10 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	//private ArmFSM armSystem;
+	private ArmFSM armSystem;
 	private DriveFSMSystem driveSystem;
-	//private SpinningIntakeFSM spinningIntakeFSM;
-	//private GroundMountFSM groundMountFSM;
+	private SpinningIntakeFSM spinningIntakeFSM;
+	private GroundMountFSM groundMountFSM;
 
 	// autonomus
 	private static boolean finishedDeposit = false;
@@ -69,67 +69,67 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 		CameraServer.startAutomaticCapture();
 		driveSystem = new DriveFSMSystem();
-		// armSystem = new ArmFSM();
-		// spinningIntakeFSM = new SpinningIntakeFSM();
+		armSystem = new ArmFSM();
+		spinningIntakeFSM = new SpinningIntakeFSM();
 		System.gc();
 	}
 
 	@Override
 	public void autonomousInit() {
-		// System.out.println("-------- Autonomous Init --------");
-		// System.gc();
+		System.out.println("-------- Autonomous Init --------");
+		System.gc();
 
-		// armSystem.reset();
-		// driveSystem.resetAutonomous();
-		// spinningIntakeFSM.reset();
+		armSystem.reset();
+		driveSystem.resetAutonomous();
+		spinningIntakeFSM.reset();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 
-		// armSystem.update(null);
-		// driveSystem.update(null);
-		// spinningIntakeFSM.update(null);
+		armSystem.update(null);
+		driveSystem.update(null);
+		spinningIntakeFSM.update(null);
 
-		// //System.out.println("finished deposit " + finishedDeposit);
+		//System.out.println("finished deposit " + finishedDeposit);
 
-		// if (driveSystem.getCurrentState() == (FSMState.P1N1)
-		// 	|| driveSystem.getCurrentState() == (FSMState.P2N1)
-		// 	|| driveSystem.getCurrentState() == (FSMState.P3N1)
-		// 	|| driveSystem.getCurrentState() == (FSMState.P4N1)) {
+		if (driveSystem.getCurrentState() == (FSMState.P1N1)
+			|| driveSystem.getCurrentState() == (FSMState.P2N1)
+			|| driveSystem.getCurrentState() == (FSMState.P3N1)
+			|| driveSystem.getCurrentState() == (FSMState.P4N1)) {
 
-		// 	if (node == 2) {
-		// 		if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_FORWARD)) {
-		// 			finishedDeposit =
-		// 				spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-		// 		}
-		// 	}
-		// 	if (node == 1) {
-		// 		if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_FORWARD)) {
-		// 			finishedDeposit =
-		// 				spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-		// 		}
-		// 	}
-		// 	if (node == 0) {
-		// 		if (armSystem.updateAuto(ArmFSMState.SHOOT_LOW_FORWARD)) {
-		// 			finishedDeposit =
-		// 				spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-		// 		}
-		// 	}
-		// 	if (node == -1) {
-		// 		// WRITE CODE TO LEAVE ARM IN HOMING POSITION
-		// 		armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
-		// 		finishedDeposit = true;
-		// 	}
-		// } else if (driveSystem.getCurrentState() == (FSMState.P1N2)
-		// 	|| driveSystem.getCurrentState() == (FSMState.P1N3)
-		// 	|| driveSystem.getCurrentState() == (FSMState.P2N2)
-		// 	|| driveSystem.getCurrentState() == (FSMState.P3N2)) {
-		// 	spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
-		// 	if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
-		// 		armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
-		// 	}
-		// }
+			if (node == 2) {
+				if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_FORWARD)) {
+					finishedDeposit =
+						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				}
+			}
+			if (node == 1) {
+				if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_FORWARD)) {
+					finishedDeposit =
+						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				}
+			}
+			if (node == 0) {
+				if (armSystem.updateAuto(ArmFSMState.SHOOT_LOW_FORWARD)) {
+					finishedDeposit =
+						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				}
+			}
+			if (node == -1) {
+				// WRITE CODE TO LEAVE ARM IN HOMING POSITION
+				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+				finishedDeposit = true;
+			}
+		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)
+			|| driveSystem.getCurrentState() == (FSMState.P1N3)
+			|| driveSystem.getCurrentState() == (FSMState.P2N2)
+			|| driveSystem.getCurrentState() == (FSMState.P3N2)) {
+			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
+			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
+				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+			}
+		}
 	}
 
 	@Override
