@@ -17,6 +17,9 @@ public final class HardwareMap {
 	public static final int CAN_ID_SPINNER_MOTOR = 45;
 	public static final int ANALOGIO_ID_DISTANCE_SENSOR = 0;
 
+	public static final int CAN_ID_SPINNER_MOTOR_GROUND_MOUNT = 40;
+
+
 	//arm robot constants
 	public static final int CAN_ID_SPARK_PIVOT = 13;
 	public static final int CAN_ID_SPARK_TELEARM = 35;
