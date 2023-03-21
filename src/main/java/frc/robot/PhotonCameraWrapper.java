@@ -29,8 +29,9 @@ public class PhotonCameraWrapper {
 	public static final double FIELD_WIDTH_METERS = 500;
 	public static final double FIELD_LENGTH_METERS = 500;
 	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
-	final double ANGULAR_P = 0.1; //need to change value
-    final double ANGULAR_D = 0.0; //need to change value
+	final double ANGULAR_P = 0.01; //need to change value
+    final double ANGULAR_D = 0; //need to change value
+	double lastTs = 0;
 
 		/** PhotonCamera object representing a camera that is
 		 * connected to PhotonVision.*/
@@ -135,18 +136,24 @@ public class PhotonCameraWrapper {
 	 * @return an angle that tells the robot how much to turn to align in degrees
 	 */
 	public double getTagTurnRotation() {
+
 		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		double rotationSpeed;
 
-		if (result.hasTargets()) {
+
+		if (result.hasTargets() && (lastTs == 0 || photonCamera.getLatestResult().getTimestampSeconds() != lastTs)) {
+			System.out.println("angle: " +  result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
+				VisionConstants.CAM_OFFSET_INCHES / getTagDistance())));
 			// Calculate angular turn power
 			// -1.0 required to ensure positive PID controller effort _increases_ yaw
-			rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
+			rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
+				VisionConstants.CAM_OFFSET_INCHES / getTagDistance())), 0);
 		} else {
 			// If we have no targets, stay still.
 			rotationSpeed = 0;
 		}
+		lastTs = photonCamera.getLatestResult().getTimestampSeconds();
 		return rotationSpeed;
 	}
 	/**
@@ -164,6 +171,8 @@ public class PhotonCameraWrapper {
 		} else {
 			return -1;
 		}
+		
+
 	}
 
 	/**

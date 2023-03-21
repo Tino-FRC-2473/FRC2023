@@ -73,14 +73,14 @@ public class Constants {
 
 	public static class VisionConstants {
 		public static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
-		public static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(-3.5);
+		public static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(-4);
 		public static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.75);
 		public static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
 		public static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
 		public static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
 		public static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
 		public static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
-		public static final double CAM_OFFSET_INCHES = -3.5;
+		public static final double CAM_OFFSET_INCHES = -4;
 		public static final int TWODTAG_PIPELINE_INDEX = 0;
 		public static final int LOWERTAPE_PIPELINE_INDEX = 1;
 		public static final int HIGHERTAPE_PIPELINE_INDEX = 2;

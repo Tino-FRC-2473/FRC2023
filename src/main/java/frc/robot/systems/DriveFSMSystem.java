@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.VisionConstants;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
@@ -355,6 +356,7 @@ public class DriveFSMSystem {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
+				System.out.println(currentState);
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
 					return FSMState.TELE_STATE_BALANCE;
 				} else if (input != null && input.isSteeringWheelHoldPressedRaw()) {
@@ -367,7 +369,11 @@ public class DriveFSMSystem {
 					return FSMState.CV_HIGH_TAPE_ALIGN;
 				} else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
 					isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
-				} 
+				} else if (input != null && input.isDriveJoystickCVConeButtonPressedRaw()) {
+					return FSMState.CV_CONE_ALIGN;
+				} else if (input != null && input.isDriveJoystickCVCubeButtonPressedRaw()) {
+					return FSMState.CV_CUBE_ALIGN;
+				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 			case AUTO_STATE_BALANCE:
 				return FSMState.AUTO_STATE_BALANCE;
@@ -745,15 +751,22 @@ public class DriveFSMSystem {
 	public void handleCVTagAlignState() {
 		double power = pcw.getTagTurnRotation();
 		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
-		System.out.println(pcw.getTagDistance());
-		System.out.println(pcw.getTagTurnRotation());
-		power = (power > 0.5) ? 0.5 : power;
+		// System.out.println(pcw.getTagDistance());
+		// System.out.println(pcw.getTagTurnRotation());
+		// if(power > 0.3) power = 0.3;
+		// else if (power < -0.3) power = -0.3;
 
+		power = MathUtil.clamp(power, -0.08, 0.08);
+
+		// System.out.println(power);
 		//may be positive power
+		
 		leftMotorFront.set(-power);
 		rightMotorFront.set(-power);
 		leftMotorBack.set(-power);
 		rightMotorBack.set(-power); 
+
+		System.out.println(leftMotorFront.get());
 	}
 	/**
 	 * Aligns to the high cube node (the one without an april tag).
