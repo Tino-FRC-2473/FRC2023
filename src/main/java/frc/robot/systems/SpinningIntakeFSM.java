@@ -4,10 +4,10 @@ package frc.robot.systems;
 import edu.wpi.first.wpilibj.Timer;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ColorSensorV3;
+// import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.I2C.Port;
+// import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.Timer;
 // Robot Imports
@@ -30,10 +30,10 @@ public class SpinningIntakeFSM {
 		EMPTY
 	}
 	//FIX VALUES
-	private static final double KEEP_SPEED = 0.07;
+	private static final double KEEP_SPEED = 0.1;
 	private static final double INTAKE_SPEED = 0.2;
 	private static final double RELEASE_SPEED = -0.2; //DONT FORGET -
-	private static final double CURRENT_THRESHOLD = 15;
+	private static final double CURRENT_THRESHOLD = 23;
 	private static final double TIME_RESET_CURRENT = 0.5;
 	//arbitrary constants for cube and cone
 	//6 inches
@@ -64,7 +64,7 @@ public class SpinningIntakeFSM {
 	private CANSparkMax spinnerMotor;
 	//private DigitalInput limitSwitchCone;
 	private AnalogInput distanceSensorObject;
-	private ColorSensorV3 colorSensor;
+	//private ColorSensorV3 colorSensor;
 	private Timer timer;
 	/* ======================== Constructor ======================== */
 	/**
@@ -78,7 +78,7 @@ public class SpinningIntakeFSM {
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
-		colorSensor = new ColorSensorV3(Port.kOnboard);
+		//colorSensor = new ColorSensorV3(Port.kOnboard);
 
 		// Reset state machine
 		reset();
@@ -112,7 +112,8 @@ public class SpinningIntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		double lagRobot = colorSensor.getColor().blue;
+		//double lagRobot = colorSensor.getColor().blue;
+		//lagRobot = colorSensor.getColor().blue;
 		if (input == null) {
 			return;
 		}
@@ -302,7 +303,7 @@ public class SpinningIntakeFSM {
 		}*/
 		//System.out.println("start time get color: "
 		//		+ Timer.getFPGATimestamp() + " " + currentState.toString());
-		double st = Timer.getFPGATimestamp();
+		/*double st = Timer.getFPGATimestamp();
 		double newBlue = colorSensor.getColor().blue;
 		System.out.println("color time " + (Timer.getFPGATimestamp() - st));
 		//distance and color sensor not used
@@ -311,7 +312,7 @@ public class SpinningIntakeFSM {
 			&& lastBlue != newBlue) {
 			updateItem();
 		}
-		lastBlue = newBlue;
+		lastBlue = newBlue;*/
 		if (isMotorAllowed) {
 			spinnerMotor.set(INTAKE_SPEED);
 		}
