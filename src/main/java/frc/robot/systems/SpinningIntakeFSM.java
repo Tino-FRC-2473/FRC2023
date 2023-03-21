@@ -30,9 +30,11 @@ public class SpinningIntakeFSM {
 		EMPTY
 	}
 	//FIX VALUES
-	private static final double CUBE_KEEP_SPEED = 0.07;
+	private static final double KEEP_SPEED = 0.07;
 	private static final double INTAKE_SPEED = 0.2;
 	private static final double RELEASE_SPEED = -0.2; //DONT FORGET -
+	private static final double CURRENT_THRESHOLD = 15;
+	private static final double TIME_RESET_CURRENT = 0.5;
 	//arbitrary constants for cube and cone
 	//6 inches
 	private static final int MIN_CONE_DISTANCE = 2150;
@@ -125,7 +127,6 @@ public class SpinningIntakeFSM {
 			SmartDashboard.putNumber("output current", spinnerMotor.getOutputCurrent());
 			// SmartDashboard.putNumber("r", colorSensor.getColor().red);
 			// SmartDashboard.putNumber("g", colorSensor.getColor().green);
-			SmartDashboard.putBoolean("is cube color", colorSensor.getColor().blue > BLUE_THRESHOLD);
 			SmartDashboard.putString("item type", itemType.toString());
 			SmartDashboard.putBoolean("Intake Motor Spinning", isMotorAllowed);
 			//System.out.println(distanceSensorObject.getValue() + " " + itemType);
@@ -254,13 +255,14 @@ public class SpinningIntakeFSM {
 				if (input.isReleaseButtonPressed()) {
 					return SpinningIntakeFSMState.RELEASE;
 				}
-				if (needsReset && isMotorAllowed && toggleUpdate)
-				{
+				if (needsReset && isMotorAllowed && toggleUpdate) {
 					timer.reset();
 					timer.start();
 					needsReset = false;
 				}
-				if (timer.hasElapsed(0.5) && spinnerMotor.getOutputCurrent() > 15) {
+				System.out.println(spinnerMotor.getOutputCurrent());
+				if (timer.hasElapsed(TIME_RESET_CURRENT)
+					&& spinnerMotor.getOutputCurrent() > CURRENT_THRESHOLD) {
 					return SpinningIntakeFSMState.IDLE_STOP;
 				}
 				if ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
@@ -298,11 +300,11 @@ public class SpinningIntakeFSM {
 		else if (input.isCubeButtonPressed()) {
 
 		}*/
-		System.out.println("start time get color: "
-				+ Timer.getFPGATimestamp() + " " + currentState.toString());
+		//System.out.println("start time get color: "
+		//		+ Timer.getFPGATimestamp() + " " + currentState.toString());
+		double st = Timer.getFPGATimestamp();
 		double newBlue = colorSensor.getColor().blue;
-		System.out.println("end time get color: "
-				+ Timer.getFPGATimestamp() + " " + currentState.toString());
+		System.out.println("color time " + (Timer.getFPGATimestamp() - st));
 		//distance and color sensor not used
 		if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
 			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE
@@ -315,11 +317,7 @@ public class SpinningIntakeFSM {
 		}
 	}
 	private void handleIdleStopState() {
-		if (itemType == ItemType.CUBE) {
-			spinnerMotor.set(CUBE_KEEP_SPEED);
-		} else {
-			spinnerMotor.set(0);
-		}
+		spinnerMotor.set(KEEP_SPEED);
 	}
 	private void handleReleaseState() {
 		itemType = ItemType.EMPTY;
