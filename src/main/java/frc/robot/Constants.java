@@ -8,6 +8,7 @@ public class Constants {
 	public static final double ANGLE_TO_TARGET_THRESHOLD_DEGREES = 3;
 	public static final double SUBSTATION_ANGLE_THRESHOLD_DEGREES = 5;
 	public static final double CV_TURN_POWER = 0.05;
+	public static final double CV_PID_CLAMP_THRESHOLD = 0.08;
 	public static final double CV_FORWARD_POWER = 0.1;
 	public static final double HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES = 67;
 	public static final double LOWER_TAPE_DRIVEUP_DISTANCE_INCHES = 45;
