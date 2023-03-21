@@ -633,18 +633,18 @@ public class ArmFSM {
 		if (input != null) {
 			if (!isFineTuning) {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-					pidControllerPivot.setReference(-pivotMotorPower,
+					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
 					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-					pidControllerPivot.setReference(pivotMotorPower,
+					pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
 					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else {
 					pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
 						CANSparkMax.ControlType.kPosition);
 				}
-				teleArmMotor.set(-input.getmechJoystickY() * teleArmMotorPower);
+				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER);
 			} else {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
 					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER_FINE_TUNING,
