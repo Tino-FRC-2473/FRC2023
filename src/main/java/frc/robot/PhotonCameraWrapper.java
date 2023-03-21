@@ -136,15 +136,15 @@ public class PhotonCameraWrapper {
 	 * @return an angle that tells the robot how much to turn to align in degrees
 	 */
 	public double getTagTurnRotation() {
-
 		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		double rotationSpeed;
 
 
 		if (result.hasTargets() && (lastTs == 0 || photonCamera.getLatestResult().getTimestampSeconds() != lastTs)) {
-			System.out.println("angle: " +  result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
-				VisionConstants.CAM_OFFSET_INCHES / getTagDistance())));
+			System.out.println("angle: " +  (result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
+				VisionConstants.CAM_OFFSET_INCHES / getTagDistance()))));
+			System.out.println("distance: " + getTagDistance());
 			// Calculate angular turn power
 			// -1.0 required to ensure positive PID controller effort _increases_ yaw
 			rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
@@ -164,6 +164,7 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
+			System.out.println(result.getBestTarget().getPitch());
 			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
 			VisionConstants.CAM_HEIGHT_METERS,
 			AprilTagConstants.APRILTAG_1_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS,

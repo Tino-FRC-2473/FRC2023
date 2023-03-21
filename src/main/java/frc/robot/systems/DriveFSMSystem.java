@@ -766,7 +766,7 @@ public class DriveFSMSystem {
 		leftMotorBack.set(-power);
 		rightMotorBack.set(-power); 
 
-		System.out.println(leftMotorFront.get());
+		//System.out.println(leftMotorFront.get());
 	}
 	/**
 	 * Aligns to the high cube node (the one without an april tag).
