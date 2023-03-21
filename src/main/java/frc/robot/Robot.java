@@ -85,10 +85,6 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-		SmartDashboard.putBoolean("Enable Drive", true);
-		SmartDashboard.putBoolean("Enable Arm", true);
-		SmartDashboard.putBoolean("Enable Intake", true);
-		SmartDashboard.putBoolean("Enable Ground Mount", true);
 		autoPathChooser = new SendableChooser<>();
 		autoPathChooser.setDefaultOption("Path 1", FSMState.P1N1);
 		autoPathChooser.addOption("Path 2", FSMState.P2N1);
