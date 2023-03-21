@@ -2,6 +2,7 @@ package frc.robot.systems;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
@@ -37,14 +38,12 @@ public class ArmFSM {
 	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 246 / 21;
 	private static final float TELEARM_MOTOR_POWER = 1.0f;
 	private static final float TELEARM_MOTOR_POWER_FINE_TUNING = 0.05f;
-	private static final float PIVOT_MOTOR_POWER = 0.7f;
+	private static final float PIVOT_MOTOR_POWER = 0.5f;
 	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.2f;
 	private static final float PIVOT_MOTOR_POWER_FINE_TUNING = 0.05f;
 
 	//20 inches
-	private static double armEncoderMaxLengthRotations = 180;
-
-	private static final double ARM_ENCODER_MAX_LENGTH_HORIZONTAL = 18
+	private static final double ARM_ENCODER_MAX_LENGTH_ROTATIONS = 33
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 
 	//19 inches
@@ -54,7 +53,7 @@ public class ArmFSM {
 	private static final double ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS = 21
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//12 inches
-	private static final double ARM_ENCODER_HIGH_BACKWARD_ROTATIONS = 28
+	private static final double ARM_ENCODER_HIGH_BACKWARD_ROTATIONS = 26
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//3 inches
 	private static final double ARM_ENCODER_MID_FORWARD_ROTATIONS = 14.5
@@ -189,13 +188,6 @@ public class ArmFSM {
 		currentState = ArmFSMState.IDLE;
 		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 		pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
-		if (pivotMotor.getEncoder().getPosition() > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
-			armEncoderMaxLengthRotations = 180 / Math.abs(Math.cos(Math.toRadians(
-				-pivotMotor.getEncoder().getPosition() / ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT)));
-		} else {
-			armEncoderMaxLengthRotations = 198 / Math.abs(Math.cos(Math.toRadians(
-				-pivotMotor.getEncoder().getPosition() / ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT)));
-		}
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -205,6 +197,8 @@ public class ArmFSM {
 	 * @param input TeleopInput
 	 */
 	public void update(TeleopInput input) {
+		System.out.println("start time Arm: " + Timer.getFPGATimestamp());
+
 		if (input == null) {
 			//handleIdleState(input);
 			return;
@@ -218,7 +212,7 @@ public class ArmFSM {
 		//SmartDashboard.putBoolean("Is going Forward", input.isThrottleForward());
 		//SmartDashboard.putNumber("Throttle Value", input.getThrottle());
 		SmartDashboard.putNumber("Extension Fraction", teleArmMotor.getEncoder().getPosition()
-			/ armEncoderMaxLengthRotations);
+			/ ARM_ENCODER_MAX_LENGTH_ROTATIONS);
 		SmartDashboard.putBoolean("Is In Fine Tuning", isFineTuning);
 		//System.out.println(pivotMotor.getEncoder().getPosition());
 		if (input.isFineTuningButtonPressed()) {
@@ -241,13 +235,6 @@ public class ArmFSM {
 		}
 		if (!withinError(pivotMotor.getEncoder().getPosition(), pivotEncoderRotationsAfterPivot)) {
 			pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
-		}
-		if (pivotMotor.getEncoder().getPosition() > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
-			armEncoderMaxLengthRotations = 180 / Math.abs(Math.cos(Math.toRadians(
-				-pivotMotor.getEncoder().getPosition() / ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT)));
-		} else {
-			armEncoderMaxLengthRotations = 198 / Math.abs(Math.cos(Math.toRadians(
-				-pivotMotor.getEncoder().getPosition() / ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT)));
 		}
 		ArmFSMState state = nextState(input);
 		switch (currentState) {
@@ -291,6 +278,7 @@ public class ArmFSM {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = state;
+		System.out.println("start end Arm: " + Timer.getFPGATimestamp());
 	}
 
 	/**
@@ -373,24 +361,24 @@ public class ArmFSM {
 				}
 				return ArmFSMState.UNHOMED_STATE;
 			case IDLE:
-				if (input.isShootHighButtonPressed() && input.isThrottleForward()
+				if (input.isShootHighButtonPressed() && input.isSliderForward()
 						&& SpinningIntakeFSM.getObjectType() == SpinningIntakeFSM.ItemType.CUBE
 						&& !atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 							ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)
-						|| input.isShootHighButtonPressed() && input.isThrottleForward()
+						|| input.isShootHighButtonPressed() && input.isSliderForward()
 						&& SpinningIntakeFSM.getObjectType() != SpinningIntakeFSM.ItemType.CUBE
 						&& !atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 							ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS)) {
 					return ArmFSMState.SHOOT_HIGH_FORWARD;
-				} else if (input.isShootHighButtonPressed() && !input.isThrottleForward()
+				} else if (input.isShootHighButtonPressed() && !input.isSliderForward()
 						&& !atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 							ARM_ENCODER_HIGH_BACKWARD_ROTATIONS)) {
 					return ArmFSMState.SHOOT_HIGH_BACKWARD;
-				} else if (input.isShootMidButtonPressed() && input.isThrottleForward()
+				} else if (input.isShootMidButtonPressed() && input.isSliderForward()
 						&& !atArmPosition(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
 							ARM_ENCODER_MID_FORWARD_ROTATIONS)) {
 					return ArmFSMState.SHOOT_MID_FORWARD;
-				} else if (input.isShootMidButtonPressed() && !input.isThrottleForward()
+				} else if (input.isShootMidButtonPressed() && !input.isSliderForward()
 						&& !atArmPosition(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 							ARM_ENCODER_MID_BACKWARD_ROTATIONS)) {
 					return ArmFSMState.SHOOT_MID_BACKWARD;
@@ -398,11 +386,11 @@ public class ArmFSM {
 						&& !atArmPosition(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS,
 							ARM_ENCODER_LOW_ROTATIONS)) {
 					return ArmFSMState.SHOOT_LOW_FORWARD;
-				} else if (input.isSubstationPickupButtonPressed() && input.isThrottleForward()
+				} else if (input.isSubstationPickupButtonPressed() && input.isSliderForward()
 						&& !atArmPosition(SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS,
 							ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS)) {
 					return ArmFSMState.SUBSTATION_PICKUP_FORWARD;
-				} else if (input.isSubstationPickupButtonPressed() && !input.isThrottleForward()
+				} else if (input.isSubstationPickupButtonPressed() && !input.isSliderForward()
 						&& !atArmPosition(SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 							ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS)) {
 					return ArmFSMState.SUBSTATION_PICKUP_BACKWARD;
@@ -435,11 +423,11 @@ public class ArmFSM {
 				}
 				return ArmFSMState.IDLE;
 			case SHOOT_HIGH_FORWARD:
-				if (input.isShootHighButtonPressed() && input.isThrottleForward()
+				if (input.isShootHighButtonPressed() && input.isSliderForward()
 					&& SpinningIntakeFSM.getObjectType() == SpinningIntakeFSM.ItemType.CUBE
 					&& !atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)
-					|| input.isShootHighButtonPressed() && input.isThrottleForward()
+					|| input.isShootHighButtonPressed() && input.isSliderForward()
 					&& SpinningIntakeFSM.getObjectType() != SpinningIntakeFSM.ItemType.CUBE
 					&& !atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS)) {
@@ -447,21 +435,21 @@ public class ArmFSM {
 				}
 				return ArmFSMState.IDLE;
 			case SHOOT_HIGH_BACKWARD:
-				if (input.isShootHighButtonPressed() && !input.isThrottleForward()
+				if (input.isShootHighButtonPressed() && !input.isSliderForward()
 						&& !atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 						ARM_ENCODER_HIGH_BACKWARD_ROTATIONS)) {
 					return ArmFSMState.SHOOT_HIGH_BACKWARD;
 				}
 				return ArmFSMState.IDLE;
 			case SHOOT_MID_FORWARD:
-				if (input.isShootMidButtonPressed() && input.isThrottleForward()
+				if (input.isShootMidButtonPressed() && input.isSliderForward()
 					&& !atArmPosition(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						ARM_ENCODER_MID_FORWARD_ROTATIONS)) {
 					return ArmFSMState.SHOOT_MID_FORWARD;
 				}
 				return ArmFSMState.IDLE;
 			case SHOOT_MID_BACKWARD:
-				if (input.isShootMidButtonPressed() && !input.isThrottleForward()
+				if (input.isShootMidButtonPressed() && !input.isSliderForward()
 					&& !atArmPosition(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 						ARM_ENCODER_MID_BACKWARD_ROTATIONS)) {
 					return ArmFSMState.SHOOT_MID_BACKWARD;
@@ -475,14 +463,14 @@ public class ArmFSM {
 				}
 				return ArmFSMState.IDLE;
 			case SUBSTATION_PICKUP_FORWARD:
-				if (input.isSubstationPickupButtonPressed() && input.isThrottleForward()
+				if (input.isSubstationPickupButtonPressed() && input.isSliderForward()
 					&& !atArmPosition(SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS)) {
 					return ArmFSMState.SUBSTATION_PICKUP_FORWARD;
 				}
 				return ArmFSMState.IDLE;
 			case SUBSTATION_PICKUP_BACKWARD:
-				if (input.isSubstationPickupButtonPressed() && !input.isThrottleForward()
+				if (input.isSubstationPickupButtonPressed() && !input.isSliderForward()
 					&& !atArmPosition(SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 						ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS)) {
 					return ArmFSMState.SUBSTATION_PICKUP_BACKWARD;
@@ -535,7 +523,9 @@ public class ArmFSM {
 			return false;
 		}
 		return input.isPivotDecreaseButtonPressed() && isMinHeight()
-			|| input.isPivotIncreaseButtonPressed() && isMaxHeight();
+			|| input.isPivotIncreaseButtonPressed() && isMaxHeight()
+			|| -input.getmechJoystickY() > JOYSTICK_DRIFT_Y
+			&& teleArmMotor.getEncoder().getPosition() >= ARM_ENCODER_MAX_LENGTH_ROTATIONS;
 	}
 
 	private boolean atArmPosition(double pivotTarget, double armTarget) {
@@ -634,11 +624,7 @@ public class ArmFSM {
 					pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
 						CANSparkMax.ControlType.kPosition);
 				}
-				if (teleArmMotor.getEncoder().getPosition() >= armEncoderMaxLengthRotations) {
-					teleArmMotor.set(-0.2);
-				} else {
-					teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER);
-				}
+				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER);
 			} else {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
 					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER_FINE_TUNING,
@@ -655,7 +641,6 @@ public class ArmFSM {
 				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER_FINE_TUNING);
 			}
 		} else {
-
 			teleArmMotor.set(0);
 			pivotMotor.set(0);
 		}
