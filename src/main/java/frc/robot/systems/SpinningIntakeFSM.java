@@ -30,7 +30,7 @@ public class SpinningIntakeFSM {
 		EMPTY
 	}
 	//FIX VALUES
-	private static final double KEEP_SPEED = 0.1;
+	private static final double KEEP_SPEED = 0.07;
 	private static final double INTAKE_SPEED = 0.2;
 	private static final double RELEASE_SPEED = -0.2; //DONT FORGET -
 	private static final double CURRENT_THRESHOLD = 23;
