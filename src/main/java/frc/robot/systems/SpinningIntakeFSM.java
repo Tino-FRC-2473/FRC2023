@@ -35,23 +35,9 @@ public class SpinningIntakeFSM {
 	private static final double RELEASE_SPEED = -0.2; //DONT FORGET -
 	private static final double CURRENT_THRESHOLD = 23;
 	private static final double TIME_RESET_CURRENT = 0.5;
-	//arbitrary constants for cube and cone
-	//6 inches
-	private static final int MIN_CONE_DISTANCE = 2150;
-	//8 inches
-	private static final int MIN_CUBE_DISTANCE = 1060;
-	//8.5 inches
-	private static final int MAX_COLOR_MEASURE = 1420;
-	//9 inches
-	private static final int MIN_COLOR_MEASURE = 1060;
-	//? inches
 	private static final int MIN_RELEASE_DISTANCE = 800;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static ItemType itemType = ItemType.EMPTY;
-
-	//CUBE RGB THRESHOLD VALUES
-	private static final double BLUE_THRESHOLD = 0.23;
-	private double lastBlue = -1;
 	private boolean isMotorAllowed = false;
 	private boolean toggleUpdate = true;
 	private boolean needsReset = true;
@@ -62,9 +48,6 @@ public class SpinningIntakeFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotor;
-	//private DigitalInput limitSwitchCone;
-	private AnalogInput distanceSensorObject;
-	//private ColorSensorV3 colorSensor;
 	private Timer timer;
 	/* ======================== Constructor ======================== */
 	/**
@@ -77,9 +60,6 @@ public class SpinningIntakeFSM {
 		timer = new Timer();
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
-		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
-		//colorSensor = new ColorSensorV3(Port.kOnboard);
-
 		// Reset state machine
 		reset();
 	}
@@ -121,10 +101,6 @@ public class SpinningIntakeFSM {
 			toggleUpdate = !toggleUpdate;
 		}
 		if (toggleUpdate) {
-			SmartDashboard.putBoolean("disabled", false);
-			//System.out.println(itemType);
-			SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
-			//SmartDashboard.putNumber("applied output", spinnerMotor.getAppliedOutput());
 			SmartDashboard.putNumber("output current", spinnerMotor.getOutputCurrent());
 			// SmartDashboard.putNumber("r", colorSensor.getColor().red);
 			// SmartDashboard.putNumber("g", colorSensor.getColor().green);
@@ -203,8 +179,10 @@ public class SpinningIntakeFSM {
 			case IDLE_STOP:
 				return true;
 			case RELEASE:
-				return distanceSensorObject.getValue() < MIN_RELEASE_DISTANCE;
+				//return distanceSensorObject.getValue() < MIN_RELEASE_DISTANCE;
 				//return timer.hasElapsed(0.25);
+				return true;
+				//NEEDS CHANGE ^
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -218,22 +196,6 @@ public class SpinningIntakeFSM {
 	public static ItemType getObjectType() {
 		return itemType;
 	}
-	private void updateItem() {
-		/*if (input.isSliderForward()) {
-			itemType = ItemType.CONE;
-		} else {
-			itemType = ItemType.CUBE;
-		}*/
-		/*System.out.println("start time get color: " + Timer.getFPGATimestamp());
-		double b = colorSensor.getColor().blue;
-		System.out.println("end time get color: " + Timer.getFPGATimestamp());
-		if (b > BLUE_THRESHOLD) {
-			itemType = ItemType.CUBE;
-		} else {
-			itemType = ItemType.CONE;
-		}*/
-	}
-
 	/* ======================== Private methods ======================== */
 	/**
 	 * Decide the next state to transition to. This is a function of the inputs
@@ -261,13 +223,8 @@ public class SpinningIntakeFSM {
 					timer.start();
 					needsReset = false;
 				}
-				System.out.println(spinnerMotor.getOutputCurrent());
 				if (timer.hasElapsed(TIME_RESET_CURRENT)
 					&& spinnerMotor.getOutputCurrent() > CURRENT_THRESHOLD) {
-					return SpinningIntakeFSMState.IDLE_STOP;
-				}
-				if ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
-					> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE) {
 					return SpinningIntakeFSMState.IDLE_STOP;
 				}
 				return SpinningIntakeFSMState.IDLE_SPINNING;
@@ -277,7 +234,6 @@ public class SpinningIntakeFSM {
 				}
 				return SpinningIntakeFSMState.IDLE_STOP;
 			case RELEASE:
-				System.out.println("release");
 				if (!input.isReleaseButtonPressed()) {
 					needsReset = true;
 					return SpinningIntakeFSMState.IDLE_SPINNING;
@@ -295,24 +251,6 @@ public class SpinningIntakeFSM {
 	private void handleStartState() {
 	}
 	private void handleIdleSpinningState() {
-		/*if (input.isConeButtonPressed()) {
-			itemType = ItemType.CONE;
-		}
-		else if (input.isCubeButtonPressed()) {
-
-		}*/
-		//System.out.println("start time get color: "
-		//		+ Timer.getFPGATimestamp() + " " + currentState.toString());
-		/*double st = Timer.getFPGATimestamp();
-		double newBlue = colorSensor.getColor().blue;
-		System.out.println("color time " + (Timer.getFPGATimestamp() - st));
-		//distance and color sensor not used
-		if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
-			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE
-			&& lastBlue != newBlue) {
-			updateItem();
-		}
-		lastBlue = newBlue;*/
 		if (isMotorAllowed) {
 			spinnerMotor.set(INTAKE_SPEED);
 		}
