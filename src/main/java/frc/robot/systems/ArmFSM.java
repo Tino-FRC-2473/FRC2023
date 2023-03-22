@@ -224,7 +224,6 @@ public class ArmFSM {
 		if (input == null) {
 			return;
 		}
-		SmartDashboard.putString("Current State", " " + currentState);
 		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
@@ -315,7 +314,11 @@ public class ArmFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		currentState = nextState(input);
+		ArmFSMState state = nextState(input);
+		if (currentState != state) {
+			SmartDashboard.putString("Current State", " " + currentState);
+		}
+		currentState = state;
 	}
 
 	/**

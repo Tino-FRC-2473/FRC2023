@@ -37,6 +37,9 @@ public class Robot extends TimedRobot {
 	private static int node = -1; // -1 is none, 0 is low, 1, mid, 2 is high
 	private static SendableChooser<FSMState> autoPathChooser;
 	private static SendableChooser<Integer> nodeChooser;
+	private boolean isArmEnabled = true;
+	private boolean isDriveEnabled = true;
+	private boolean isIntakeEnabled = true;
 	/**
 	 * This function that returns whether or not the robot has finished
 	 * 	depositing the object in autonomus.
@@ -61,7 +64,6 @@ public class Robot extends TimedRobot {
 	public static void setNode(int level) {
 		node = level;
 	}
-
 	/**
 	 * This function returns the chooser object for the auto path for the robot.
 	 * @return The chooser object which contains information on which auto path was selected.
@@ -101,38 +103,55 @@ public class Robot extends TimedRobot {
 		nodeChooser.addOption("High", 2);
 		nodeChooser.addOption("None", -1);
 		SmartDashboard.putData("Node", nodeChooser);
-		driveSystem = new DriveFSMSystem();
-		if (HardwareMap.isRobotGroundMount()) {
-			groundMountFSM = new GroundMountFSM();
-		} else {
-			armSystem = new ArmFSM();
+		if (isDriveEnabled) {
+			driveSystem = new DriveFSMSystem();
 		}
-		spinningIntakeFSM = new SpinningIntakeFSM();
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM = new GroundMountFSM();
+			} else {
+				armSystem = new ArmFSM();
+			}
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM = new SpinningIntakeFSM();
+		}
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		System.gc();
-		if (HardwareMap.isRobotGroundMount()) {
-			groundMountFSM .reset();
-		} else {
-			armSystem.reset();
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM .reset();
+			} else {
+				armSystem.reset();
+			}
 		}
-		driveSystem.resetAutonomous();
-		spinningIntakeFSM.reset();
+		if (isDriveEnabled) {
+			driveSystem.resetAutonomous();
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.reset();
+		}
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-
-		if (HardwareMap.isRobotGroundMount()) {
-			groundMountFSM.update(null);
-		} else {
-			armSystem.update(null);
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM.update(null);
+			} else {
+				armSystem.update(null);
+			}
 		}
-		driveSystem.update(null);
-		spinningIntakeFSM.update(null);
+		if (isDriveEnabled) {
+			driveSystem.update(null);
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.update(null);
+		}
 
 		System.out.println(finishedDeposit);
 
@@ -215,28 +234,38 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-
-		if (HardwareMap.isRobotGroundMount()) {
-			groundMountFSM.reset();
-		} else {
-			armSystem.reset();
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM.reset();
+			} else {
+				armSystem.reset();
+			}
 		}
-		driveSystem.resetTeleop();
-		spinningIntakeFSM.reset();
+		if (isDriveEnabled) {
+			driveSystem.resetTeleop();
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.reset();
+		}
 	}
 
 
 	@Override
 	public void teleopPeriodic() {
 		System.out.println("Loop start: " + Timer.getFPGATimestamp());
-
-		if (HardwareMap.isRobotGroundMount()) {
-			groundMountFSM.update(input);
-		} else {
-			armSystem.update(input);
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM.update(input);
+			} else {
+				armSystem.update(input);
+			}
 		}
-		driveSystem.update(input);
-		spinningIntakeFSM.update(input);
+		if (isDriveEnabled) {
+			driveSystem.update(input);
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.update(input);
+		}
 
 		System.out.println("Loop end: " + Timer.getFPGATimestamp());
 	}
