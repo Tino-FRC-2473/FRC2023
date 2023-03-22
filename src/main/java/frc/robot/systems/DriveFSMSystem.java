@@ -346,30 +346,15 @@ public class DriveFSMSystem {
 		currentState = nextState(input);
 	}
 
-	private void handleCVConeAlignState() {
-		double angle = pcw.getConeTurnAngle();
-		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
-			return;
-		}
-		System.out.println(pcw.getCubeTurnAngle());
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_RIGHT_OPT);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_LEFT_OPT);
-		}
-	}
-
-	private void handleCVCubeAlignState() {
-		double angle = pcw.getCubeTurnAngle();
-		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
-			return;
-		}
-		System.out.println(pcw.getCubeTurnAngle());
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_RIGHT_OPT);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_LEFT_OPT);
-		}
+	public void handleCVConeAlignState() {
+		double power = pcw.getConeTurnRotation();
+		isNotForwardEnough =  pcw.getDistanceToCone() > Constants.CUBE_DRIVEUP_DISTANCE_INCHES;
+		power = MathUtil.clamp(
+			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
+		leftMotorFront.set(-power);
+		rightMotorFront.set(-power);
+		leftMotorBack.set(-power);
+		rightMotorBack.set(-power);
 	}
 
 	/* ======================== Private methods ======================== */
@@ -824,6 +809,16 @@ public class DriveFSMSystem {
 	public void handleCVTagAlignState() {
 		double power = pcw.getTagTurnRotation();
 		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
+		power = MathUtil.clamp(
+			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
+		leftMotorFront.set(-power);
+		rightMotorFront.set(-power);
+		leftMotorBack.set(-power);
+		rightMotorBack.set(-power);
+	}
+	public void handleCVCubeAlignState() {
+		double power = pcw.getCubeTurnRotation();
+		isNotForwardEnough =  pcw.getDistanceToCube() > Constants.CUBE_DRIVEUP_DISTANCE_INCHES;
 		power = MathUtil.clamp(
 			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
 		leftMotorFront.set(-power);
