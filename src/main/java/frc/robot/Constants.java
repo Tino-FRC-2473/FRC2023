@@ -95,11 +95,11 @@ public class Constants {
 		public static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
 		public static final double CAM_OFFSET_INCHES = -4;
 		public static final int TWODTAG_PIPELINE_INDEX = 0;
-		public static final int LOWERTAPE_PIPELINE_INDEX = 1;
-		public static final int HIGHERTAPE_PIPELINE_INDEX = 2;
-		public static final int THREEDTAG_PIPELINE_INDEX = 3;
+		public static final int LOWERTAPE_PIPELINE_INDEX = 3;
+		public static final int HIGHERTAPE_PIPELINE_INDEX = 1;
+		public static final int THREEDTAG_PIPELINE_INDEX = 5;
 		public static final int CUBE_PIPELINE_INDEX = 4;
-		public static final int CONE_PIPELINE_INDEX = 5;
+		public static final int CONE_PIPELINE_INDEX = 2;
 
 	}
 	public static class AprilTagConstants {
