@@ -26,11 +26,9 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
  * with its coordinates.
  */
 public class PhotonCameraWrapper {
-	public static final double FIELD_WIDTH_METERS = 500;
-	public static final double FIELD_LENGTH_METERS = 500;
 	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
-	public static final double ANGULAR_P = 0.01; //need to change value
-	public static final double ANGULAR_D = 0; //need to change value
+	public static final double ANGULAR_P = 0.01;
+	public static final double ANGULAR_D = 0;
 		/** PhotonCamera object representing a camera that is
 		 * connected to PhotonVision.*/
 	private PhotonCamera photonCamera;
@@ -59,8 +57,8 @@ public class PhotonCameraWrapper {
 		photonCamera.setDriverMode(false);
 		robotPoseEstimator = new PhotonPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY,
 		photonCamera, new Transform3d(
-			new Translation3d(VisionConstants.CAM_OFFSET_X_METERS,
-			VisionConstants.CAM_OFFSET_Y_METERS,
+			new Translation3d(Units.inchesToMeters(VisionConstants.CAM_OFFSET_INCHES),
+			0,
 			VisionConstants.CAM_HEIGHT_METERS),
 			new Rotation3d(
 					0, VisionConstants.CAM_PITCH_RADIANS,
@@ -157,9 +155,6 @@ public class PhotonCameraWrapper {
 		double curTs = photonCamera.getLatestResult().getTimestampSeconds();
 		//compare curTs to lastTs: check if code is running faster than limelight (causes overshoot)
 		if (result.hasTargets() && (lastTs == 0 || curTs != lastTs)) {
-			System.out.println("angle: " +  (result.getBestTarget().getYaw() + Math.toDegrees(
-				Math.atan(VisionConstants.CAM_OFFSET_INCHES / getTagDistance()))));
-			System.out.println("distance: " + getTagDistance());
 			// Calculate angular turn power
 			// -1.0 required to ensure positive PID controller effort increases yaw
 			rotationSpeed = -turnController.calculate(getTagTurnAngle(), 0);
@@ -178,7 +173,6 @@ public class PhotonCameraWrapper {
 		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			System.out.println(result.getBestTarget().getPitch());
 			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
 			VisionConstants.CAM_HEIGHT_METERS,
 			AprilTagConstants.APRILTAG_1_HEIGHT_METERS, VisionConstants.CAM_PITCH_RADIANS,

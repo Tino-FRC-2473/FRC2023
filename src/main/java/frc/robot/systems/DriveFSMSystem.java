@@ -134,7 +134,6 @@ public class DriveFSMSystem {
 
 		UsbCamera usb = CameraServer.startAutomaticCapture();
 		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
-
 		// Creates the CvSink and connects it to the UsbCamera
 		cvSink = CameraServer.getVideo();
 		// Creates the CvSource and MjpegServer [2] and connects them
@@ -386,7 +385,6 @@ public class DriveFSMSystem {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
-				System.out.println(currentState);
 				return getCVState(input);
 			case AUTO_STATE_BALANCE:
 				return FSMState.AUTO_STATE_BALANCE;
