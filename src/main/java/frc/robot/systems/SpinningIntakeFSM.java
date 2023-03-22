@@ -4,12 +4,7 @@ package frc.robot.systems;
 import edu.wpi.first.wpilibj.Timer;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-// import com.revrobotics.ColorSensorV3;
-
-import edu.wpi.first.wpilibj.AnalogInput;
-// import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.wpilibj.Timer;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
