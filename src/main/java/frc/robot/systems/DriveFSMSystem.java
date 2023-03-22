@@ -18,6 +18,7 @@ import frc.robot.PhotonCameraWrapper;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.Robot;
+import frc.robot.AutoPathChooser;
 import frc.robot.drive.DriveFunctions;
 import frc.robot.drive.DriveModes;
 import frc.robot.drive.DrivePower;
@@ -173,14 +174,14 @@ public class DriveFSMSystem {
 		gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
-		if (Robot.getAutoChooser() != null) {
-			currentState = Robot.getAutoChooser().getSelected();
+		if (AutoPathChooser.getAutoPathChooser() != null) {
+			currentState = AutoPathChooser.getSelectedPath();
 		} else {
 			currentState = FSMState.P1N1;
 		}
 		Robot.resetFinishedDeposit();
-		if (Robot.getNodeChooser() != null) {
-			Robot.setNode(Robot.getNodeChooser().getSelected());
+		if (AutoPathChooser.getNodeChooser() != null) {
+			Robot.setNode(AutoPathChooser.getSelectedNode());
 		}
 			//Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
