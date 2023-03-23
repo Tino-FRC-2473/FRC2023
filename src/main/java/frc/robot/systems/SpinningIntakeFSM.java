@@ -26,9 +26,9 @@ public class SpinningIntakeFSM {
 	}
 	//FIX VALUES
 	private static final double KEEP_SPEED = 0.07;
-	private static final double INTAKE_SPEED = 0.2;
+	private static final double INTAKE_SPEED = 0.3;
 	private static final double RELEASE_SPEED = -1; //DONT FORGET -
-	private static final double CURRENT_THRESHOLD = 23;
+	private static final double CURRENT_THRESHOLD = 26;
 	private static final double TIME_RESET_CURRENT = 0.5;
 	private static final int MIN_RELEASE_DISTANCE = 800;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
@@ -97,10 +97,13 @@ public class SpinningIntakeFSM {
 		}
 		if (toggleUpdate) {
 			SmartDashboard.putNumber("output current", spinnerMotor.getOutputCurrent());
+			SmartDashboard.putString("spinning intake state", currentState.toString());
+			SmartDashboard.putNumber("velocity", spinnerMotor.getEncoder().getVelocity());
 			// SmartDashboard.putNumber("r", colorSensor.getColor().red);
 			// SmartDashboard.putNumber("g", colorSensor.getColor().green);
 			SmartDashboard.putString("item type", itemType.toString());
-			SmartDashboard.putBoolean("Intake Motor Spinning", isMotorAllowed);
+			SmartDashboard.putNumber("spinner power", spinnerMotor.get());
+			// SmartDashboard.putBoolean("Intake Motor Spinning", isMotorAllowed);
 			//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 			if (input.isIntakeButtonPressed()) {
 				isMotorAllowed = !isMotorAllowed;
@@ -218,10 +221,11 @@ public class SpinningIntakeFSM {
 					timer.start();
 					needsReset = false;
 				}
-				if (timer.hasElapsed(TIME_RESET_CURRENT)
-					&& spinnerMotor.getOutputCurrent() > CURRENT_THRESHOLD) {
+				/*if (timer.hasElapsed(TIME_RESET_CURRENT)
+					&& spinnerMotor.getEncoder().getVelocity() < 500) {
+						//&& spinnerMotor.getOutputCurrent() > CURRENT_THRESHOLD) {
 					return SpinningIntakeFSMState.IDLE_STOP;
-				}
+				}*/
 				return SpinningIntakeFSMState.IDLE_SPINNING;
 			case IDLE_STOP:
 				if (input.isReleaseButtonPressed()) {

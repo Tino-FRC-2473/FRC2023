@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.SpinningIntakeFSM;
-//import frc.robot.systems.GroundMountFSM;
+import frc.robot.systems.GroundMountFSM;
 
-import frc.robot.systems.ArmFSM.ArmFSMState;
+// import frc.robot.systems.ArmFSM.ArmFSMState;
 import frc.robot.systems.DriveFSMSystem.FSMState;
 import frc.robot.systems.SpinningIntakeFSM.SpinningIntakeFSMState;
 //import frc.robot.systems.GroundMountFSM.GroundMountFSMState;
@@ -25,10 +25,10 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private ArmFSM armSystem;
+	// private ArmFSM armSystem;
 	private DriveFSMSystem driveSystem;
 	private SpinningIntakeFSM spinningIntakeFSM;
-	//private GroundMountFSM groundMountFSM;
+	private GroundMountFSM groundMountFSM;
 
 	// autonomus
 	private static boolean finishedDeposit = false;
@@ -68,8 +68,8 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		driveSystem = new DriveFSMSystem();
-		armSystem = new ArmFSM();
-		// groundMountFSM = new GroundMountFSM();
+		// armSystem = new ArmFSM();
+		groundMountFSM = new GroundMountFSM();
 		spinningIntakeFSM = new SpinningIntakeFSM();
 		System.gc();
 	}
@@ -79,8 +79,8 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Autonomous Init --------");
 		System.gc();
 
-		armSystem.reset();
-		//groundMountFSM.reset();
+		// armSystem.reset();
+		groundMountFSM.reset();
 		driveSystem.resetAutonomous();
 		spinningIntakeFSM.reset();
 	}
@@ -88,13 +88,13 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 
-		armSystem.update(null);
+		// armSystem.update(null);
 		driveSystem.update(null);
 		spinningIntakeFSM.update(null);
-		// groundMountFSM.update(null);
+		groundMountFSM.update(null);
 		System.out.println(finishedDeposit);
 
-		if (driveSystem.getCurrentState() == (FSMState.P1N1)
+		/*if (driveSystem.getCurrentState() == (FSMState.P1N1)
 			|| driveSystem.getCurrentState() == (FSMState.P2N1)
 			|| driveSystem.getCurrentState() == (FSMState.P3N1)
 			|| driveSystem.getCurrentState() == (FSMState.P4N1)) {
@@ -159,7 +159,7 @@ public class Robot extends TimedRobot {
 				//groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_UP);
 				armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
 			}
-		}
+		}*/
 	}
 
 
@@ -169,20 +169,19 @@ public class Robot extends TimedRobot {
 
 		System.gc();
 		//armSystem.reset();
-		//driveSystem.resetTeleop();
+		driveSystem.resetTeleop();
 		spinningIntakeFSM.reset();
-		//groundMountFSM.reset();
+		groundMountFSM.reset();
 	}
 
 
 	@Override
 	public void teleopPeriodic() {
 		//armSystem.update(input);
-		//driveSystem.update(input);
+		driveSystem.update(input);
 		spinningIntakeFSM.update(input);
-		//groundMountFSM.update(input);
+		groundMountFSM.update(input);
 	}
-
 	@Override
 	public void disabledInit() {
 		System.out.println("-------- Disabled Init --------");

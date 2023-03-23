@@ -151,7 +151,7 @@ public class GroundMountFSM {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
-		//System.out.println("end time ground mount: " + Timer.getFPGATimestamp());
+		System.out.println("end time ground mount: " + Timer.getFPGATimestamp());
 	}
 	/* ======================== Private methods ======================== */
 	/**
