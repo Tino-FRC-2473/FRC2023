@@ -13,6 +13,7 @@ public class AutoPathChooser {
 	 * auto path and node for the robot without re-deploying.
 	 */
 	public AutoPathChooser() {
+		autoPathChooser = new SendableChooser<>();
 		autoPathChooser.setDefaultOption("Path 1", FSMState.P1N1);
 		autoPathChooser.addOption("Path 2", FSMState.P2N1);
 		autoPathChooser.addOption("Path 3", FSMState.P3N1);
