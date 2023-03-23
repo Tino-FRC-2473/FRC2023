@@ -217,7 +217,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		System.out.println("Loop start: " + Timer.getFPGATimestamp());
 		if (isArmEnabled) {
 			if (HardwareMap.isRobotGroundMount()) {
 				groundMountFSM.update(input);
@@ -232,7 +231,6 @@ public class Robot extends TimedRobot {
 			spinningIntakeFSM.update(input);
 		}
 
-		System.out.println("Loop end: " + Timer.getFPGATimestamp());
 	}
 
 	@Override
