@@ -8,10 +8,12 @@ public class Constants {
 	public static final double ANGLE_TO_TARGET_THRESHOLD_DEGREES = 3;
 	public static final double SUBSTATION_ANGLE_THRESHOLD_DEGREES = 5;
 	public static final double CV_TURN_POWER = 0.05;
+	public static final double CV_PID_CLAMP_THRESHOLD = 0.08;
 	public static final double CV_FORWARD_POWER = 0.1;
 	public static final double HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES = 67;
 	public static final double LOWER_TAPE_DRIVEUP_DISTANCE_INCHES = 45;
 	public static final double TAG_DRIVEUP_DISTANCE_INCHES = 32;
+	public static final double CUBE_DRIVEUP_DISTANCE_INCHES = 45;
 	public static final int WEBCAM_PIXELS_WIDTH = 480;
 	public static final int WEBCAM_PIXELS_HEIGHT = 480;
 	public static final double WHEEL_DIAMETER_INCHES = 6.0; //7.65
@@ -85,15 +87,13 @@ public class Constants {
 	public static final double QUARTER_PI = Math.PI / 4;
 
 	public static class VisionConstants {
-		public static final double CAM_OFFSET_X_METERS = Units.inchesToMeters(0);
-		public static final double CAM_OFFSET_Y_METERS = Units.inchesToMeters(-3.5);
 		public static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.75);
 		public static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
 		public static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
 		public static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
 		public static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
 		public static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
-		public static final double CAM_OFFSET_INCHES = -3.5;
+		public static final double CAM_OFFSET_INCHES = -4;
 		public static final int TWODTAG_PIPELINE_INDEX = 0;
 		public static final int LOWERTAPE_PIPELINE_INDEX = 1;
 		public static final int HIGHERTAPE_PIPELINE_INDEX = 2;
