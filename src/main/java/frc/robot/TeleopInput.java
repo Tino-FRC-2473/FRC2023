@@ -30,6 +30,8 @@ public class TeleopInput {
 	private static final int CV_ALIGN_BUTTON_LEFT_NODE = 4;
 	private static final int CV_ALIGN_BUTTON_MIDDLE_NODE = 3;
 	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
+	private static final int CV_ALIGN_BUTTON_CONE = 8;
+	private static final int CV_ALIGN_BUTTON_CUBE = 9;
 	private static final int DISABLE_UPDATE_BUTTON = 2;
 
 	private static final int GROUND_MOUNT_BUTTON = 4;
@@ -240,6 +242,23 @@ public class TeleopInput {
 	public boolean isDriveJoystickCVTagButtonPressedRaw() {
 		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_RIGHT_NODE);
 	}
+
+	/**
+	 * Get if cv align button (8) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isDriveJoystickCVConeButtonPressedRaw() {
+		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_CONE);
+	}
+
+	/**
+	 * Get if cv align button (9) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isDriveJoystickCVCubeButtonPressedRaw() {
+		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_CUBE);
+	}
+
 
 	/* ------------------------ Steering Wheel ------------------------ */
 	/**

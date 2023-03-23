@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.SPI;
 
 import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.VisionConstants;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
@@ -36,6 +37,8 @@ public class DriveFSMSystem {
 		CV_LOW_TAPE_ALIGN,
 		CV_HIGH_TAPE_ALIGN,
 		CV_TAG_ALIGN,
+		CV_CUBE_ALIGN,
+		CV_CONE_ALIGN,
 		IDLE,
 
 		P1N1,
@@ -91,12 +94,11 @@ public class DriveFSMSystem {
 	private CameraServer cam;
 	private CvSink cvSink;
 	private CvSource outputStrem;
-	static final int TURN_RIGHT_OPT = 4;
-	static final int TURN_LEFT_OPT = 3;
+	static final int STOP_OPT = 0;
 	static final int MOVE_FORWARD_OPT = 1;
 	static final int MOVE_BACKWARD_OPT = 2;
-
-
+	static final int TURN_LEFT_OPT = 3;
+	static final int TURN_RIGHT_OPT = 4;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -132,7 +134,6 @@ public class DriveFSMSystem {
 
 		UsbCamera usb = CameraServer.startAutomaticCapture();
 		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
-
 		// Creates the CvSink and connects it to the UsbCamera
 		cvSink = CameraServer.getVideo();
 		// Creates the CvSource and MjpegServer [2] and connects them
@@ -238,6 +239,13 @@ public class DriveFSMSystem {
 				handleCVTagAlignState();
 				break;
 
+			case CV_CUBE_ALIGN:
+				handleCVCubeAlignState();
+				break;
+			case CV_CONE_ALIGN:
+				handleCVConeAlignState();
+				break;
+
 			case TELE_STATE_BALANCE:
 				handleTeleOpBalanceState(input);
 				break;
@@ -338,6 +346,32 @@ public class DriveFSMSystem {
 		currentState = nextState(input);
 	}
 
+	private void handleCVConeAlignState() {
+		double angle = pcw.getConeTurnAngle();
+		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
+			return;
+		}
+		System.out.println(pcw.getCubeTurnAngle());
+		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			cvmove(TURN_RIGHT_OPT);
+		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			cvmove(TURN_LEFT_OPT);
+		}
+	}
+
+	private void handleCVCubeAlignState() {
+		double angle = pcw.getCubeTurnAngle();
+		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
+			return;
+		}
+		System.out.println(pcw.getCubeTurnAngle());
+		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			cvmove(TURN_RIGHT_OPT);
+		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
+			cvmove(TURN_LEFT_OPT);
+		}
+	}
+
 	/* ======================== Private methods ======================== */
 	/**
 	 * Decide the next state to transition to. This is a function of the inputs
@@ -351,20 +385,7 @@ public class DriveFSMSystem {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
-				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
-					return FSMState.TELE_STATE_BALANCE;
-				} else if (input != null && input.isSteeringWheelHoldPressedRaw()) {
-					return FSMState.TELE_STATE_HOLD_WHILE_TILTED;
-				}
-				if (input != null && input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
-					isNotForwardEnough = true; return FSMState.CV_LOW_TAPE_ALIGN;
-				} else if (input != null && input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
-					isNotForwardEnough = true;
-					return FSMState.CV_HIGH_TAPE_ALIGN;
-				} else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
-					isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
-				}
-				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+				return getCVState(input);
 			case AUTO_STATE_BALANCE:
 				return FSMState.AUTO_STATE_BALANCE;
 			case TURNING_STATE:
@@ -387,6 +408,16 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_TAG_ALIGN;
+			case CV_CUBE_ALIGN:
+				if (!input.isDriveJoystickCVCubeButtonPressedRaw()) {
+					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+				}
+				return FSMState.CV_CUBE_ALIGN;
+			case CV_CONE_ALIGN:
+				if (!input.isDriveJoystickCVConeButtonPressedRaw()) {
+					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+				}
+				return FSMState.CV_CONE_ALIGN;
 			case IDLE: return FSMState.IDLE;
 			case TELE_STATE_BALANCE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
@@ -498,6 +529,26 @@ public class DriveFSMSystem {
 			default: throw new IllegalStateException("Invalid state: " + currentState.toString()); }
 	}
 
+	private FSMState getCVState(TeleopInput input) {
+		if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
+			return FSMState.TELE_STATE_BALANCE;
+		} else if (input != null && input.isSteeringWheelHoldPressedRaw()) {
+			return FSMState.TELE_STATE_HOLD_WHILE_TILTED;
+		}
+		if (input != null && input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
+			isNotForwardEnough = true; return FSMState.CV_LOW_TAPE_ALIGN;
+		} else if (input != null && input.isDriveJoystickCVHighTapeButtonPressedRaw()) {
+			isNotForwardEnough = true;
+			return FSMState.CV_HIGH_TAPE_ALIGN;
+		} else if (input != null && input.isDriveJoystickCVTagButtonPressedRaw()) {
+			isNotForwardEnough = true; return FSMState.CV_TAG_ALIGN;
+		} else if (input != null && input.isDriveJoystickCVConeButtonPressedRaw()) {
+			return FSMState.CV_CONE_ALIGN;
+		} else if (input != null && input.isDriveJoystickCVCubeButtonPressedRaw()) {
+			return FSMState.CV_CUBE_ALIGN;
+		}
+		return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+	}
 	/* ------------------------ FSM state handlers ------------------------ */
 	/**
 	 * Handle behavior in TELE_STATE_2_MOTOR_DRIVE.
@@ -771,22 +822,14 @@ public class DriveFSMSystem {
 	* Aligns to april tag and drives up to within 35 inches of it
 	*/
 	public void handleCVTagAlignState() {
-		double angle = pcw.getTagTurnAngle();
-		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
-			return;
-		}
+		double power = pcw.getTagTurnRotation();
 		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_RIGHT_OPT);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_LEFT_OPT);
-		} else {
-			if (isNotForwardEnough) {
-				cvmove(MOVE_FORWARD_OPT);
-			} else {
-				cvmove(0);
-			}
-		}
+		power = MathUtil.clamp(
+			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
+		leftMotorFront.set(-power);
+		rightMotorFront.set(-power);
+		leftMotorBack.set(-power);
+		rightMotorBack.set(-power);
 	}
 	/**.
 	 * Aligns to the high cube node (the one without an april tag).
@@ -826,7 +869,7 @@ public class DriveFSMSystem {
 	public void cvmove(int opt) {
 		switch (opt) {
 			//stop
-			case 0:
+			case STOP_OPT:
 				leftMotorFront.set(0);
 				rightMotorFront.set(0);
 				leftMotorBack.set(0);

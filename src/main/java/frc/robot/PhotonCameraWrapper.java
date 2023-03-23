@@ -3,6 +3,7 @@ package frc.robot;
 import java.io.IOException;
 
 import org.photonvision.PhotonCamera;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -25,15 +26,20 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
  * with its coordinates.
  */
 public class PhotonCameraWrapper {
+	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
+	public static final double ANGULAR_P = 0.01;
+	public static final double ANGULAR_D = 0;
 		/** PhotonCamera object representing a camera that is
 		 * connected to PhotonVision.*/
 	private PhotonCamera photonCamera;
 		/** RobotPoseEstimator object to estimate position of robot.*/
 	private PhotonPoseEstimator robotPoseEstimator;
+		/** PIDController object to implement PID for robot turning.*/
+	private PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
 
-	public static final double FIELD_WIDTH_METERS = 500;
-	public static final double FIELD_LENGTH_METERS = 500;
-	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
+		/** Last timestamp holder to check if code is running faster than limelight.*/
+	private double lastTs = 0;
+
 		/** Creates a new PhotonCameraWrapper. */
 	public PhotonCameraWrapper() {
 		AprilTagFieldLayout atfl = null;
@@ -51,8 +57,8 @@ public class PhotonCameraWrapper {
 		photonCamera.setDriverMode(false);
 		robotPoseEstimator = new PhotonPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY,
 		photonCamera, new Transform3d(
-			new Translation3d(VisionConstants.CAM_OFFSET_X_METERS,
-			VisionConstants.CAM_OFFSET_Y_METERS,
+			new Translation3d(Units.inchesToMeters(VisionConstants.CAM_OFFSET_INCHES),
+			0,
 			VisionConstants.CAM_HEIGHT_METERS),
 			new Rotation3d(
 					0, VisionConstants.CAM_PITCH_RADIANS,
@@ -123,6 +129,7 @@ public class PhotonCameraWrapper {
 		}
 		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
+
 	/**
 	 * Returns the angle for the robot to turn to align with the grid april tag.
 	 * @return an angle that tells the robot how much to turn to align in degrees
@@ -135,6 +142,28 @@ public class PhotonCameraWrapper {
 				VisionConstants.CAM_OFFSET_INCHES / getTagDistance()));
 		}
 		return Constants.INVALID_TURN_RETURN_DEGREES;
+	}
+
+	/**
+	 * Returns the rotation power for the robot to turn to align with the grid april tag (uses pid).
+	 * @return an angle that tells the robot how much to turn to align in degrees
+	 */
+	public double getTagTurnRotation() {
+		photonCamera.setPipelineIndex(VisionConstants.TWODTAG_PIPELINE_INDEX);
+		var result = photonCamera.getLatestResult();
+		double rotationSpeed;
+		double curTs = photonCamera.getLatestResult().getTimestampSeconds();
+		//compare curTs to lastTs: check if code is running faster than limelight (causes overshoot)
+		if (result.hasTargets() && (lastTs == 0 || curTs != lastTs)) {
+			// Calculate angular turn power
+			// -1.0 required to ensure positive PID controller effort increases yaw
+			rotationSpeed = -turnController.calculate(getTagTurnAngle(), 0);
+		} else {
+			// If we have no targets, stay still.
+			rotationSpeed = 0;
+		}
+		lastTs = photonCamera.getLatestResult().getTimestampSeconds();
+		return rotationSpeed;
 	}
 	/**
 	 * Returns the distance to the grid april tag.
@@ -211,7 +240,7 @@ public class PhotonCameraWrapper {
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cone
  * and 360 if there are no cones.*/
-	public double getTurnAngleToCone() {
+	public double getConeTurnAngle() {
 		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
@@ -221,7 +250,7 @@ public class PhotonCameraWrapper {
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cube
  * and 360 if there are no cubes.*/
-	public double getTurnAngleToCube() {
+	public double getCubeTurnAngle() {
 		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {

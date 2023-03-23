@@ -5,12 +5,11 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 // Systems
 import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.SpinningIntakeFSM;
-//import frc.robot.systems.GroundMountFSM;
+import frc.robot.systems.GroundMountFSM;
 
 import frc.robot.systems.ArmFSM.ArmFSMState;
 import frc.robot.systems.DriveFSMSystem.FSMState;
@@ -27,7 +26,7 @@ public class Robot extends TimedRobot {
 	private ArmFSM armSystem;
 	private DriveFSMSystem driveSystem;
 	private SpinningIntakeFSM spinningIntakeFSM;
-	//private GroundMountFSM groundMountFSM;
+	private GroundMountFSM groundMountFSM;
 
 	// autonomus
 	private static boolean finishedDeposit = false;
@@ -162,13 +161,9 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		System.out.println("Loop start: " + Timer.getFPGATimestamp());
-
 		armSystem.update(input);
 		driveSystem.update(input);
 		spinningIntakeFSM.update(input);
-
-		System.out.println("Loop end: " + Timer.getFPGATimestamp());
 	}
 
 	@Override
