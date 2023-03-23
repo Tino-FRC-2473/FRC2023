@@ -115,6 +115,11 @@ public class PhotonCameraWrapper {
 		}
 		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
+
+	/**
+	 * Returns the rotation power for the robot to align with the cube object.
+	 * @return a power to apply to all the motors
+	 */
 	public double getCubeTurnRotation() {
 		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
@@ -130,6 +135,11 @@ public class PhotonCameraWrapper {
 		lastTs = photonCamera.getLatestResult().getTimestampSeconds();
 		return rotationSpeed;
 	}
+
+	/**
+	 * Returns the rotation power for the robot to align with the cone object.
+	 * @return a power to apply to all the motors
+	 */
 	public double getConeTurnRotation() {
 		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
@@ -251,7 +261,7 @@ public class PhotonCameraWrapper {
 			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
 				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CONE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
-					result.getBestTarget().getPitch())));
+					result.getBestTarget().getPitch()))) + Constants.CONE_DISTANCE_ADD;
 		}
 		return -1;
 	}
@@ -263,7 +273,7 @@ public class PhotonCameraWrapper {
 			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
 				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CUBE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
-					result.getBestTarget().getPitch())));
+					result.getBestTarget().getPitch()))) + Constants.CUBE_DISTANCE_ADD;
 		}
 		return -1;
 	}
@@ -310,5 +320,11 @@ public class PhotonCameraWrapper {
 			return true;
 		}
 		return false;
+	}
+/**
+ * @return Returns the number of targets.
+ */
+	public int getNumberofTargets() {
+		return photonCamera.getLatestResult().getTargets().size();
 	}
 }

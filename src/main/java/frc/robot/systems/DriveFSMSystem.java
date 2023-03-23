@@ -90,6 +90,8 @@ public class DriveFSMSystem {
 	private boolean finishedTurning; // only for turn state
 
 	private boolean isNotForwardEnough = false;
+	private int targetContourIndex = 0;
+	private int lastContourSwitchCount = -1;
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 	private CameraServer cam;
 	private CvSink cvSink;
@@ -214,13 +216,19 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-
 		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
 
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
 		updateLineOdometryTele(gyroAngleForOdo);
+		if (input.isDriveJoystickCVSwitchContourButtonPressedRaw()) {
+			if (targetContourIndex < pcw.getNumberofTargets()) {
+				targetContourIndex++;
+			} else {
+				targetContourIndex = 0;
+			}
+		}
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -344,17 +352,6 @@ public class DriveFSMSystem {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
-	}
-
-	public void handleCVConeAlignState() {
-		double power = pcw.getConeTurnRotation();
-		isNotForwardEnough =  pcw.getDistanceToCone() > Constants.CUBE_DRIVEUP_DISTANCE_INCHES;
-		power = MathUtil.clamp(
-			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
-		leftMotorFront.set(-power);
-		rightMotorFront.set(-power);
-		leftMotorBack.set(-power);
-		rightMotorBack.set(-power);
 	}
 
 	/* ======================== Private methods ======================== */
@@ -535,6 +532,21 @@ public class DriveFSMSystem {
 		return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 	}
 	/* ------------------------ FSM state handlers ------------------------ */
+
+	/**
+	 * Handle behavior in CV_CONE_ALIGN.
+	 */
+	public void handleCVConeAlignState() {
+		double power = pcw.getConeTurnRotation();
+		isNotForwardEnough =  pcw.getDistanceToCone() > Constants.CUBE_DRIVEUP_DISTANCE_INCHES;
+		power = MathUtil.clamp(
+			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
+		leftMotorFront.set(-power);
+		rightMotorFront.set(-power);
+		leftMotorBack.set(-power);
+		rightMotorBack.set(-power);
+	}
+
 	/**
 	 * Handle behavior in TELE_STATE_2_MOTOR_DRIVE.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
@@ -816,6 +828,10 @@ public class DriveFSMSystem {
 		leftMotorBack.set(-power);
 		rightMotorBack.set(-power);
 	}
+
+	/**.
+	* Aligns to cube rotationally
+	*/
 	public void handleCVCubeAlignState() {
 		double power = pcw.getCubeTurnRotation();
 		isNotForwardEnough =  pcw.getDistanceToCube() > Constants.CUBE_DRIVEUP_DISTANCE_INCHES;
