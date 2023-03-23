@@ -6,14 +6,15 @@ package frc.robot;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
-import frc.robot.systems.ArmFSM;
+// import frc.robot.systems.ArmFSM;
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.SpinningIntakeFSM;
 import frc.robot.systems.GroundMountFSM;
 
-import frc.robot.systems.ArmFSM.ArmFSMState;
+// import frc.robot.systems.ArmFSM.ArmFSMState;
 import frc.robot.systems.DriveFSMSystem.FSMState;
-import frc.robot.systems.SpinningIntakeFSM.SpinningIntakeFSMState;
+// import frc.robot.systems.SpinningIntakeFSM.SpinningIntakeFSMState;
+//import frc.robot.systems.GroundMountFSM.GroundMountFSMState;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -23,7 +24,7 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private ArmFSM armSystem;
+	// private ArmFSM armSystem;
 	private DriveFSMSystem driveSystem;
 	private SpinningIntakeFSM spinningIntakeFSM;
 	private GroundMountFSM groundMountFSM;
@@ -66,7 +67,8 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		driveSystem = new DriveFSMSystem();
-		armSystem = new ArmFSM();
+		//armSystem = new ArmFSM();
+		groundMountFSM = new GroundMountFSM();
 		spinningIntakeFSM = new SpinningIntakeFSM();
 	}
 
@@ -74,21 +76,22 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 
-		armSystem.reset();
-		driveSystem.resetAutonomous();
+		//armSystem.reset();
+		groundMountFSM.reset();
+		//driveSystem.resetAutonomous();
 		spinningIntakeFSM.reset();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 
-		armSystem.update(null);
-		driveSystem.update(null);
+		// armSystem.update(null);
+		// driveSystem.update(null);
 		spinningIntakeFSM.update(null);
-
+		groundMountFSM.update(null);
 		System.out.println(finishedDeposit);
 
-		if (driveSystem.getCurrentState() == (FSMState.P1N1)
+		/*if (driveSystem.getCurrentState() == (FSMState.P1N1)
 			|| driveSystem.getCurrentState() == (FSMState.P2N1)
 			|| driveSystem.getCurrentState() == (FSMState.P3N1)
 			|| driveSystem.getCurrentState() == (FSMState.P4N1)) {
@@ -146,24 +149,27 @@ public class Robot extends TimedRobot {
 			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
 				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 			}
-		}
+		}*/
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 
-		armSystem.reset();
+		System.gc();
+		//armSystem.reset();
 		driveSystem.resetTeleop();
 		spinningIntakeFSM.reset();
+		groundMountFSM.reset();
 	}
 
 
 	@Override
 	public void teleopPeriodic() {
-		armSystem.update(input);
+		//armSystem.update(input);
 		driveSystem.update(input);
 		spinningIntakeFSM.update(input);
+		groundMountFSM.update(input);
 	}
 
 	@Override
