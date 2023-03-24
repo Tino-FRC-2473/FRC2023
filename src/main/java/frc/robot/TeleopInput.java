@@ -63,6 +63,13 @@ public class TeleopInput {
 	/* ------------------------ Left Joystick ------------------------ */
 
 	/**
+	 * Get the value of the Disable Intake button.
+	 * @return True if the button is pressed
+	 */
+	public boolean isDisableUpdatedPressed() {
+		return mechJoystick.getRawButtonPressed(DISABLE_UPDATE_BUTTON);
+	}
+	/**
 	 * Get value of lower pivot button for ground mount.
 	 * @return true if pressed
 	 */
