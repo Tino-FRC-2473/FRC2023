@@ -9,6 +9,7 @@ import frc.robot.Constants.VisionConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
@@ -18,6 +19,7 @@ import frc.robot.PhotonCameraWrapper;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.Robot;
+import frc.robot.AutoPathChooser;
 import frc.robot.drive.DriveFunctions;
 import frc.robot.drive.DriveModes;
 import frc.robot.drive.DrivePower;
@@ -173,12 +175,18 @@ public class DriveFSMSystem {
 		gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
-
-		currentState = FSMState.P6N1;
+		if (AutoPathChooser.getAutoPathChooser() != null) {
+			currentState = AutoPathChooser.getSelectedPath();
+		} else {
+			currentState = FSMState.P1N1;
+		}
 		Robot.resetFinishedDeposit();
-		Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
+		if (AutoPathChooser.getNodeChooser() != null) {
+			Robot.setNode(AutoPathChooser.getSelectedNode());
+		}
+			//Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
-
+		SmartDashboard.putString("Path", "" + currentState);
 		roboXPos = 0;
 		roboYPos = 0;
 
@@ -221,6 +229,7 @@ public class DriveFSMSystem {
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
 		updateLineOdometryTele(gyroAngleForOdo);
+		SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
 
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
