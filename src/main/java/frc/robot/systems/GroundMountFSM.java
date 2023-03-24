@@ -31,7 +31,8 @@ public class GroundMountFSM {
 	private static final double P_CONSTANT = 0.010;
 	private static final double P_UP_CONSTANT = 0.012;
 	private static final double ERROR = 5;
-	private static final double MAX_ACCEL = 0.1;
+	private static final double MAX_ACCEL = 0.002;
+	private static final double MAX_DECEL = 0.03;
 
 	/* ======================== Private variables ======================== */
 	private GroundMountFSMState currentState;
@@ -208,6 +209,10 @@ public class GroundMountFSM {
 		return a;
 	}
 	private double changePower(double target) {
+		if (target > 0 && target < lastPower - MAX_DECEL)
+			return lastPower - MAX_DECEL;
+		if (target < 0 && target > lastPower + MAX_DECEL)
+			return lastPower + MAX_DECEL;
 		if (target > lastPower + MAX_ACCEL)
 			return lastPower + MAX_ACCEL;
 		else if (target < lastPower - MAX_ACCEL)
@@ -229,8 +234,14 @@ public class GroundMountFSM {
 		// if (lastPower > 0)
 		// 	pivotArmMotor.set(lastPower-MAX_ACCEL);
 		// else
-		lastPower = capMotorPower(changePower(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
-		pivotArmMotor.set(lastPower);
+		if (withinError(0, pivotArmMotor.getEncoder().getPosition()) && !limitSwitchHigh.isPressed())
+		{
+			pivotArmMotor.set(PIVOT_UP_POWER);
+		}
+		else {
+			lastPower = capMotorPower(changePower(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
+			pivotArmMotor.set(lastPower);
+		}
 		//System.out.println(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT);
 	}
 	private void handlePivotingDownState() {
