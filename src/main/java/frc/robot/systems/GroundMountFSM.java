@@ -239,6 +239,9 @@ public class GroundMountFSM {
 			pivotArmMotor.set(PIVOT_UP_POWER);
 		}
 		else {
+			if (limitSwitchHigh.isPressed()) {
+				pivotArmMotor.getEncoder().setPosition(0);
+			}
 			lastPower = capMotorPower(changePower(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
 			pivotArmMotor.set(lastPower);
 		}
