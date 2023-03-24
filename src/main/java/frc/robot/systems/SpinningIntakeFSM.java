@@ -1,5 +1,6 @@
 package frc.robot.systems;
 
+import edu.wpi.first.math.spline.CubicHermiteSpline;
 // WPILib Imports
 import edu.wpi.first.wpilibj.Timer;
 // Third party Hardware Imports
@@ -26,9 +27,9 @@ public class SpinningIntakeFSM {
 	}
 	//FIX VALUES
 	private static final double KEEP_SPEED = 0.07;
-	private static final double INTAKE_SPEED = 0.3;
-	private static final double RELEASE_SPEED = -1; //DONT FORGET -
-	private static final double CURRENT_THRESHOLD = 26;
+	private static final double INTAKE_SPEED = 0.4;
+	private static final double RELEASE_SPEED = -0.7; //DONT FORGET -
+	private static final double CURRENT_THRESHOLD = 20;
 	private static final double TIME_RESET_CURRENT = 0.5;
 	private static final int MIN_RELEASE_DISTANCE = 800;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
@@ -36,6 +37,8 @@ public class SpinningIntakeFSM {
 	private boolean isMotorAllowed = false;
 	private boolean toggleUpdate = true;
 	private boolean needsReset = true;
+	private int tick = 0;
+	private double[] currLogs = new double[10];
 
 
 	/* ======================== Private variables ======================== */
@@ -221,11 +224,21 @@ public class SpinningIntakeFSM {
 					timer.start();
 					needsReset = false;
 				}
-				/*if (timer.hasElapsed(TIME_RESET_CURRENT)
-					&& spinnerMotor.getEncoder().getVelocity() < 500) {
-						//&& spinnerMotor.getOutputCurrent() > CURRENT_THRESHOLD) {
-					return SpinningIntakeFSMState.IDLE_STOP;
-				}*/
+				if (timer.hasElapsed(TIME_RESET_CURRENT)) {
+					currLogs[tick%10] = spinnerMotor.getOutputCurrent();
+					tick++;
+
+					double avg = 0;
+					
+					for (int i = 0; i < 10; i++)
+						avg += currLogs[i];
+				
+					avg /= 10;
+
+					if (avg > CURRENT_THRESHOLD) {
+						return SpinningIntakeFSMState.IDLE_STOP;
+					}
+				}
 				return SpinningIntakeFSMState.IDLE_SPINNING;
 			case IDLE_STOP:
 				if (input.isReleaseButtonPressed()) {
@@ -248,16 +261,20 @@ public class SpinningIntakeFSM {
 	 * Handle behavior in states.
 	 */
 	private void handleStartState() {
+		System.out.println("not in idle spinning");
 	}
 	private void handleIdleSpinningState() {
 		if (isMotorAllowed) {
+			System.out.println("in idle spinning");
 			spinnerMotor.set(INTAKE_SPEED);
 		}
 	}
 	private void handleIdleStopState() {
+		System.out.println("not in idle spinning");
 		spinnerMotor.set(KEEP_SPEED);
 	}
 	private void handleReleaseState() {
+		System.out.println("not in idle spinning");
 		itemType = ItemType.EMPTY;
 		spinnerMotor.set(RELEASE_SPEED);
 		isMotorAllowed = true;

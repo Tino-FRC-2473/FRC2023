@@ -24,10 +24,10 @@ public class GroundMountFSM {
 	}
 	//arbitrary constants, must test all of these
 	private static final double PIVOT_UP_POWER = -0.1;
-	private static final double MIN_POWER = -0.4;
+	private static final double MIN_POWER = -0.3;
 	private static final double MAX_POWER = 0.25;
 	private boolean zeroed = false;
-	private static final double BOTTOM_ENCODER_LIMIT = 23.00; //ARBITRARY VALUE
+	private static final double BOTTOM_ENCODER_LIMIT = 55.00; //ARBITRARY VALUE
 	private static final double P_CONSTANT = 0.010;
 	private static final double P_UP_CONSTANT = 0.012;
 	private static final double ERROR = 5;
@@ -41,6 +41,7 @@ public class GroundMountFSM {
 	private CANSparkMax pivotArmMotor;
 	private SparkMaxLimitSwitch limitSwitchHigh;
 	private SparkMaxLimitSwitch limitSwitchLow;
+	private double lastPower;
 
 
 	/* ======================== Constructor ======================== */
@@ -207,7 +208,6 @@ public class GroundMountFSM {
 		return a;
 	}
 	private double changePower(double target) {
-		double lastPower = pivotArmMotor.get();
 		if (target > lastPower + MAX_ACCEL)
 			return lastPower + MAX_ACCEL;
 		else if (target < lastPower - MAX_ACCEL)
@@ -229,7 +229,8 @@ public class GroundMountFSM {
 		// if (lastPower > 0)
 		// 	pivotArmMotor.set(lastPower-MAX_ACCEL);
 		// else
-		pivotArmMotor.set(capMotorPower(changePower(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT)));
+		lastPower = capMotorPower(changePower(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
+		pivotArmMotor.set(lastPower);
 		//System.out.println(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT);
 	}
 	private void handlePivotingDownState() {
@@ -240,12 +241,12 @@ public class GroundMountFSM {
 		// - pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT);
 		// System.out.println((targetEncoder - pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT);
 		// System.out.println(pivotArmMotor.get());
-		double lastPower = pivotArmMotor.get();
 		// if (lastPower < 0)
 		// 	pivotArmMotor.set(lastPower+MAX_ACCEL);
 		// else
-		pivotArmMotor.set(capMotorPower(changePower((targetEncoder
-			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT)));
+		lastPower = capMotorPower(changePower((targetEncoder
+			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
+		pivotArmMotor.set(lastPower);
 	}
 
 	/* AUTONOMOUS HANDLES */
