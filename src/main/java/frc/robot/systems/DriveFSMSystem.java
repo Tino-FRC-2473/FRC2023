@@ -248,10 +248,10 @@ public class DriveFSMSystem {
 				break;
 
 			case CV_CUBE_ALIGN:
-				handleCVCubeAlignState();
+				handleCVCubeAlignState(targetContourIndex);
 				break;
 			case CV_CONE_ALIGN:
-				handleCVConeAlignState();
+				handleCVConeAlignState(targetContourIndex);
 				break;
 
 			case TELE_STATE_BALANCE:
@@ -536,9 +536,8 @@ public class DriveFSMSystem {
 	/**
 	 * Handle behavior in CV_CONE_ALIGN.
 	 */
-	public void handleCVConeAlignState() {
-		double power = pcw.getConeTurnRotation();
-		isNotForwardEnough =  pcw.getDistanceToCone() > Constants.CUBE_DRIVEUP_DISTANCE_INCHES;
+	public void handleCVConeAlignState(int targetContour) {
+		double power = pcw.getConeTurnRotation(targetContour);
 		power = MathUtil.clamp(
 			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
 		leftMotorFront.set(-power);
@@ -832,9 +831,8 @@ public class DriveFSMSystem {
 	/**.
 	* Aligns to cube rotationally
 	*/
-	public void handleCVCubeAlignState() {
-		double power = pcw.getCubeTurnRotation();
-		isNotForwardEnough =  pcw.getDistanceToCube() > Constants.CUBE_DRIVEUP_DISTANCE_INCHES;
+	public void handleCVCubeAlignState(int targetContour) {
+		double power = pcw.getCubeTurnRotation(targetContour);
 		power = MathUtil.clamp(
 			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
 		leftMotorFront.set(-power);

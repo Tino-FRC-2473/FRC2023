@@ -279,22 +279,22 @@ public class PhotonCameraWrapper {
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cone
  * and 360 if there are no cones.*/
-	public double getConeTurnAngle() {
+	public double getConeTurnAngle(int cnt) {
 		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
+			return result.getTargets().get(cnt).getYaw() + Math.toDegrees(Math.atan(
 				VisionConstants.CAM_OFFSET_INCHES / getDistanceToCone()));
 		}
 		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cube
  * and 360 if there are no cubes.*/
-	public double getCubeTurnAngle() {
+	public double getCubeTurnAngle(int cnt) {
 		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
+			return result.getTargets().get(cnt).getYaw() + Math.toDegrees(Math.atan(
 				VisionConstants.CAM_OFFSET_INCHES / getDistanceToCube()));
 		}
 		return Constants.INVALID_TURN_RETURN_DEGREES;
