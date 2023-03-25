@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Timer;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -31,7 +32,6 @@ public class SpinningIntakeFSM {
 	private static final double TIME_RESET_CURRENT = 0.5;
 	private static final int MIN_RELEASE_DISTANCE = 800;
 	private static final int AVERAGE_SIZE = 10;
-	private static final double OVERRUN_THRESHOLD = 0.02;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static ItemType itemType = ItemType.EMPTY;
 	private boolean isMotorAllowed = false;
@@ -140,7 +140,7 @@ public class SpinningIntakeFSM {
 		}
 		double timeTaken = Timer.getFPGATimestamp() - begin;
 		//System.out.println("spinning intake time taken: " + timeTaken);
-		if (timeTaken > OVERRUN_THRESHOLD) {
+		if (timeTaken > Constants.OVERRUN_THRESHOLD) {
 			System.out.println("ALERT ALERT SPINNING INTAKE " + timeTaken);
 			System.out.println("intake state" + currentState);
 		}
