@@ -262,14 +262,6 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get if cv align button (8) is pressed.
-	 * @return true if button is pressed
-	 */
-	public boolean isDriveJoystickCVConeButtonPressedRaw() {
-		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_CONE);
-	}
-
-	/**
 	 * Get if cv align button (9) is pressed.
 	 * @return true if button is pressed
 	 */

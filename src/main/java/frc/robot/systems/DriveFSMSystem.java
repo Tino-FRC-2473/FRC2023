@@ -362,32 +362,6 @@ public class DriveFSMSystem {
 		currentState = nextState(input);
 	}
 
-	private void handleCVConeAlignState() {
-		double angle = pcw.getConeTurnAngle();
-		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
-			return;
-		}
-		System.out.println(pcw.getCubeTurnAngle());
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_RIGHT_OPT);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_LEFT_OPT);
-		}
-	}
-
-	private void handleCVCubeAlignState() {
-		double angle = pcw.getCubeTurnAngle();
-		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
-			return;
-		}
-		System.out.println(pcw.getCubeTurnAngle());
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_RIGHT_OPT);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_LEFT_OPT);
-		}
-	}
-
 	/* ======================== Private methods ======================== */
 	/**
 	 * Decide the next state to transition to. This is a function of the inputs
