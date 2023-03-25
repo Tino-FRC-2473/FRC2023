@@ -41,41 +41,45 @@ public class Constants {
 	public static final double GYRO_TURN_MULTIPLER_BELOW_90 = 0.987;
 	public static final double CHARGING_STATION_LEVELED_ERROR_DEGREES = 2;
 	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 170;
-	public static final double AUTONOMUS_MOVE_POWER = 0.2;
 	public static final double AUTONOMUS_X_MOVE_THRESHOLD = 2;
 	public static final double AUTONOMUS_Y_MOVE_THRESHOLD = 20;
 	public static final double POWER_TO_HOLD_ROBO_ON_TILTED_CS = 0.03;
+	public static final double AUTONOMUS_MOVE_POWER = 0.2;
 
 	// Path points
 
+	// GROUND MOUNT ONLY
+
 	// push in, out of community, charge station
-	public static final double P1X1 = 32;
-	public static final double P1X2 = -130;
-	public static final double P1X3 = -55;
+	public static final double P1X1 = 1;
+	public static final double P1X2 = -100;
+	public static final double P1X3 = -86;
 
 	// push in, charge station
-	public static final double P2X1 = 32;
-	public static final double P2X2 = -53;
+	public static final double P2X1 = 1;
+	public static final double P2X2 = -86;
 
 	// push in, out of community (on edges)
-	public static final double P3X1 = 32;
-	public static final double P3X2 = -110; // fix this point to be close to other objs
+	public static final double P3X1 = 1;
+	public static final double P3X2 = -130; // fix this point to be close to other objs
 
-	// push in only
-	public static final double P4X1 = 32;
+	// push in/deposit only (BOTH ARM AND GROUND MOUNT)
+	public static final double P4X1 = 1;
+
+	//ARM ONLY
 
 	// deposit backwards, exit community, charge station
-	public static final double P5X1 = -32;
-	public static final double P5X2 = 120;
-	public static final double P5X3 = 56;
+	public static final double P5X1 = -1;
+	public static final double P5X2 = 100;
+	public static final double P5X3 = 86;
 
 	// deposit backwards, charge station
-	public static final double P6X1 = -32;
-	public static final double P6X2 = 56;
+	public static final double P6X1 = -1;
+	public static final double P6X2 = 86;
 
 	// deposit backwards, out of community (on edges)
-	public static final double P7X1 = -32;
-	public static final double P7X2 = 100;
+	public static final double P7X1 = -1;
+	public static final double P7X2 = 130;
 
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;

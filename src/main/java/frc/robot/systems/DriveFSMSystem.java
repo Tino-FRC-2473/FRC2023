@@ -178,7 +178,7 @@ public class DriveFSMSystem {
 		if (AutoPathChooser.getAutoPathChooser() != null) {
 			currentState = AutoPathChooser.getSelectedPath();
 		} else {
-			currentState = FSMState.P1N1;
+			currentState = FSMState.P4N1;
 		}
 		Robot.resetFinishedDeposit();
 		if (AutoPathChooser.getNodeChooser() != null) {
@@ -186,7 +186,7 @@ public class DriveFSMSystem {
 		}
 			//Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
-		SmartDashboard.putString("Path", "" + currentState);
+		SmartDashboard.putString("Path Point", "" + currentState);
 		roboXPos = 0;
 		roboYPos = 0;
 
@@ -749,17 +749,22 @@ public class DriveFSMSystem {
 		double roboX = -roboXPos;
 		double roboY = roboYPos;
 
+		double power = Constants.AUTONOMUS_MOVE_POWER;
+		if (HardwareMap.isRobotGroundMount()) {
+			power = 2 * Constants.AUTONOMUS_MOVE_POWER;
+		}
+
 		if (!completedPoint) {
 			if (forwards) {
-				leftMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
-				rightMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
-				leftMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
-				rightMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
+				leftMotorFront.set(-power);
+				rightMotorFront.set(power);
+				leftMotorBack.set(-power);
+				rightMotorBack.set(power);
 			} else {
-				leftMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
-				rightMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
-				leftMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
-				rightMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
+				leftMotorFront.set(power);
+				rightMotorFront.set(-power);
+				leftMotorBack.set(power);
+				rightMotorBack.set(-power);
 			}
 		}
 
