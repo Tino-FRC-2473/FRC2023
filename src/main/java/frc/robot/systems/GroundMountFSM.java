@@ -18,22 +18,25 @@ public class GroundMountFSM {
 		START_STATE,
 		PIVOTING_UP,
 		PIVOTING_DOWN,
+		PIVOTING_MID,
 		AUTONOMOUS_UP,
 		AUTONOMOUS_DOWN,
 		AUTONOMOUS_IDLE
 	}
 	//arbitrary constants, must test all of these
-	private static final double PIVOT_UP_POWER = -0.1;
+	private static final double PIVOT_UP_POWER = -0.2;
 	private static final double MIN_POWER = -0.3;
 	private static final double MAX_POWER = 0.25;
 	private boolean zeroed = false;
 	private static final double BOTTOM_ENCODER_LIMIT = 55.00; //ARBITRARY VALUE
+	private static final double MID_ENCODER = 25;
 	private static final double P_CONSTANT = 0.010;
 	private static final double P_UP_CONSTANT = 0.012;
-	private static final double ERROR = 5;
-	private static final double MAX_ACCEL = 0.002;
-	private static final double MAX_DECEL = 0.03;
+	private static final double ERROR = 10;
+	private static final double MAX_ACCEL = 0.007;
+	private static final double MAX_DECEL = 0.10;
 	private static final double PICKUP_ENCODER = 50;
+	private static final double OVERRUN_THRESHOLD = 0.02;
 
 	/* ======================== Private variables ======================== */
 	private GroundMountFSMState currentState;
@@ -130,7 +133,7 @@ public class GroundMountFSM {
 	 */
 	public void update(TeleopInput input) {
 		//System.out.println("power: " + pivotArmMotor.get());
-		System.out.println("start time ground mount: " + Timer.getFPGATimestamp());
+		double begin = Timer.getFPGATimestamp();
 		//System.out.println(itemType);
 		SmartDashboard.putNumber("encoder", pivotArmMotor.getEncoder().getPosition());
 		SmartDashboard.putString("state", currentState.toString());
@@ -150,11 +153,18 @@ public class GroundMountFSM {
 			case PIVOTING_UP:
 				handlePivotingUpState();
 				break;
+			case PIVOTING_MID:
+				handlePivotingMidState();
+				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
-		System.out.println("end time ground mount: " + Timer.getFPGATimestamp());
+		double tt = (Timer.getFPGATimestamp() - begin);
+		//System.out.println("ground mount time taken: " + );
+		if (tt > OVERRUN_THRESHOLD) {
+			System.out.println("ALERT ALERT GROUND MOUNT " +  tt);
+		}
 	}
 	/* ======================== Private methods ======================== */
 	/**
@@ -182,14 +192,31 @@ public class GroundMountFSM {
 				if (input.isPivotButtonPressed()) {
 					return GroundMountFSMState.PIVOTING_DOWN;
 				}
+				if (input.isGroundMountShootButtonPressed()) {
+					return GroundMountFSMState.PIVOTING_MID;
+				}
 				//means pivot button is not pressed and limit switch not activated, stay in state
 				return GroundMountFSMState.PIVOTING_UP;
 			case PIVOTING_DOWN:
-				if (!input.isPivotButtonPressed()) {
+				if (!input.isPivotButtonPressed()
+					&& !input.isGroundMountShootButtonPressed()) {
 					return GroundMountFSMState.PIVOTING_UP;
+				}
+				if (input.isGroundMountShootButtonPressed()) {
+					return GroundMountFSMState.PIVOTING_MID;
 				}
 				//means limit switch low not activated and pivot button still pressed, stay in state
 				return GroundMountFSMState.PIVOTING_DOWN;
+			case PIVOTING_MID:
+				if (!input.isPivotButtonPressed()
+					&& !input.isGroundMountShootButtonPressed()) {
+					return GroundMountFSMState.PIVOTING_UP;
+				}
+				if (input.isPivotButtonPressed()) {
+					return GroundMountFSMState.PIVOTING_DOWN;
+				}
+				//means limit switch low not activated and pivot button still pressed, stay in state
+				return GroundMountFSMState.PIVOTING_MID;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -239,18 +266,22 @@ public class GroundMountFSM {
 		// if (lastPower > 0)
 		// 	pivotArmMotor.set(lastPower-MAX_ACCEL);
 		// else
-		if (withinError(0, pivotArmMotor.getEncoder().getPosition())
+		if (limitSwitchHigh.isPressed()) {
+			pivotArmMotor.getEncoder().setPosition(0);
+		} else if (withinError(0, pivotArmMotor.getEncoder().getPosition())
 			&& !limitSwitchHigh.isPressed()) {
 			pivotArmMotor.set(PIVOT_UP_POWER);
 		} else {
-			if (limitSwitchHigh.isPressed()) {
-				pivotArmMotor.getEncoder().setPosition(0);
-			}
 			lastPower = capMotorPower(changePower(
 				-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
 			pivotArmMotor.set(lastPower);
 		}
 		//System.out.println(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT);
+	}
+	private void handlePivotingMidState() {
+		lastPower = capMotorPower(changePower((MID_ENCODER
+			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
+		pivotArmMotor.set(lastPower);
 	}
 	private void handlePivotingDownState() {
 		double targetEncoder = BOTTOM_ENCODER_LIMIT;

@@ -35,6 +35,7 @@ public class TeleopInput {
 	private static final int DISABLE_UPDATE_BUTTON = 2;
 
 	private static final int GROUND_MOUNT_BUTTON = 4;
+	private static final int GROUND_MOUNT_BUTTON_SHOOT = 7;
 	private static final int INTAKE_BUTTON = 6;
 
 	/* ======================== Private variables ======================== */
@@ -76,7 +77,13 @@ public class TeleopInput {
 	public boolean isPivotButtonPressed() {
 		return mechJoystick.getRawButton(GROUND_MOUNT_BUTTON);
 	}
-
+	/**
+	 * Get value of lower pivot button for ground mount.
+	 * @return true if pressed
+	 */
+	public boolean isGroundMountShootButtonPressed() {
+		return mechJoystick.getRawButton(GROUND_MOUNT_BUTTON_SHOOT);
+	}
 	/**
 	 * Get X axis of Left Joystick.
 	 * @return Axis value

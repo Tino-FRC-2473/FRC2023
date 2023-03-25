@@ -26,11 +26,12 @@ public class SpinningIntakeFSM {
 	//FIX VALUES
 	private static final double KEEP_SPEED = 0.07;
 	private static final double INTAKE_SPEED = 0.4;
-	private static final double RELEASE_SPEED = -0.7; //DONT FORGET -
+	private static final double RELEASE_SPEED = -1; //DONT FORGET -
 	private static final double CURRENT_THRESHOLD = 20;
 	private static final double TIME_RESET_CURRENT = 0.5;
 	private static final int MIN_RELEASE_DISTANCE = 800;
 	private static final int AVERAGE_SIZE = 10;
+	private static final double OVERRUN_THRESHOLD = 0.02;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static ItemType itemType = ItemType.EMPTY;
 	private boolean isMotorAllowed = false;
@@ -91,6 +92,7 @@ public class SpinningIntakeFSM {
 	public void update(TeleopInput input) {
 		//double lagRobot = colorSensor.getColor().blue;
 		//lagRobot = colorSensor.getColor().blue;
+		double begin = Timer.getFPGATimestamp();
 		if (input == null) {
 			return;
 		}
@@ -136,7 +138,11 @@ public class SpinningIntakeFSM {
 			System.out.println("Update disabled");
 			SmartDashboard.putBoolean("disabled", true);
 		}
-		System.out.println("end time spinning intake: " + Timer.getFPGATimestamp());
+		double timeTaken = Timer.getFPGATimestamp() - begin;
+		//System.out.println("spinning intake time taken: " + timeTaken);
+		if (timeTaken > OVERRUN_THRESHOLD) {
+			System.out.println("ALERT ALERT SPINNING INTAKE " + timeTaken);
+		}
 	}
 	/**
 	 * Run given state and return if state is complete.
@@ -210,7 +216,7 @@ public class SpinningIntakeFSM {
 		if (input == null) {
 			return SpinningIntakeFSMState.START_STATE;
 		}
-		System.out.println(spinnerMotor.getOutputCurrent());
+		//System.out.println(spinnerMotor.getOutputCurrent());
 		switch (currentState) {
 			case START_STATE:
 				return SpinningIntakeFSMState.IDLE_SPINNING;
@@ -259,20 +265,20 @@ public class SpinningIntakeFSM {
 	 * Handle behavior in states.
 	 */
 	private void handleStartState() {
-		System.out.println("not in idle spinning");
+		//System.out.println("not in idle spinning");
 	}
 	private void handleIdleSpinningState() {
 		if (isMotorAllowed) {
-			System.out.println("in idle spinning");
+			//System.out.println("in idle spinning");
 			spinnerMotor.set(INTAKE_SPEED);
 		}
 	}
 	private void handleIdleStopState() {
-		System.out.println("not in idle spinning");
+		//System.out.println("not in idle spinning");
 		spinnerMotor.set(KEEP_SPEED);
 	}
 	private void handleReleaseState() {
-		System.out.println("not in idle spinning");
+		//System.out.println("not in idle spinning");
 		itemType = ItemType.EMPTY;
 		spinnerMotor.set(RELEASE_SPEED);
 		isMotorAllowed = true;

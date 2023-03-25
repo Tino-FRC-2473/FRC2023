@@ -3,12 +3,13 @@ package frc.robot.systems;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 
 import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.VisionConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.cameraserver.CameraServer;
+//import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
@@ -93,7 +94,7 @@ public class DriveFSMSystem {
 
 	private boolean isNotForwardEnough = false;
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
-	private CameraServer cam;
+	//private CameraServer cam;
 	private CvSink cvSink;
 	private CvSource outputStrem;
 	static final int STOP_OPT = 0;
@@ -134,13 +135,13 @@ public class DriveFSMSystem {
 
 		gyro = new AHRS(SPI.Port.kMXP);
 
-		UsbCamera usb = CameraServer.startAutomaticCapture();
-		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
-		// Creates the CvSink and connects it to the UsbCamera
-		cvSink = CameraServer.getVideo();
-		// Creates the CvSource and MjpegServer [2] and connects them
-		outputStrem = CameraServer.putVideo("RobotFrontCamera",
-		Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+		// UsbCamera usb = CameraServer.startAutomaticCapture();
+		// usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
+		// // Creates the CvSink and connects it to the UsbCamera
+		// cvSink = CameraServer.getVideo();
+		// // Creates the CvSource and MjpegServer [2] and connects them
+		// outputStrem = CameraServer.putVideo("RobotFrontCamera",
+		// Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
 
 		// Reset state machine
 		resetAutonomous();
@@ -222,7 +223,7 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-
+		double begin = Timer.getFPGATimestamp();
 		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
 
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
@@ -353,6 +354,11 @@ public class DriveFSMSystem {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
+		double timeTaken = Timer.getFPGATimestamp() - begin;
+		//System.out.println("drive time taken: " + timeTaken);
+		if (timeTaken > 0.02) {
+			System.out.println("ALERT ALERT SPINNING INTAKE " + timeTaken);
+		}
 	}
 
 	private void handleCVConeAlignState() {
