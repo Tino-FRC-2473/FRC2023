@@ -126,9 +126,21 @@ public class Robot extends TimedRobot {
 			|| driveSystem.getCurrentState() == (FSMState.P4N1)) {
 
 			if (HardwareMap.isRobotGroundMount()) {
-				if (groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_DOWN)) {
-					finishedDeposit =
-							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				if (node == 1) {
+					// CHANGE TO MID SHOOT
+					if (groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_DOWN)) {
+						finishedDeposit =
+								spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+					}
+				}
+				if (node == 0) {
+					if (groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_DOWN)) {
+						finishedDeposit =
+								spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+					}
+				}
+				if (node == -1) {
+					finishedDeposit = true;
 				}
 			} else {
 				if (node == 2) {
@@ -172,7 +184,7 @@ public class Robot extends TimedRobot {
 							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
 					}
 				}
-				if (node == -1) {
+				if (node == -1 || node == 0) {
 					finishedDeposit = true;
 				}
 			}
