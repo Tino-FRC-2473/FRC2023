@@ -357,7 +357,7 @@ public class DriveFSMSystem {
 		double timeTaken = Timer.getFPGATimestamp() - begin;
 		//System.out.println("drive time taken: " + timeTaken);
 		if (timeTaken > 0.02) {
-			System.out.println("ALERT ALERT SPINNING INTAKE " + timeTaken);
+			System.out.println("ALERT ALERT DRIVE " + timeTaken);
 		}
 	}
 

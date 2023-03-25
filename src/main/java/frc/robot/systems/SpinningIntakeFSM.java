@@ -131,17 +131,18 @@ public class SpinningIntakeFSM {
 			}
 			SpinningIntakeFSMState previousState = currentState;
 			currentState = nextState(input);
-			if (previousState != currentState) {
-				System.out.println(currentState);
-			}
+			//if (previousState != currentState) {
+				//System.out.println(currentState);
+			//}
 		} else {
-			System.out.println("Update disabled");
+			//System.out.println("Update disabled");
 			SmartDashboard.putBoolean("disabled", true);
 		}
 		double timeTaken = Timer.getFPGATimestamp() - begin;
 		//System.out.println("spinning intake time taken: " + timeTaken);
 		if (timeTaken > OVERRUN_THRESHOLD) {
 			System.out.println("ALERT ALERT SPINNING INTAKE " + timeTaken);
+			System.out.println("intake state" + currentState);
 		}
 	}
 	/**
