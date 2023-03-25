@@ -41,6 +41,15 @@ public class ArmFSM {
 	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.2f;
 	private static final float PIVOT_MOTOR_POWER_FINE_TUNING = 0.05f;
 
+	//increase this constant to make the tele arm motor power greater
+	//decrease this constant to make the tele arm motor power less
+	private static final double TELEARM_MOTOR_POWER_CONTROL_CONSTANT = 80;
+
+	private static final double TELEARM_MAX_EXTENSION_CONSTANT = 198;
+	//
+	private static final double PIVOT_MOTOR_POWER_CONTROL_CONSTANT = 0.5;
+
+	private static final double PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE = 13;
 	//20 inches
 	private static final double ARM_ENCODER_MAX_LENGTH_ROTATIONS = 33
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
@@ -106,7 +115,7 @@ public class ArmFSM {
 
 	private static final double AUTONOMOUS_UP_ANGLE_ENCODER_ROTATIONS = -158;
 	private static final double PID_PIVOT_MAX_POWER = 0.5;
-	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.15;
+	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.2;
 	private static final double ERROR_ARM_ROTATIONS = 1.0;
 	private static final double PID_CONSTANT_PIVOT_P = 0.00014f;
 	private static final double PID_CONSTANT_PIVOT_I = 0.000030f;
@@ -130,6 +139,11 @@ public class ArmFSM {
 
 	private double pivotEncoderRotationsIntoIdle = 0;
 	private double pivotEncoderRotationsAfterPivot = 0;
+
+	private double teleArmMotorPower = 1.0;
+	private double pivotMotorPower = PIVOT_MOTOR_POWER_CONTROL_CONSTANT;
+	private double maxArmExtensionEncoderRotations = ARM_ENCODER_MAX_LENGTH_ROTATIONS;
+
 	private boolean isFineTuning = false;
 	/**
 	 * Creates an instance of an ArmFSM.
@@ -187,6 +201,18 @@ public class ArmFSM {
 		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 		pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 		// Call one tick of update to ensure outputs reflect start state
+		if (pivotMotor.getEncoder().getPosition() > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+			maxArmExtensionEncoderRotations = TELEARM_MAX_EXTENSION_CONSTANT
+				/ Math.abs(Math.cos(Math.toRadians(
+				pivotMotor.getEncoder().getPosition()
+				/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT
+				- PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)));
+		} else {
+			maxArmExtensionEncoderRotations = TELEARM_MAX_EXTENSION_CONSTANT
+				/ Math.abs(Math.cos(Math.toRadians(
+				(pivotMotor.getEncoder().getPosition() - ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS)
+				/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT)));
+		}
 		update(null);
 	}
 
@@ -198,7 +224,6 @@ public class ArmFSM {
 		if (input == null) {
 			return;
 		}
-		SmartDashboard.putString("Current State", " " + currentState);
 		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
@@ -226,6 +251,28 @@ public class ArmFSM {
 		}
 		if (!withinError(pivotMotor.getEncoder().getPosition(), pivotEncoderRotationsAfterPivot)) {
 			pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
+		}
+		if (teleArmMotor.getEncoder().getPosition() <= TELEARM_MOTOR_POWER_CONTROL_CONSTANT) {
+			teleArmMotorPower = 1.0;
+		} else {
+			teleArmMotorPower = TELEARM_MOTOR_POWER_CONTROL_CONSTANT
+				/ teleArmMotor.getEncoder().getPosition();
+		}
+		pivotMotorPower = PIVOT_MOTOR_POWER_CONTROL_CONSTANT
+				* Math.abs(Math.cos(Math.toRadians(pivotMotor.getEncoder().getPosition()
+				/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT
+				- PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE))) + PIVOT_MOTOR_SLOW_DOWN_POWER;
+		if (pivotMotor.getEncoder().getPosition() > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+			maxArmExtensionEncoderRotations = TELEARM_MAX_EXTENSION_CONSTANT
+				/ Math.abs(Math.cos(Math.toRadians(
+				pivotMotor.getEncoder().getPosition()
+				/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT
+				- PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)));
+		} else {
+			maxArmExtensionEncoderRotations = TELEARM_MAX_EXTENSION_CONSTANT
+				/ Math.abs(Math.cos(Math.toRadians(
+				(pivotMotor.getEncoder().getPosition() - ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS)
+				/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT)));
 		}
 		switch (currentState) {
 			case UNHOMED_STATE:
@@ -267,7 +314,11 @@ public class ArmFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		currentState = nextState(input);
+		ArmFSMState state = nextState(input);
+		if (currentState != state) {
+			SmartDashboard.putString("Current State", " " + currentState);
+		}
+		currentState = state;
 	}
 
 	/**
@@ -484,6 +535,9 @@ public class ArmFSM {
 		return pivotLimitSwitchLow.isPressed();
 	}
 
+	private boolean isRetracted() {
+		return teleArmLimitSwitch.isPressed();
+	}
 	private boolean isArmMovementInputPressed(TeleopInput input) {
 		if (input == null) {
 			return false;
@@ -582,29 +636,13 @@ public class ArmFSM {
 		if (input != null) {
 			if (!isFineTuning) {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-					if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX
-						&& pivotMotor.getEncoder().getPosition()
-							> ENCODER_TICKS_SLOW_DOWN_RANGE_MIN) {
-						pidControllerPivot.setReference(-PIVOT_MOTOR_SLOW_DOWN_POWER,
+					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
-						pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
-					} else {
-						pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
-							CANSparkMax.ControlType.kDutyCycle);
-						pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
-					}
+					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-					if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX
-						&& pivotMotor.getEncoder().getPosition()
-						> ENCODER_TICKS_SLOW_DOWN_RANGE_MIN) {
-						pidControllerPivot.setReference(PIVOT_MOTOR_SLOW_DOWN_POWER,
+					pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
-						pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
-					} else {
-						pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
-							CANSparkMax.ControlType.kDutyCycle);
-						pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
-					}
+					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else {
 					pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
 						CANSparkMax.ControlType.kPosition);

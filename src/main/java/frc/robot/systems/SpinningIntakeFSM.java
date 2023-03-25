@@ -70,11 +70,16 @@ public class SpinningIntakeFSM {
 	 */
 	public SpinningIntakeFSM() {
 		// Perform hardware init
-		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
+		if (HardwareMap.isRobotGroundMount()) {
+			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR_GROUND_MOUNT,
 										CANSparkMax.MotorType.kBrushless);
+		} else {
+			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
+										CANSparkMax.MotorType.kBrushless);
+		}
 		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
 		colorSensor = new ColorSensorV3(Port.kOnboard);
-
+		SmartDashboard.putString("item type", itemType.toString());
 		// Reset state machine
 		reset();
 	}
@@ -113,10 +118,9 @@ public class SpinningIntakeFSM {
 		System.out.println("start time spinning intake: " + Timer.getFPGATimestamp());
 		if (input.isToggleIntakeUpdatePressed()) {
 			toggleUpdate = !toggleUpdate;
+			SmartDashboard.putBoolean("Is update enabled", toggleUpdate);
 		}
-		SmartDashboard.putBoolean("Is update enabled", toggleUpdate);
 		if (toggleUpdate) {
-			SmartDashboard.putString("item type", itemType.toString());
 			if (input.isIntakeButtonPressed()) {
 				isMotorAllowed = !isMotorAllowed;
 				spinnerMotor.set(0);
@@ -193,10 +197,17 @@ public class SpinningIntakeFSM {
 	}
 	private void updateItem() {
 		double b = colorSensor.getColor().blue;
+		ItemType prevItem = itemType;
 		if (b > BLUE_THRESHOLD) {
 			itemType = ItemType.CUBE;
+			if (prevItem != itemType) {
+				SmartDashboard.putString("item type", itemType.toString());
+			}
 		} else {
 			itemType = ItemType.CONE;
+			if (prevItem != itemType) {
+				SmartDashboard.putString("item type", itemType.toString());
+			}
 		}
 	}
 
@@ -268,6 +279,7 @@ public class SpinningIntakeFSM {
 	}
 	private void handleReleaseState() {
 		itemType = ItemType.EMPTY;
+		SmartDashboard.putString("item type", itemType.toString());
 		if (isMotorAllowed) {
 			spinnerMotor.set(RELEASE_SPEED);
 		}

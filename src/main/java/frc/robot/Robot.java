@@ -14,6 +14,7 @@ import frc.robot.systems.GroundMountFSM;
 import frc.robot.systems.ArmFSM.ArmFSMState;
 import frc.robot.systems.DriveFSMSystem.FSMState;
 import frc.robot.systems.SpinningIntakeFSM.SpinningIntakeFSMState;
+import frc.robot.systems.GroundMountFSM.GroundMountFSMState;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -27,11 +28,14 @@ public class Robot extends TimedRobot {
 	private DriveFSMSystem driveSystem;
 	private SpinningIntakeFSM spinningIntakeFSM;
 	private GroundMountFSM groundMountFSM;
+	private boolean isArmEnabled = true;
+	private boolean isDriveEnabled = true;
+	private boolean isIntakeEnabled = true;
 
 	// autonomus
 	private static boolean finishedDeposit = false;
 	private static int node = -1; // -1 is none, 0 is low, 1, mid, 2 is high
-
+	private AutoPathChooser autoPathChooser;
 	/**
 	 * This function that returns whether or not the robot has finished
 	 * 	depositing the object in autonomus.
@@ -56,7 +60,6 @@ public class Robot extends TimedRobot {
 	public static void setNode(int level) {
 		node = level;
 	}
-
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -65,26 +68,55 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-		driveSystem = new DriveFSMSystem();
-		armSystem = new ArmFSM();
-		spinningIntakeFSM = new SpinningIntakeFSM();
+		autoPathChooser = new AutoPathChooser();
+		if (isDriveEnabled) {
+			driveSystem = new DriveFSMSystem();
+		}
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM = new GroundMountFSM();
+			} else {
+				armSystem = new ArmFSM();
+			}
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM = new SpinningIntakeFSM();
+		}
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-
-		armSystem.reset();
-		driveSystem.resetAutonomous();
-		spinningIntakeFSM.reset();
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM .reset();
+			} else {
+				armSystem.reset();
+			}
+		}
+		if (isDriveEnabled) {
+			driveSystem.resetAutonomous();
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.reset();
+		}
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-
-		armSystem.update(null);
-		driveSystem.update(null);
-		spinningIntakeFSM.update(null);
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM.update(null);
+			} else {
+				armSystem.update(null);
+			}
+		}
+		if (isDriveEnabled) {
+			driveSystem.update(null);
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.update(null);
+		}
 
 		System.out.println(finishedDeposit);
 
@@ -93,45 +125,56 @@ public class Robot extends TimedRobot {
 			|| driveSystem.getCurrentState() == (FSMState.P3N1)
 			|| driveSystem.getCurrentState() == (FSMState.P4N1)) {
 
-			if (node == 2) {
-				if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_FORWARD)) {
+			if (HardwareMap.isRobotGroundMount()) {
+				if (groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_DOWN)) {
 					finishedDeposit =
-						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
 				}
-			}
-			if (node == 1) {
-				if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_FORWARD)) {
-					finishedDeposit =
-						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+			} else {
+				if (node == 2) {
+					if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_FORWARD)) {
+						finishedDeposit =
+							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+					}
 				}
-			}
-			if (node == 0) {
-				if (armSystem.updateAuto(ArmFSMState.SHOOT_LOW_FORWARD)) {
-					finishedDeposit =
-						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				if (node == 1) {
+					if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_FORWARD)) {
+						finishedDeposit =
+							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+					}
 				}
-			}
-			if (node == -1) {
-				finishedDeposit = true;
+				if (node == 0) {
+					if (armSystem.updateAuto(ArmFSMState.SHOOT_LOW_FORWARD)) {
+						finishedDeposit =
+							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+					}
+				}
+				if (node == -1) {
+					finishedDeposit = true;
+				}
 			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P5N1)
 			|| driveSystem.getCurrentState() == (FSMState.P6N1)
 			|| driveSystem.getCurrentState() == (FSMState.P7N1)) {
 
-			if (node == 2) {
-				if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_BACKWARD)) {
-					finishedDeposit =
-						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-				}
-			}
-			if (node == 1) {
-				if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_BACKWARD)) {
-					finishedDeposit =
-						spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-				}
-			}
-			if (node == -1) {
+			if (HardwareMap.isRobotGroundMount()) {
 				finishedDeposit = true;
+			} else {
+				if (node == 2) {
+					if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_BACKWARD)) {
+						finishedDeposit =
+							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+					}
+				}
+				if (node == 1) {
+					if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_BACKWARD)) {
+						finishedDeposit =
+							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+					}
+				}
+				if (node == -1) {
+					finishedDeposit = true;
+				}
 			}
 		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)
 			|| driveSystem.getCurrentState() == (FSMState.P1N3)
@@ -143,8 +186,12 @@ public class Robot extends TimedRobot {
 			|| driveSystem.getCurrentState() == (FSMState.P7N2)) {
 
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
-			if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
-				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_UP);
+			} else {
+				if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
+					armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
+				}
 			}
 		}
 	}
@@ -152,18 +199,38 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-
-		armSystem.reset();
-		driveSystem.resetTeleop();
-		spinningIntakeFSM.reset();
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM.reset();
+			} else {
+				armSystem.reset();
+			}
+		}
+		if (isDriveEnabled) {
+			driveSystem.resetTeleop();
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.reset();
+		}
 	}
 
 
 	@Override
 	public void teleopPeriodic() {
-		armSystem.update(input);
-		driveSystem.update(input);
-		spinningIntakeFSM.update(input);
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM.update(input);
+			} else {
+				armSystem.update(input);
+			}
+		}
+		if (isDriveEnabled) {
+			driveSystem.update(input);
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.update(input);
+		}
+
 	}
 
 	@Override

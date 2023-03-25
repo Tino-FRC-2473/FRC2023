@@ -29,6 +29,7 @@ public class TeleopInput {
 	private static final int CV_ALIGN_BUTTON_CONE = 8;
 	private static final int CV_ALIGN_BUTTON_CUBE = 9;
 	private static final int CV_SWITCH_CONTOUR_BUTTON = 11;
+	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
 	private static final int DISABLE_UPDATE_BUTTON = 2;
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
@@ -250,6 +251,14 @@ public class TeleopInput {
 	 */
 	public boolean isDriveJoystickCVTagButtonPressedRaw() {
 		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_TAG);
+	}
+
+	/**
+	 * Get if cv align button (8) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isDriveJoystickCVConeButtonPressedRaw() {
+		return driveJoystick.getRawButton(CV_ALIGN_BUTTON_CONE);
 	}
 
 	/**

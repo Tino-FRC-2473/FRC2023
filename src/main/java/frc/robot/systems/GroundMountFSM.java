@@ -128,7 +128,6 @@ public class GroundMountFSM {
 	 */
 	public void update(TeleopInput input) {
 		SmartDashboard.putNumber("encoder", pivotArmMotor.getEncoder().getPosition());
-		SmartDashboard.putString("state", currentState.toString());
 		SmartDashboard.putNumber("power", pivotArmMotor.get());
 		SmartDashboard.putBoolean("limit low", isLimitSwitchLowPressed());
 		SmartDashboard.putBoolean("limit high", isLimitSwitchHighPressed());
@@ -154,7 +153,11 @@ public class GroundMountFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		currentState = nextState(input);
+		GroundMountFSMState state = nextState(input);
+		if (state != currentState) {
+			SmartDashboard.putString("state", currentState.toString());
+		}
+		currentState = state;
 	}
 	/* ======================== Private methods ======================== */
 	/**
