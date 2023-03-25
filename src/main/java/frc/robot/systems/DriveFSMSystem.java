@@ -183,10 +183,12 @@ public class DriveFSMSystem {
 		Robot.resetFinishedDeposit();
 		if (AutoPathChooser.getNodeChooser() != null) {
 			Robot.setNode(AutoPathChooser.getSelectedNode());
+		} else {
+			Robot.setNode(-1);
 		}
-			//Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
+		// -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
-		SmartDashboard.putString("Path Point", "" + currentState);
+		SmartDashboard.putString("Auto Path Point", "" + currentState);
 		roboXPos = 0;
 		roboYPos = 0;
 
