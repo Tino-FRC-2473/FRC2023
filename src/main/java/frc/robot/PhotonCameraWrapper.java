@@ -118,16 +118,17 @@ public class PhotonCameraWrapper {
 
 	/**
 	 * Returns the rotation power for the robot to align with the cube object.
+	 * @param cntID the specific contour selected
 	 * @return a power to apply to all the motors
 	 */
-	public double getCubeTurnRotation() {
+	public double getCubeTurnRotation(int cntID) {
 		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		double rotationSpeed;
 		double curTs = photonCamera.getLatestResult().getTimestampSeconds();
 		//compare curTs to lastTs: check if code is running faster than limelight (causes overshoot)
 		if (result.hasTargets() && (lastTs == 0 || curTs != lastTs)) {
-			rotationSpeed = -turnController.calculate(getCubeTurnAngle(), 0);
+			rotationSpeed = -turnController.calculate(getCubeTurnAngle(cntID), 0);
 		} else {
 			// If we have no targets, stay still.
 			rotationSpeed = 0;
@@ -138,16 +139,17 @@ public class PhotonCameraWrapper {
 
 	/**
 	 * Returns the rotation power for the robot to align with the cone object.
+	 * @param cntID the specific contour selected
 	 * @return a power to apply to all the motors
 	 */
-	public double getConeTurnRotation() {
+	public double getConeTurnRotation(int cntID) {
 		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		double rotationSpeed;
 		double curTs = photonCamera.getLatestResult().getTimestampSeconds();
 		//compare curTs to lastTs: check if code is running faster than limelight (causes overshoot)
 		if (result.hasTargets() && (lastTs == 0 || curTs != lastTs)) {
-			rotationSpeed = -turnController.calculate(getConeTurnAngle(), 0);
+			rotationSpeed = -turnController.calculate(getConeTurnAngle(cntID), 0);
 		} else {
 			// If we have no targets, stay still.
 			rotationSpeed = 0;
@@ -278,6 +280,7 @@ public class PhotonCameraWrapper {
 		return -1;
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cone
+ * @param cnt the specific contour to find the angle towards
  * and 360 if there are no cones.*/
 	public double getConeTurnAngle(int cnt) {
 		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
@@ -289,6 +292,7 @@ public class PhotonCameraWrapper {
 		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cube
+ * @param cnt the specific contour to find the angle towards
  * and 360 if there are no cubes.*/
 	public double getCubeTurnAngle(int cnt) {
 		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);

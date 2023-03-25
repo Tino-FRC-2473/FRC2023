@@ -30,6 +30,10 @@ public class TeleopInput {
 	private static final int CV_ALIGN_BUTTON_CUBE = 9;
 	private static final int CV_SWITCH_CONTOUR_BUTTON = 11;
 	private static final int DISABLE_UPDATE_BUTTON = 2;
+	private static final int AIM_HIGH_BUTTON = 7;
+	private static final int AIM_MID_BUTTON = 9;
+	private static final int AIM_LOW_BUTTON = 11;
+	private static final int SUBSTATION_PICKUP_BUTTON = 8;
 
 	private static final int GROUND_MOUNT_BUTTON = 4;
 	private static final int INTAKE_BUTTON = 6;
