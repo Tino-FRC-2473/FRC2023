@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import java.io.IOException;
+
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
@@ -28,8 +30,8 @@ public class Robot extends TimedRobot {
 	private DriveFSMSystem driveSystem;
 	private SpinningIntakeFSM spinningIntakeFSM;
 	private GroundMountFSM groundMountFSM;
-	private boolean isArmEnabled = true;
-	private boolean isDriveEnabled = true;
+	private boolean isArmEnabled = false;
+	private boolean isDriveEnabled = false;
 	private boolean isIntakeEnabled = true;
 
 	// autonomus
@@ -80,7 +82,11 @@ public class Robot extends TimedRobot {
 			}
 		}
 		if (isIntakeEnabled) {
-			spinningIntakeFSM = new SpinningIntakeFSM();
+			try {
+				spinningIntakeFSM = new SpinningIntakeFSM();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -236,6 +242,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledInit() {
 		System.out.println("-------- Disabled Init --------");
+		if (spinningIntakeFSM != null) {
+			spinningIntakeFSM.closePrintWriter();
+		}
 	}
 
 	@Override

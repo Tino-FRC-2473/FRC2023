@@ -1,6 +1,12 @@
 package frc.robot.systems;
 // WPILib Imports
 import edu.wpi.first.wpilibj.Timer;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,7 +45,7 @@ public class SpinningIntakeFSM {
 	private boolean needsReset = true;
 	private int tick = 0;
 	private double[] currLogs = new double[AVERAGE_SIZE];
-
+	private PrintWriter pw;
 
 	/* ======================== Private variables ======================== */
 	private SpinningIntakeFSMState currentState;
@@ -53,11 +59,17 @@ public class SpinningIntakeFSM {
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public SpinningIntakeFSM() {
+	public SpinningIntakeFSM() throws IOException {
 		// Perform hardware init
 		timer = new Timer();
-		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
+		if (HardwareMap.isRobotGroundMount()) {
+			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR_GROUND_MOUNT,
 										CANSparkMax.MotorType.kBrushless);
+		} else {
+			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
+										CANSparkMax.MotorType.kBrushless);
+		}
+		pw = new PrintWriter(new FileWriter(new File("output.txt")));
 		// Reset state machine
 		reset();
 	}
@@ -83,6 +95,13 @@ public class SpinningIntakeFSM {
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
+	/**
+	 * close the printwriter for writing overrun errors.
+	 */
+	public void closePrintWriter() {
+		pw.close();
+	}
+
 	/**
 	 * Update FSM based on new inputs. This function only calls the FSM state
 	 * specific handlers.
@@ -138,11 +157,15 @@ public class SpinningIntakeFSM {
 			//System.out.println("Update disabled");
 			SmartDashboard.putBoolean("disabled", true);
 		}
-		double timeTaken = Timer.getFPGATimestamp() - begin;
-		//System.out.println("spinning intake time taken: " + timeTaken);
+		double currentTime = Timer.getFPGATimestamp();
+		double timeTaken = currentTime - begin;
 		if (timeTaken > Constants.OVERRUN_THRESHOLD) {
 			System.out.println("ALERT ALERT SPINNING INTAKE " + timeTaken);
-			System.out.println("intake state" + currentState);
+			// System.out.println("intake state" + currentState);
+			pw.println("SPINNING INTAKE OVERRUN AT TIME: " + currentTime
+				+ ", LOOP TIME: " + timeTaken);
+		} else {
+			pw.println(timeTaken);
 		}
 	}
 	/**
@@ -280,6 +303,9 @@ public class SpinningIntakeFSM {
 	}
 	private void handleReleaseState() {
 		//System.out.println("not in idle spinning");
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			currLogs[i] = 0;
+		}
 		itemType = ItemType.EMPTY;
 		spinnerMotor.set(RELEASE_SPEED);
 		isMotorAllowed = true;

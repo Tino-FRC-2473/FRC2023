@@ -30,13 +30,14 @@ public class GroundMountFSM {
 	private boolean zeroed = false;
 	private static final double BOTTOM_ENCODER_LIMIT = 55.00; //ARBITRARY VALUE
 	private static final double MID_ENCODER = 25;
-	private static final double P_CONSTANT = 0.010;
-	private static final double P_UP_CONSTANT = 0.012;
+	private static final double P_CONSTANT = 0.012;
+	private static final double P_UP_CONSTANT = 0.014;
 	private static final double ERROR = 10;
-	private static final double MAX_ACCEL = 0.007;
+	private static final double MAX_ACCEL = 0.01;
 	private static final double MAX_DECEL = 0.10;
 	private static final double PICKUP_ENCODER = 50;
 	private static final double OVERRUN_THRESHOLD = 0.02;
+	private static final double PIVOT_MID_ACCEL_THRESHOLD = 5;
 
 	/* ======================== Private variables ======================== */
 	private GroundMountFSMState currentState;
@@ -279,7 +280,14 @@ public class GroundMountFSM {
 		//System.out.println(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT);
 	}
 	private void handlePivotingMidState() {
-		lastPower = capMotorPower(changePower((MID_ENCODER
+		double newMidEncoder = MID_ENCODER;
+		if (pivotArmMotor.getEncoder().getPosition() > MID_ENCODER + PIVOT_MID_ACCEL_THRESHOLD) {
+			newMidEncoder -= PIVOT_MID_ACCEL_THRESHOLD;
+		}
+		if (pivotArmMotor.getEncoder().getPosition() < MID_ENCODER - PIVOT_MID_ACCEL_THRESHOLD) {
+			newMidEncoder += PIVOT_MID_ACCEL_THRESHOLD;
+		}
+		lastPower = capMotorPower(changePower((newMidEncoder
 			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
 		pivotArmMotor.set(lastPower);
 	}

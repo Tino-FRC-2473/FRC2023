@@ -583,6 +583,7 @@ public class DriveFSMSystem {
 			double steerAngle = input.getSteerAngle();
 			double currentLeftPower = leftMotorBack.get();
 			double currentRightPower = rightMotorFront.get();
+			//System.out.println("steer angle = " + steerAngle);
 
 
 			DrivePower targetPower = DriveModes.arcadeDrive(input.getdriveJoystickY(),
