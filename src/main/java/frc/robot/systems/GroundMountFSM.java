@@ -21,7 +21,8 @@ public class GroundMountFSM {
 		PIVOTING_MID,
 		AUTONOMOUS_UP,
 		AUTONOMOUS_DOWN,
-		AUTONOMOUS_IDLE
+		AUTONOMOUS_IDLE,
+		AUTONOMOUS_MID
 	}
 	//arbitrary constants, must test all of these
 	private static final double PIVOT_UP_POWER = -0.2;
@@ -115,11 +116,15 @@ public class GroundMountFSM {
 		switch (state) {
 			case AUTONOMOUS_UP:
 				handleAutonomousUpState();
-				return withinError(pivotArmMotor.getEncoder().getPosition(), 0);
+				return withinError(pivotArmMotor.getEncoder().getPosition(), 0)
+					|| limitSwitchHigh.isPressed();
 			case AUTONOMOUS_DOWN:
 				handleAutonomousDownState();
 				return withinError(pivotArmMotor.getEncoder().getPosition(), BOTTOM_ENCODER_LIMIT)
 					|| limitSwitchLow.isPressed();
+			case AUTONOMOUS_MID:
+				handleAutonomousMidState();
+				return withinError(pivotArmMotor.getEncoder().getPosition(), MID_ENCODER);
 			case AUTONOMOUS_IDLE:
 				handleAutonomousIdleState();
 				return true;
@@ -296,12 +301,6 @@ public class GroundMountFSM {
 		if (pivotArmMotor.getEncoder().getPosition() > PICKUP_ENCODER) {
 			targetEncoder = PICKUP_ENCODER;
 		}
-		// System.out.println(changePower(targetEncoder
-		// - pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT);
-		// System.out.println(pivotArmMotor.get());
-		// if (lastPower < 0)
-		// 	pivotArmMotor.set(lastPower+MAX_ACCEL);
-		// else
 		lastPower = capMotorPower(changePower((targetEncoder
 			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
 		pivotArmMotor.set(lastPower);
@@ -310,12 +309,39 @@ public class GroundMountFSM {
 	/* AUTONOMOUS HANDLES */
 
 	private void handleAutonomousDownState() {
-		pivotArmMotor.set(capMotorPower((BOTTOM_ENCODER_LIMIT
+		double targetEncoder = BOTTOM_ENCODER_LIMIT;
+		if (pivotArmMotor.getEncoder().getPosition() > PICKUP_ENCODER) {
+			targetEncoder = PICKUP_ENCODER;
+		}
+		lastPower = capMotorPower(changePower((targetEncoder
 			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
+		pivotArmMotor.set(lastPower);
 	}
 
 	private void handleAutonomousUpState() {
-		pivotArmMotor.set(capMotorPower(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
+		if (limitSwitchHigh.isPressed()) {
+			pivotArmMotor.getEncoder().setPosition(0);
+		} else if (withinError(0, pivotArmMotor.getEncoder().getPosition())
+			&& !limitSwitchHigh.isPressed()) {
+			pivotArmMotor.set(PIVOT_UP_POWER);
+		} else {
+			lastPower = capMotorPower(changePower(
+				-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
+			pivotArmMotor.set(lastPower);
+		}
+	}
+
+	private void handleAutonomousMidState() {
+		double newMidEncoder = MID_ENCODER;
+		if (pivotArmMotor.getEncoder().getPosition() > MID_ENCODER + PIVOT_MID_ACCEL_THRESHOLD) {
+			newMidEncoder -= PIVOT_MID_ACCEL_THRESHOLD;
+		}
+		if (pivotArmMotor.getEncoder().getPosition() < MID_ENCODER - PIVOT_MID_ACCEL_THRESHOLD) {
+			newMidEncoder += PIVOT_MID_ACCEL_THRESHOLD;
+		}
+		lastPower = capMotorPower(changePower((newMidEncoder
+			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
+		pivotArmMotor.set(lastPower);
 	}
 
 	private void handleAutonomousIdleState() {
