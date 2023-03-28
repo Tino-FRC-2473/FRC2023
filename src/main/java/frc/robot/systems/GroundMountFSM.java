@@ -62,13 +62,6 @@ public class GroundMountFSM {
 	 */
 	public GroundMountFSM() {
 		// Perform hardware init
-		pidControllerPivot = pivotArmMotor.getPIDController();
-		pidControllerPivot.setP(PID_CONSTANT_PIVOT_P);
-		pidControllerPivot.setI(PID_CONSTANT_PIVOT_I);
-		pidControllerPivot.setD(PID_CONSTANT_PIVOT_D);
-		pidControllerPivot.setIZone(0);
-		pidControllerPivot.setFF(0);
-		pidControllerPivot.setOutputRange(MIN_POWER, MAX_POWER);
 		if (HardwareMap.isTestBoardGroundMount()) {
 			pivotArmMotor = new CANSparkMax(HardwareMap.CAN_ID_GROUND_MOUNT,
 										CANSparkMax.MotorType.kBrushless);
@@ -83,6 +76,13 @@ public class GroundMountFSM {
 		limitSwitchLow = pivotArmMotor.getForwardLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		limitSwitchLow.enableLimitSwitch(true);
+		pidControllerPivot = pivotArmMotor.getPIDController();
+		pidControllerPivot.setP(PID_CONSTANT_PIVOT_P);
+		pidControllerPivot.setI(PID_CONSTANT_PIVOT_I);
+		pidControllerPivot.setD(PID_CONSTANT_PIVOT_D);
+		pidControllerPivot.setIZone(0);
+		pidControllerPivot.setFF(0);
+		pidControllerPivot.setOutputRange(MIN_POWER, MAX_POWER);
 		// Reset state machine
 		reset();
 	}
