@@ -17,6 +17,9 @@ import frc.robot.systems.ArmFSM.ArmFSMState;
 import frc.robot.systems.DriveFSMSystem.FSMState;
 import frc.robot.systems.SpinningIntakeFSM.SpinningIntakeFSMState;
 import frc.robot.systems.GroundMountFSM.GroundMountFSMState;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.util.datalog.StringLogEntry;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -30,14 +33,23 @@ public class Robot extends TimedRobot {
 	private DriveFSMSystem driveSystem;
 	private SpinningIntakeFSM spinningIntakeFSM;
 	private GroundMountFSM groundMountFSM;
-	private boolean isArmEnabled = false;
+	private boolean isArmEnabled = true;
 	private boolean isDriveEnabled = false;
 	private boolean isIntakeEnabled = true;
+	private static StringLogEntry myStringLog;
+	private boolean resetLogs = true;
 
 	// autonomus
 	private static boolean finishedDeposit = false;
 	private static int node = -1; // -1 is none, 0 is low, 1, mid, 2 is high
 	private AutoPathChooser autoPathChooser;
+	/**
+	 * get string log.
+	 * @return string log
+	 */
+	public static StringLogEntry getStringLog() {
+		return myStringLog;
+	}
 	/**
 	 * This function that returns whether or not the robot has finished
 	 * 	depositing the object in autonomus.
@@ -82,11 +94,7 @@ public class Robot extends TimedRobot {
 			}
 		}
 		if (isIntakeEnabled) {
-			try {
-				spinningIntakeFSM = new SpinningIntakeFSM();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			spinningIntakeFSM = new SpinningIntakeFSM();
 		}
 	}
 
@@ -205,6 +213,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
+		DataLogManager.start();
+		DriverStation.startDataLog(DataLogManager.getLog(), false);
+		myStringLog = new StringLogEntry(DataLogManager.getLog(), "/my/string");
 		if (isArmEnabled) {
 			if (HardwareMap.isRobotGroundMount()) {
 				groundMountFSM.reset();

@@ -6,6 +6,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import frc.robot.Robot;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
@@ -45,7 +49,8 @@ public class SpinningIntakeFSM {
 	private boolean needsReset = true;
 	private int tick = 0;
 	private double[] currLogs = new double[AVERAGE_SIZE];
-	private PrintWriter pw;
+
+	// private PrintWriter pw;
 
 	/* ======================== Private variables ======================== */
 	private SpinningIntakeFSMState currentState;
@@ -59,8 +64,7 @@ public class SpinningIntakeFSM {
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public SpinningIntakeFSM() throws IOException {
-		// Perform hardware init
+	public SpinningIntakeFSM() {
 		timer = new Timer();
 		if (HardwareMap.isRobotGroundMount()) {
 			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR_GROUND_MOUNT,
@@ -69,7 +73,7 @@ public class SpinningIntakeFSM {
 			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		}
-		pw = new PrintWriter(new FileWriter(new File("output.txt")));
+		// pw = new PrintWriter(new FileWriter(new File("output.txt")));
 		// Reset state machine
 		reset();
 	}
@@ -99,7 +103,7 @@ public class SpinningIntakeFSM {
 	 * close the printwriter for writing overrun errors.
 	 */
 	public void closePrintWriter() {
-		pw.close();
+		// pw.close();
 	}
 
 	/**
@@ -111,10 +115,11 @@ public class SpinningIntakeFSM {
 	public void update(TeleopInput input) {
 		//double lagRobot = colorSensor.getColor().blue;
 		//lagRobot = colorSensor.getColor().blue;
-		double begin = Timer.getFPGATimestamp();
 		if (input == null) {
 			return;
 		}
+		Robot.getStringLog().append("spinning intake start in " + currentState.toString());
+		double begin = Timer.getFPGATimestamp();
 		if (input.isDisableUpdatedPressed()) {
 			toggleUpdate = !toggleUpdate;
 		}
@@ -162,11 +167,12 @@ public class SpinningIntakeFSM {
 		if (timeTaken > Constants.OVERRUN_THRESHOLD) {
 			System.out.println("ALERT ALERT SPINNING INTAKE " + timeTaken);
 			// System.out.println("intake state" + currentState);
-			pw.println("SPINNING INTAKE OVERRUN AT TIME: " + currentTime
-				+ ", LOOP TIME: " + timeTaken);
+			// pw.println("SPINNING INTAKE OVERRUN AT TIME: " + currentTime
+			// 	+ ", LOOP TIME: " + timeTaken);
 		} else {
-			pw.println(timeTaken);
+			// pw.println(timeTaken);
 		}
+		Robot.getStringLog().append("spinning intake ending");
 	}
 	/**
 	 * Run given state and return if state is complete.
