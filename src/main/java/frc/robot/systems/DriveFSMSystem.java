@@ -23,7 +23,7 @@ import frc.robot.AutoPathChooser;
 import frc.robot.drive.DriveFunctions;
 import frc.robot.drive.DriveModes;
 import frc.robot.drive.DrivePower;
-
+import edu.wpi.first.math.controller.PIDController;
 
 // Java Imports
 
@@ -103,6 +103,12 @@ public class DriveFSMSystem {
 	static final int MOVE_BACKWARD_OPT = 2;
 	static final int TURN_LEFT_OPT = 3;
 	static final int TURN_RIGHT_OPT = 4;
+
+	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
+	public static final double ANGULAR_P = 0.01;
+	public static final double ANGULAR_D = 0;
+	private PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
+
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -798,29 +804,21 @@ public class DriveFSMSystem {
 		double angle;
 		if (lower) {
 			angle = pcw.getLowerTapeTurnAngle();
-			isNotForwardEnough =  pcw.getLowerTapeDistance()
-				> Constants.LOWER_TAPE_DRIVEUP_DISTANCE_INCHES;
-			//drives forward until within 42 inches of lower tape
 		} else {
 			angle = pcw.getHigherTapeTurnAngle();
-			isNotForwardEnough = pcw.getHigherTapeDistance()
-				> Constants.HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES;
-			//drives forward until within 65 inches of higher tape
 		}
-		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
-			return;
-		}
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_RIGHT_OPT);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_LEFT_OPT);
+		double power;
+		if (angle != Constants.INVALID_TURN_RETURN_DEGREES) {
+			power = -turnController.calculate(angle, 0);
 		} else {
-			if (isNotForwardEnough) {
-				cvmove(MOVE_FORWARD_OPT);
-			} else {
-				cvmove(0);
-			}
+			power = 0;
 		}
+		power = MathUtil.clamp(
+			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
+		leftMotorFront.set(-power);
+		rightMotorFront.set(-power);
+		leftMotorBack.set(-power);
+		rightMotorBack.set(-power);
 	}
 
 	/**.
