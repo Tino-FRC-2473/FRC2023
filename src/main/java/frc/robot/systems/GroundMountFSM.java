@@ -30,11 +30,11 @@ public class GroundMountFSM {
 	private static final double MIN_POWER = -0.3;
 	private static final double MAX_POWER = 0.25;
 	private boolean zeroed = false;
-	private static final double BOTTOM_ENCODER_LIMIT = 55.00; //ARBITRARY VALUE
+	private static final double BOTTOM_ENCODER_LIMIT = 53.00; //ARBITRARY VALUE
 	private static final double MID_ENCODER = 25;
-	private static final double PID_CONSTANT_PIVOT_P = 0.012;
-	private static final double PID_CONSTANT_PIVOT_I = 0;
-	private static final double PID_CONSTANT_PIVOT_D = 0;
+	private static final double PID_CONSTANT_PIVOT_P = 0.010;
+	private static final double PID_CONSTANT_PIVOT_I = 0.0000;
+	private static final double PID_CONSTANT_PIVOT_D = 0.001;
 	private static final double ERROR = 10;
 	private static final double MAX_ACCEL = 0.01;
 	private static final double MAX_DECEL = 0.10;
