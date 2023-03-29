@@ -73,11 +73,11 @@ public class Robot extends TimedRobot {
 			driveSystem = new DriveFSMSystem();
 		}
 		if (isArmEnabled) {
-			if (HardwareMap.isRobotGroundMount()) {
-				groundMountFSM = new GroundMountFSM();
-			} else {
+			//if (HardwareMap.isRobotGroundMount()) {
+				//groundMountFSM = new GroundMountFSM();
+			//} else {
 				armSystem = new ArmFSM();
-			}
+			//}
 		}
 		if (isIntakeEnabled) {
 			spinningIntakeFSM = new SpinningIntakeFSM();
@@ -200,11 +200,11 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		if (isArmEnabled) {
-			if (HardwareMap.isRobotGroundMount()) {
-				groundMountFSM.reset();
-			} else {
+			//if (HardwareMap.isRobotGroundMount()) {
+				//groundMountFSM.reset();
+			//} else {
 				armSystem.reset();
-			}
+			//}
 		}
 		if (isDriveEnabled) {
 			driveSystem.resetTeleop();
@@ -218,11 +218,11 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		if (isArmEnabled) {
-			if (HardwareMap.isRobotGroundMount()) {
-				groundMountFSM.update(input);
-			} else {
+			//if (HardwareMap.isRobotGroundMount()) {
+				//groundMountFSM.update(input);
+			//} else {
 				armSystem.update(input);
-			}
+			//}
 		}
 		if (isDriveEnabled) {
 			driveSystem.update(input);
