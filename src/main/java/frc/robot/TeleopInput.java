@@ -147,6 +147,30 @@ public class TeleopInput {
 		return mechJoystick.getRawButton(AIM_LOW_BUTTON);
 	}
 
+/**
+	 * Get the value of the Shoot High button.
+	 * @return True if button is pressed
+	 */
+	public boolean isGroundMountUpPressed() {
+		return mechJoystick.getRawButton(AIM_HIGH_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Shoot Mid button.
+	 * @return True if button is pressed
+	 */
+	public boolean isGroundMountMidPressed() {
+		return mechJoystick.getRawButton(AIM_MID_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Shoot Low button.
+	 * @return True if button is pressed
+	 */
+	public boolean isGroundMountLowPressed() {
+		return mechJoystick.getRawButton(AIM_LOW_BUTTON);
+	}
+
 	/**
 	 * Get the value of the Substation Pickup button.
 	 * @return True if button is pressed

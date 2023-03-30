@@ -2,13 +2,6 @@ package frc.robot.systems;
 // WPILib Imports
 import edu.wpi.first.wpilibj.Timer;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.util.datalog.StringLogEntry;
 import frc.robot.Robot;
 
 // Third party Hardware Imports
