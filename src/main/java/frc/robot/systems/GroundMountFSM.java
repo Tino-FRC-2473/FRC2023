@@ -157,7 +157,6 @@ public class GroundMountFSM {
 		double begin = Timer.getFPGATimestamp();
 		//System.out.println(itemType);
 		SmartDashboard.putNumber("encoder", pivotArmMotor.getEncoder().getPosition());
-		SmartDashboard.putString("state", currentState.toString());
 		SmartDashboard.putNumber("power", pivotArmMotor.get());
 		SmartDashboard.putBoolean("limit low", isLimitSwitchLowPressed());
 		SmartDashboard.putBoolean("limit high", isLimitSwitchHighPressed());

@@ -67,7 +67,6 @@ public class SpinningIntakeFSM {
 			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		}
-		// pw = new PrintWriter(new FileWriter(new File("output.txt")));
 		// Reset state machine
 		reset();
 	}
@@ -116,6 +115,7 @@ public class SpinningIntakeFSM {
 		double begin = Timer.getFPGATimestamp();
 		if (input.isDisableUpdatedPressed()) {
 			toggleUpdate = !toggleUpdate;
+			SmartDashboard.putBoolean("Is update enabled", toggleUpdate);
 		}
 		if (input.isThrottleForward()) {
 			itemType = ItemType.CUBE;

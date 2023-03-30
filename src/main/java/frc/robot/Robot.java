@@ -72,7 +72,6 @@ public class Robot extends TimedRobot {
 	public static void setNode(int level) {
 		node = level;
 	}
-
 	/**
 	 * This function returns the node for the autonomous path of the robot.
 	 * @return An int representing the node. 0 is low, 1 is mid, 2 is high.
@@ -107,6 +106,23 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
+		if (isArmEnabled) {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM .reset();
+			} else {
+				armSystem.reset();
+			}
+		}
+		if (isDriveEnabled) {
+			driveSystem.resetAutonomous();
+		}
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.reset();
+		}
+	}
+
+	@Override
+	public void autonomousPeriodic() {
 		if (isArmEnabled) {
 			if (HardwareMap.isRobotGroundMount()) {
 				groundMountFSM.update(null);
