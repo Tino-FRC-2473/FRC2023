@@ -227,7 +227,7 @@ public class DriveFSMSystem {
 	 * Update FSM based on new inputs. This function only calls the FSM state
 	 * specific handlers.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot isDriveJoystickCVSwitchContourButtonPressedRaw in autonomous mode.
+	 *        the robot in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
 		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
@@ -237,8 +237,11 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("Contour Index", targetContourIndex);
 		updateLineOdometryTele(gyroAngleForOdo);
+		SmartDashboard.putBoolean("input is null", input == null);
+		if (input != null) {
+			SmartDashboard.putBoolean("switch contour button pressed", input.isDriveJoystickCVSwitchContourButtonPressedRaw());
+		}
 		if (input != null && input.isDriveJoystickCVSwitchContourButtonPressedRaw()) {
-			System.out.println("here");
 			if (targetContourIndex < pcw.getNumberofTargets()) {
 				targetContourIndex++;
 			} else {
