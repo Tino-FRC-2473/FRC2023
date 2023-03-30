@@ -225,8 +225,8 @@ public class TeleopInput {
 	 * Get if cv contour switch (11) is pressed.
 	 * @return true if button is pressed
 	 */
-	public boolean isDriveJoystickCVSwitchContourButtonPressedRaw() {
-		return driveJoystick.getRawButton(CV_SWITCH_CONTOUR_BUTTON);
+	public boolean isMechJoystickCVSwitchContourButtonPressedRaw() {
+		return mechJoystick.getRawButton(CV_SWITCH_CONTOUR_BUTTON);
 	}
 
 	/**

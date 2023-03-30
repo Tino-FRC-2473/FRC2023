@@ -79,44 +79,44 @@ public class Robot extends TimedRobot {
 				armSystem = new ArmFSM();
 			//}
 		}
-		if (isIntakeEnabled) {
-			spinningIntakeFSM = new SpinningIntakeFSM();
-		}
+		// if (isIntakeEnabled) {
+		// 	spinningIntakeFSM = new SpinningIntakeFSM();
+		// }
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		if (isArmEnabled) {
-			if (HardwareMap.isRobotGroundMount()) {
-				groundMountFSM .reset();
-			} else {
+			//if (HardwareMap.isRobotGroundMount()) {
+				//groundMountFSM .reset();
+			//} else {
 				armSystem.reset();
-			}
+			//}
 		}
 		if (isDriveEnabled) {
 			driveSystem.resetAutonomous();
 		}
-		if (isIntakeEnabled) {
-			spinningIntakeFSM.reset();
-		}
+		// if (isIntakeEnabled) {
+		// 	//spinningIntakeFSM.reset();
+		// }
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 		if (isArmEnabled) {
-			if (HardwareMap.isRobotGroundMount()) {
-				groundMountFSM.update(null);
-			} else {
+			//if (HardwareMap.isRobotGroundMount()) {
+				//groundMountFSM.update(null);
+			//} else {
 				armSystem.update(null);
-			}
+			//}
 		}
 		if (isDriveEnabled) {
 			driveSystem.update(null);
 		}
-		if (isIntakeEnabled) {
-			spinningIntakeFSM.update(null);
-		}
+		// if (isIntakeEnabled) {
+		// 	spinningIntakeFSM.update(null);
+		// }
 
 		System.out.println(finishedDeposit);
 
@@ -209,9 +209,9 @@ public class Robot extends TimedRobot {
 		if (isDriveEnabled) {
 			driveSystem.resetTeleop();
 		}
-		if (isIntakeEnabled) {
-			spinningIntakeFSM.reset();
-		}
+		// if (isIntakeEnabled) {
+		// 	spinningIntakeFSM.reset();
+		// }
 	}
 
 
@@ -227,9 +227,9 @@ public class Robot extends TimedRobot {
 		if (isDriveEnabled) {
 			driveSystem.update(input);
 		}
-		if (isIntakeEnabled) {
-			spinningIntakeFSM.update(input);
-		}
+		// if (isIntakeEnabled) {
+		// 	spinningIntakeFSM.update(input);
+		// }
 
 	}
 

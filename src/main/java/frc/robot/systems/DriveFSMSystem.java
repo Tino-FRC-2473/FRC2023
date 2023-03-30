@@ -41,6 +41,7 @@ public class DriveFSMSystem {
 		CV_TAG_ALIGN,
 		CV_CUBE_ALIGN,
 		CV_CONE_ALIGN,
+		CV_SWITCH_CONTOUR,
 		IDLE,
 
 		P1N1,
@@ -234,21 +235,7 @@ public class DriveFSMSystem {
 
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
-
-		SmartDashboard.putNumber("Contour Index", targetContourIndex);
 		updateLineOdometryTele(gyroAngleForOdo);
-		SmartDashboard.putBoolean("input is null", input == null);
-		if (input != null) {
-			SmartDashboard.putBoolean("switch contour button pressed", input.isDriveJoystickCVSwitchContourButtonPressedRaw());
-		}
-		if (input != null && input.isDriveJoystickCVSwitchContourButtonPressedRaw()) {
-			if (targetContourIndex < pcw.getNumberofTargets()) {
-				targetContourIndex++;
-			} else {
-				targetContourIndex = 0;
-			}
-		}
-
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				handleTeleOp2MotorState(input);
@@ -271,6 +258,10 @@ public class DriveFSMSystem {
 				break;
 			case CV_CONE_ALIGN:
 				handleCVConeAlignState(targetContourIndex);
+				break;
+
+			case CV_SWITCH_CONTOUR:
+				handleCVSwitchContour();
 				break;
 
 			case TELE_STATE_BALANCE:
@@ -419,6 +410,11 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_CONE_ALIGN;
+			case CV_SWITCH_CONTOUR:
+				if (!input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
+					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+				}
+				return FSMState.CV_SWITCH_CONTOUR;
 			case IDLE: return FSMState.IDLE;
 			case TELE_STATE_BALANCE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
@@ -531,6 +527,7 @@ public class DriveFSMSystem {
 	}
 
 	private FSMState getCVState(TeleopInput input) {
+		System.out.println("here 1");
 		if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
 			return FSMState.TELE_STATE_BALANCE;
 		} else if (input != null && input.isSteeringWheelHoldPressedRaw()) {
@@ -547,10 +544,25 @@ public class DriveFSMSystem {
 			return FSMState.CV_CONE_ALIGN;
 		} else if (input != null && input.isDriveJoystickCVCubeButtonPressedRaw()) {
 			return FSMState.CV_CUBE_ALIGN;
+		} else if (input != null && input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
+			System.out.println("here");
+			SmartDashboard.putBoolean("11 button pressed" , input.isMechJoystickCVSwitchContourButtonPressedRaw());
+			return FSMState.CV_SWITCH_CONTOUR;
 		}
 		return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 	}
 	/* ------------------------ FSM state handlers ------------------------ */
+
+	private void handleCVSwitchContour() {
+		SmartDashboard.putNumber("Contour Index", targetContourIndex);
+		if (targetContourIndex < pcw.getNumberofTargets()) {
+			System.out.println(pcw.getNumberofTargets());
+			targetContourIndex++;
+		} else {
+			targetContourIndex = 0;
+		}
+		SmartDashboard.putNumber("Contour Index", targetContourIndex);
+	}
 
 	/**
 	 * @param targetContour the contour target used
