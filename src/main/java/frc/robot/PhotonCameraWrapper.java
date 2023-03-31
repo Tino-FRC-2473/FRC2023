@@ -103,20 +103,6 @@ public class PhotonCameraWrapper {
 	}
 
 	/**
-	 * Returns the angle for the robot to turn to align with the lower reflective tape.
-	 * @return an angle that tells the robot how much to turn to align in degrees
-	 */
-	public double getLowerTapeTurnAngle() {
-		photonCamera.setPipelineIndex(VisionConstants.LOWERTAPE_PIPELINE_INDEX);
-		var result = photonCamera.getLatestResult();
-		if (result.hasTargets()) {
-			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
-				VisionConstants.CAM_OFFSET_INCHES / getLowerTapeDistance()));
-		}
-		return Constants.INVALID_TURN_RETURN_DEGREES;
-	}
-
-	/**
 	 * Returns the rotation power for the robot to align with the cube object.
 	 * @param cntID the specific contour selected
 	 * @return a power to apply to all the motors
@@ -157,8 +143,23 @@ public class PhotonCameraWrapper {
 		lastTs = photonCamera.getLatestResult().getTimestampSeconds();
 		return rotationSpeed;
 	}
+
 	/**
-	 * Returns the angle for the robot to turn to align with the higher reflective tape.
+	 * Returns the angle for the robot to turn to align with the lower reflective tape.
+	 * @return an angle that tells the robot how much to turn to align in degrees
+	 */
+	public double getLowerTapeTurnAngle() {
+		photonCamera.setPipelineIndex(VisionConstants.LOWERTAPE_PIPELINE_INDEX);
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			return result.getBestTarget().getYaw() + Math.toDegrees(Math.atan(
+				VisionConstants.CAM_OFFSET_INCHES / getLowerTapeDistance()));
+		}
+		return Constants.INVALID_TURN_RETURN_DEGREES;
+	}
+
+	/**
+	 * Returns the angle for the robot to turn to align with the higher reflective x.
 	 * @return an angle that tells the robot how much to turn to align in degrees
 	 */
 	public double getHigherTapeTurnAngle() {

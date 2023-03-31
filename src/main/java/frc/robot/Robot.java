@@ -93,14 +93,14 @@ public class Robot extends TimedRobot {
 		}
 		if (isArmEnabled) {
 			//if (HardwareMap.isRobotGroundMount()) {
-				//groundMountFSM = new GroundMountFSM();
+				groundMountFSM = new GroundMountFSM();
 			//} else {
-				armSystem = new ArmFSM();
+				//armSystem = new ArmFSM();
 			//}
 		}
-		// if (isIntakeEnabled) {
-		// 	spinningIntakeFSM = new SpinningIntakeFSM();
-		// }
+		if (isIntakeEnabled) {
+			spinningIntakeFSM = new SpinningIntakeFSM();
+		}
 	}
 
 	@Override
@@ -116,26 +116,26 @@ public class Robot extends TimedRobot {
 		if (isDriveEnabled) {
 			driveSystem.resetAutonomous();
 		}
-		// if (isIntakeEnabled) {
-		// 	//spinningIntakeFSM.reset();
-		// }
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.reset();
+		}
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 		if (isArmEnabled) {
-			//if (HardwareMap.isRobotGroundMount()) {
-				//groundMountFSM.update(null);
-			//} else {
+			if (HardwareMap.isRobotGroundMount()) {
+				groundMountFSM.update(null);
+			} else {
 				armSystem.update(null);
-			//}
+			}
 		}
 		if (isDriveEnabled) {
 			driveSystem.update(null);
 		}
-		// if (isIntakeEnabled) {
-		// 	spinningIntakeFSM.update(null);
-		// }
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.update(null);
+		}
 
 		System.out.println(finishedDeposit);
 
@@ -234,17 +234,17 @@ public class Robot extends TimedRobot {
 		myStringLog = new StringLogEntry(DataLogManager.getLog(), "/my/string");
 		if (isArmEnabled) {
 			//if (HardwareMap.isRobotGroundMount()) {
-				//groundMountFSM.reset();
+				groundMountFSM.reset();
 			//} else {
-				armSystem.reset();
+				//armSystem.reset();
 			//}
 		}
 		if (isDriveEnabled) {
 			driveSystem.resetTeleop();
 		}
-		// if (isIntakeEnabled) {
-		// 	spinningIntakeFSM.reset();
-		// }
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.reset();
+		}
 	}
 
 
@@ -252,17 +252,17 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		if (isArmEnabled) {
 			//if (HardwareMap.isRobotGroundMount()) {
-				//groundMountFSM.update(input);
+				groundMountFSM.update(input);
 			//} else {
-				armSystem.update(input);
+				//armSystem.update(input);
 			//}
 		}
 		if (isDriveEnabled) {
 			driveSystem.update(input);
 		}
-		// if (isIntakeEnabled) {
-		// 	spinningIntakeFSM.update(input);
-		// }
+		if (isIntakeEnabled) {
+			spinningIntakeFSM.update(input);
+		}
 
 	}
 
