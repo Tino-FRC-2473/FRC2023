@@ -37,6 +37,7 @@ public class TeleopInput {
 	private static final int SUBSTATION_PICKUP_BUTTON = 8;
 
 	private static final int GROUND_MOUNT_BUTTON = 4;
+	private static final int GROUND_MOUNT_BUTTON_SHOOT = 7;
 	private static final int INTAKE_BUTTON = 6;
 
 	/* ======================== Private variables ======================== */
@@ -65,13 +66,26 @@ public class TeleopInput {
 	/* ------------------------ Left Joystick ------------------------ */
 
 	/**
+	 * Get the value of the Disable Intake button.
+	 * @return True if the button is pressed
+	 */
+	public boolean isDisableUpdatedPressed() {
+		return mechJoystick.getRawButtonPressed(DISABLE_UPDATE_BUTTON);
+	}
+	/**
 	 * Get value of lower pivot button for ground mount.
 	 * @return true if pressed
 	 */
 	public boolean isPivotButtonPressed() {
 		return mechJoystick.getRawButton(GROUND_MOUNT_BUTTON);
 	}
-
+	/**
+	 * Get value of lower pivot button for ground mount.
+	 * @return true if pressed
+	 */
+	public boolean isGroundMountShootButtonPressed() {
+		return mechJoystick.getRawButton(GROUND_MOUNT_BUTTON_SHOOT);
+	}
 	/**
 	 * Get X axis of Left Joystick.
 	 * @return Axis value
@@ -132,6 +146,30 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isShootLowButtonPressed() {
+		return mechJoystick.getRawButton(AIM_LOW_BUTTON);
+	}
+
+/**
+	 * Get the value of the Shoot High button.
+	 * @return True if button is pressed
+	 */
+	public boolean isGroundMountUpPressed() {
+		return mechJoystick.getRawButton(AIM_HIGH_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Shoot Mid button.
+	 * @return True if button is pressed
+	 */
+	public boolean isGroundMountMidPressed() {
+		return mechJoystick.getRawButton(AIM_MID_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Shoot Low button.
+	 * @return True if button is pressed
+	 */
+	public boolean isGroundMountLowPressed() {
 		return mechJoystick.getRawButton(AIM_LOW_BUTTON);
 	}
 

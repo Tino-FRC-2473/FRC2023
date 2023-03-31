@@ -1,14 +1,13 @@
 package frc.robot.systems;
-
 // WPILib Imports
 import edu.wpi.first.wpilibj.Timer;
+
+import frc.robot.Robot;
+
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ColorSensorV3;
-
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -29,39 +28,30 @@ public class SpinningIntakeFSM {
 		EMPTY
 	}
 	//FIX VALUES
-	private static final double CUBE_KEEP_SPEED = 0.07;
-	private static final double INTAKE_SPEED = 0.2;
-	private static final double RELEASE_SPEED = -0.2; //DONT FORGET -
-	//arbitrary constants for cube and cone
-	//6 inches
-	private static final int MIN_CONE_DISTANCE = 2150;
-	//8 inches
-	private static final int MIN_CUBE_DISTANCE = 1060;
-	//8.5 inches
-	private static final int MAX_COLOR_MEASURE = 1420;
-	//9 inches
-	private static final int MIN_COLOR_MEASURE = 1060;
-	//? inches
+	private static final double KEEP_SPEED = 0.07;
+	private static final double INTAKE_SPEED = 0.4;
+	private static final double RELEASE_SPEED = -1; //DONT FORGET -
+	private static final double RELEASE_SPEED_LOW = -0.3;
+	private static final double CURRENT_THRESHOLD = 20;
+	private static final double TIME_RESET_CURRENT = 0.5;
 	private static final int MIN_RELEASE_DISTANCE = 800;
+	private static final int AVERAGE_SIZE = 10;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static ItemType itemType = ItemType.EMPTY;
-
-	//CUBE RGB THRESHOLD VALUES
-	private static final double BLUE_THRESHOLD = 0.23;
-	private double lastBlue = -1;
 	private boolean isMotorAllowed = false;
-	private boolean toggleUpdate = false;
+	private boolean toggleUpdate = true;
+	private boolean needsReset = true;
+	private int tick = 0;
+	private double[] currLogs = new double[AVERAGE_SIZE];
+
+	// private PrintWriter pw;
 
 	/* ======================== Private variables ======================== */
 	private SpinningIntakeFSMState currentState;
-
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotor;
-	//private DigitalInput limitSwitchCone;
-	private AnalogInput distanceSensorObject;
-	private ColorSensorV3 colorSensor;
-
+	private Timer timer;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -69,7 +59,7 @@ public class SpinningIntakeFSM {
 	 * the constructor is called only once when the robot boots.
 	 */
 	public SpinningIntakeFSM() {
-		// Perform hardware init
+		timer = new Timer();
 		if (HardwareMap.isRobotGroundMount()) {
 			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR_GROUND_MOUNT,
 										CANSparkMax.MotorType.kBrushless);
@@ -77,9 +67,6 @@ public class SpinningIntakeFSM {
 			spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		}
-		distanceSensorObject = new AnalogInput(HardwareMap.ANALOGIO_ID_DISTANCE_SENSOR);
-		colorSensor = new ColorSensorV3(Port.kOnboard);
-		SmartDashboard.putString("item type", itemType.toString());
 		// Reset state machine
 		reset();
 	}
@@ -106,21 +93,45 @@ public class SpinningIntakeFSM {
 		update(null);
 	}
 	/**
+	 * close the printwriter for writing overrun errors.
+	 */
+	public void closePrintWriter() {
+		// pw.close();
+	}
+
+	/**
 	 * Update FSM based on new inputs. This function only calls the FSM state
 	 * specific handlers.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+		//double lagRobot = colorSensor.getColor().blue;
+		//lagRobot = colorSensor.getColor().blue;
 		if (input == null) {
 			return;
 		}
-		System.out.println("start time spinning intake: " + Timer.getFPGATimestamp());
-		if (input.isToggleIntakeUpdatePressed()) {
+		Robot.getStringLog().append("spinning intake start in " + currentState.toString());
+		double begin = Timer.getFPGATimestamp();
+		if (input.isDisableUpdatedPressed()) {
 			toggleUpdate = !toggleUpdate;
 			SmartDashboard.putBoolean("Is update enabled", toggleUpdate);
 		}
+		if (input.isThrottleForward()) {
+			itemType = ItemType.CUBE;
+		} else {
+			itemType = ItemType.CONE;
+		}
 		if (toggleUpdate) {
+			SmartDashboard.putNumber("output current", spinnerMotor.getOutputCurrent());
+			SmartDashboard.putString("spinning intake state", currentState.toString());
+			SmartDashboard.putNumber("velocity", spinnerMotor.getEncoder().getVelocity());
+			// SmartDashboard.putNumber("r", colorSensor.getColor().red);
+			// SmartDashboard.putNumber("g", colorSensor.getColor().green);
+			SmartDashboard.putString("item type", itemType.toString());
+			SmartDashboard.putNumber("spinner power", spinnerMotor.get());
+			// SmartDashboard.putBoolean("Intake Motor Spinning", isMotorAllowed);
+			//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 			if (input.isIntakeButtonPressed()) {
 				isMotorAllowed = !isMotorAllowed;
 				spinnerMotor.set(0);
@@ -136,18 +147,30 @@ public class SpinningIntakeFSM {
 					handleIdleStopState();
 					break;
 				case RELEASE:
-					handleReleaseState();
+					handleReleaseState(input);
 					break;
 				default:
 					throw new IllegalStateException("Invalid state: " + currentState.toString());
 			}
 			SpinningIntakeFSMState previousState = currentState;
 			currentState = nextState(input);
-			if (previousState != currentState) {
-				System.out.println(currentState);
-			}
+			//if (previousState != currentState) {
+				//System.out.println(currentState);
+			//}
+		} else {
+			//System.out.println("Update disabled");
+			SmartDashboard.putBoolean("disabled", true);
 		}
-		System.out.println("end time spinning intake: " + Timer.getFPGATimestamp());
+		double currentTime = Timer.getFPGATimestamp();
+		double timeTaken = currentTime - begin;
+		if (timeTaken > Constants.OVERRUN_THRESHOLD) {
+			System.out.println("ALERT ALERT SPINNING INTAKE " + timeTaken);
+			// System.out.println("intake state" + currentState);
+			// pw.println("SPINNING INTAKE OVERRUN AT TIME: " + currentTime
+			// 	+ ", LOOP TIME: " + timeTaken);
+		}
+		Robot.getStringLog().append("spinning intake ending");
+		Robot.getStringLog().append("Time taken for loop: " + timeTaken);
 	}
 	/**
 	 * Run given state and return if state is complete.
@@ -155,6 +178,14 @@ public class SpinningIntakeFSM {
 	 * @return Boolean that returns if given state is complete
 	 */
 	public boolean updateAutonomous(SpinningIntakeFSMState state) {
+		//System.out.println(itemType);
+		// SmartDashboard.putNumber("distance", distanceSensorObject.getValue());
+		// // SmartDashboard.putNumber("r", colorSensor.getColor().red);
+		// // SmartDashboard.putNumber("g", colorSensor.getColor().green);
+		// SmartDashboard.putNumber("b", colorSensor.getColor().blue);
+		// SmartDashboard.putString("item type", itemType.toString());
+		// SmartDashboard.putNumber("Blue threshold", BLUE_THRESHOLD);
+		//System.out.println(distanceSensorObject.getValue() + " " + itemType);
 		isMotorAllowed = true;
 		switch (state) {
 			case START_STATE:
@@ -167,7 +198,7 @@ public class SpinningIntakeFSM {
 				handleIdleStopState();
 				break;
 			case RELEASE:
-				handleReleaseState();
+				handleReleaseState(null);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + state.toString());
@@ -176,12 +207,16 @@ public class SpinningIntakeFSM {
 			case START_STATE:
 				return true;
 			case IDLE_SPINNING:
-				return ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
-					> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE);
+				return true;
+				//return ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
+				//	> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE);
 			case IDLE_STOP:
 				return true;
 			case RELEASE:
-				return distanceSensorObject.getValue() < MIN_RELEASE_DISTANCE;
+				//return distanceSensorObject.getValue() < MIN_RELEASE_DISTANCE;
+				//return timer.hasElapsed(0.25);
+				return true;
+				//NEEDS CHANGE ^
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -195,22 +230,6 @@ public class SpinningIntakeFSM {
 	public static ItemType getObjectType() {
 		return itemType;
 	}
-	private void updateItem() {
-		double b = colorSensor.getColor().blue;
-		ItemType prevItem = itemType;
-		if (b > BLUE_THRESHOLD) {
-			itemType = ItemType.CUBE;
-			if (prevItem != itemType) {
-				SmartDashboard.putString("item type", itemType.toString());
-			}
-		} else {
-			itemType = ItemType.CONE;
-			if (prevItem != itemType) {
-				SmartDashboard.putString("item type", itemType.toString());
-			}
-		}
-	}
-
 	/* ======================== Private methods ======================== */
 	/**
 	 * Decide the next state to transition to. This is a function of the inputs
@@ -225,6 +244,7 @@ public class SpinningIntakeFSM {
 		if (input == null) {
 			return SpinningIntakeFSMState.START_STATE;
 		}
+		//System.out.println(spinnerMotor.getOutputCurrent());
 		switch (currentState) {
 			case START_STATE:
 				return SpinningIntakeFSMState.IDLE_SPINNING;
@@ -232,9 +252,24 @@ public class SpinningIntakeFSM {
 				if (input.isReleaseButtonPressed()) {
 					return SpinningIntakeFSMState.RELEASE;
 				}
-				if ((itemType == ItemType.CUBE && distanceSensorObject.getValue()
-					> MIN_CUBE_DISTANCE) || distanceSensorObject.getValue() > MIN_CONE_DISTANCE) {
-					return SpinningIntakeFSMState.IDLE_STOP;
+				if (needsReset && isMotorAllowed && toggleUpdate) {
+					timer.reset();
+					timer.start();
+					needsReset = false;
+				}
+				if (timer.hasElapsed(TIME_RESET_CURRENT)) {
+					currLogs[tick % AVERAGE_SIZE] = spinnerMotor.getOutputCurrent();
+					tick++;
+
+					double avg = 0;
+					for (int i = 0; i < AVERAGE_SIZE; i++) {
+						avg += currLogs[i];
+					}
+					avg /= AVERAGE_SIZE;
+
+					if (avg > CURRENT_THRESHOLD) {
+						return SpinningIntakeFSMState.IDLE_STOP;
+					}
 				}
 				return SpinningIntakeFSMState.IDLE_SPINNING;
 			case IDLE_STOP:
@@ -244,6 +279,7 @@ public class SpinningIntakeFSM {
 				return SpinningIntakeFSMState.IDLE_STOP;
 			case RELEASE:
 				if (!input.isReleaseButtonPressed()) {
+					needsReset = true;
 					return SpinningIntakeFSMState.IDLE_SPINNING;
 				}
 				return SpinningIntakeFSMState.RELEASE;
@@ -257,31 +293,37 @@ public class SpinningIntakeFSM {
 	 * Handle behavior in states.
 	 */
 	private void handleStartState() {
+		//System.out.println("not in idle spinning");
 	}
 	private void handleIdleSpinningState() {
-		double newBlue = colorSensor.getColor().blue;
-		if (distanceSensorObject.getValue() < MAX_COLOR_MEASURE
-			&& distanceSensorObject.getValue() > MIN_COLOR_MEASURE
-			&& lastBlue != newBlue) {
-			updateItem();
-		}
-		lastBlue = newBlue;
 		if (isMotorAllowed) {
+			//System.out.println("in idle spinning");
 			spinnerMotor.set(INTAKE_SPEED);
 		}
 	}
 	private void handleIdleStopState() {
-		if (itemType == ItemType.CUBE) {
-			spinnerMotor.set(CUBE_KEEP_SPEED);
-		} else {
-			spinnerMotor.set(0);
-		}
+		//System.out.println("not in idle spinning");
+		spinnerMotor.set(KEEP_SPEED);
 	}
-	private void handleReleaseState() {
-		itemType = ItemType.EMPTY;
-		SmartDashboard.putString("item type", itemType.toString());
-		if (isMotorAllowed) {
-			spinnerMotor.set(RELEASE_SPEED);
+	private void handleReleaseState(TeleopInput input) {
+		//System.out.println("not in idle spinning");
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			currLogs[i] = 0;
 		}
+		if (input != null) {
+			if (itemType == ItemType.CUBE) {
+				spinnerMotor.set(RELEASE_SPEED);
+			} else {
+				spinnerMotor.set(RELEASE_SPEED_LOW);
+			}
+		} else {
+			if (Robot.getNode() == 0) {
+				spinnerMotor.set(RELEASE_SPEED_LOW);
+			} else {
+				spinnerMotor.set(RELEASE_SPEED);
+			}
+		}
+		itemType = ItemType.EMPTY;
+		isMotorAllowed = true;
 	}
 }

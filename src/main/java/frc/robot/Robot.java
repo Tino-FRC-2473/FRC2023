@@ -15,6 +15,9 @@ import frc.robot.systems.ArmFSM.ArmFSMState;
 import frc.robot.systems.DriveFSMSystem.FSMState;
 import frc.robot.systems.SpinningIntakeFSM.SpinningIntakeFSMState;
 import frc.robot.systems.GroundMountFSM.GroundMountFSMState;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.util.datalog.StringLogEntry;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -31,11 +34,20 @@ public class Robot extends TimedRobot {
 	private boolean isArmEnabled = true;
 	private boolean isDriveEnabled = true;
 	private boolean isIntakeEnabled = true;
+	private static StringLogEntry myStringLog;
+	private boolean resetLogs = true;
 
 	// autonomus
 	private static boolean finishedDeposit = false;
 	private static int node = -1; // -1 is none, 0 is low, 1, mid, 2 is high
 	private AutoPathChooser autoPathChooser;
+	/**
+	 * get string log.
+	 * @return string log
+	 */
+	public static StringLogEntry getStringLog() {
+		return myStringLog;
+	}
 	/**
 	 * This function that returns whether or not the robot has finished
 	 * 	depositing the object in autonomus.
@@ -59,6 +71,13 @@ public class Robot extends TimedRobot {
 	 */
 	public static void setNode(int level) {
 		node = level;
+	}
+	/**
+	 * This function returns the node for the autonomous path of the robot.
+	 * @return An int representing the node. 0 is low, 1 is mid, 2 is high.
+	 */
+	public static int getNode() {
+		return node;
 	}
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -126,9 +145,20 @@ public class Robot extends TimedRobot {
 			|| driveSystem.getCurrentState() == (FSMState.P4N1)) {
 
 			if (HardwareMap.isRobotGroundMount()) {
-				if (groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_DOWN)) {
-					finishedDeposit =
-							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+				if (node == 1) {
+					if (groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_MID)) {
+						finishedDeposit =
+								spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+					}
+				}
+				if (node == 0) {
+					if (groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_DOWN)) {
+						finishedDeposit =
+								spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+					}
+				}
+				if (node == -1) {
+					finishedDeposit = true;
 				}
 			} else {
 				if (node == 2) {
@@ -172,7 +202,7 @@ public class Robot extends TimedRobot {
 							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
 					}
 				}
-				if (node == -1) {
+				if (node == -1 || node == 0) {
 					finishedDeposit = true;
 				}
 			}
@@ -199,6 +229,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
+		DataLogManager.start();
+		DriverStation.startDataLog(DataLogManager.getLog(), false);
+		myStringLog = new StringLogEntry(DataLogManager.getLog(), "/my/string");
 		if (isArmEnabled) {
 			//if (HardwareMap.isRobotGroundMount()) {
 				//groundMountFSM.reset();
@@ -236,6 +269,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledInit() {
 		System.out.println("-------- Disabled Init --------");
+		if (spinningIntakeFSM != null) {
+			spinningIntakeFSM.closePrintWriter();
+		}
 	}
 
 	@Override

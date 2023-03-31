@@ -132,16 +132,25 @@ public class DriveFSMSystem {
 		rightMotorBack.getEncoder().setPosition(0);
 		leftMotorFront.getEncoder().setPosition(0);
 
+		rightMotorFront.set(0);
+		leftMotorBack.set(0);
+		rightMotorBack.set(0);
+		leftMotorFront.set(0);
+
+		gyro = new AHRS(SPI.Port.kMXP);
+
+		gyro.reset();
+		gyro.zeroYaw();
+		gyroAngleForOdo = 0;
+		roboXPos = 0;
+		roboYPos = 0;
+		updateLineOdometryTele(0);
+
 		leftPower = 0;
 		rightPower = 0;
 
 		finishedTurning = false;
 		completedPoint = false;
-
-		roboXPos = 0;
-		roboYPos = 0;
-
-		gyro = new AHRS(SPI.Port.kMXP);
 
 		UsbCamera usb = CameraServer.startAutomaticCapture();
 		usb.setResolution(Constants.WEBCAM_PIXELS_WIDTH, Constants.WEBCAM_PIXELS_HEIGHT);
@@ -181,23 +190,30 @@ public class DriveFSMSystem {
 		rightMotorBack.getEncoder().setPosition(0);
 		leftMotorFront.getEncoder().setPosition(0);
 
+		rightMotorFront.set(0);
+		leftMotorBack.set(0);
+		rightMotorBack.set(0);
+		leftMotorFront.set(0);
+
 		gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
+		roboXPos = 0;
+		roboYPos = 0;
+		updateLineOdometryTele(0);
+
 		if (AutoPathChooser.getAutoPathChooser() != null) {
 			currentState = AutoPathChooser.getSelectedPath();
 		} else {
-			currentState = FSMState.P1N1;
+			currentState = FSMState.P4N1;
 		}
 		Robot.resetFinishedDeposit();
 		if (AutoPathChooser.getNodeChooser() != null) {
 			Robot.setNode(AutoPathChooser.getSelectedNode());
 		}
-			//Robot.setNode(2); // -1 is none, 0 is low, 1, mid, 2 is high
+		// -1 is none, 0 is low, 1, mid, 2 is high
 		completedPoint = false;
-		SmartDashboard.putString("Path", "" + currentState);
-		roboXPos = 0;
-		roboYPos = 0;
+		SmartDashboard.putString("Auto Path Point", "" + currentState);
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -212,13 +228,19 @@ public class DriveFSMSystem {
 		rightMotorBack.getEncoder().setPosition(0);
 		leftMotorFront.getEncoder().setPosition(0);
 
+		rightMotorFront.set(0);
+		leftMotorBack.set(0);
+		rightMotorBack.set(0);
+		leftMotorFront.set(0);
+
+		gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
-
-		currentState = FSMState.TELE_STATE_2_MOTOR_DRIVE;
-
 		roboXPos = 0;
 		roboYPos = 0;
+		updateLineOdometryTele(0);
+
+		currentState = FSMState.TELE_STATE_2_MOTOR_DRIVE;
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -768,17 +790,22 @@ public class DriveFSMSystem {
 		double roboX = -roboXPos;
 		double roboY = roboYPos;
 
+		double power = Constants.AUTONOMUS_MOVE_POWER;
+		if (HardwareMap.isRobotGroundMount()) {
+			power = 2 * Constants.AUTONOMUS_MOVE_POWER;
+		}
+
 		if (!completedPoint) {
 			if (forwards) {
-				leftMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
-				rightMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
-				leftMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
-				rightMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
+				leftMotorFront.set(-power);
+				rightMotorFront.set(power);
+				leftMotorBack.set(-power);
+				rightMotorBack.set(power);
 			} else {
-				leftMotorFront.set(Constants.AUTONOMUS_MOVE_POWER);
-				rightMotorFront.set(-Constants.AUTONOMUS_MOVE_POWER);
-				leftMotorBack.set(Constants.AUTONOMUS_MOVE_POWER);
-				rightMotorBack.set(-Constants.AUTONOMUS_MOVE_POWER);
+				leftMotorFront.set(power);
+				rightMotorFront.set(-power);
+				leftMotorBack.set(power);
+				rightMotorBack.set(-power);
 			}
 		}
 
