@@ -31,7 +31,7 @@ public class GroundMountFSM {
 	private static final double MAX_POWER = 0.25;
 	private boolean zeroed = false;
 	//private static final double BOTTOM_ENCODER_LIMIT = 54.00; //ARBITRARY VALUE
-	private static final double MID_ENCODER = 25;
+	private static final double MID_ENCODER = 26;
 	private static final double P_CONSTANT = 0.015;
 	private static final double P_UP_CONSTANT = 0.01;
 	private static final double PID_CONSTANT_PIVOT_P = 0.010;
@@ -43,7 +43,7 @@ public class GroundMountFSM {
 	private static final double ACCEL_CONSTANT = 0.90;
 	private static final double MAX_LOWER_POWER = 0.19;
 	private static final double BELT_SKIP_THRESHOLD = 7;
-	private static final double PICKUP_ENCODER = 50;
+	private static final double PICKUP_ENCODER = 52;
 	private static final double OVERRUN_THRESHOLD = 0.02;
 	private static final double PIVOT_MID_DIFFERENCE = 8;
 	private SparkMaxPIDController pidControllerPivot;
