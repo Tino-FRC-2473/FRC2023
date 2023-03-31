@@ -257,6 +257,9 @@ public class DriveFSMSystem {
 
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
+
+		System.out.println("high dist: " + pcw.getLowerTapeDistance());
+		System.out.println("state: " + currentState);
 		updateLineOdometryTele(gyroAngleForOdo);
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
@@ -419,6 +422,7 @@ public class DriveFSMSystem {
 				return FSMState.CV_HIGH_TAPE_ALIGN;
 			case CV_TAG_ALIGN:
 				if (!input.isDriveJoystickCVTagButtonPressedRaw()) {
+					System.out.println("hello");
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_TAG_ALIGN;
@@ -432,11 +436,12 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_CONE_ALIGN;
-			case CV_SWITCH_CONTOUR:
+			/*case CV_SWITCH_CONTOUR:
 				if (!input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_SWITCH_CONTOUR;
+			*/
 			case IDLE: return FSMState.IDLE;
 			case TELE_STATE_BALANCE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
@@ -566,11 +571,10 @@ public class DriveFSMSystem {
 			return FSMState.CV_CONE_ALIGN;
 		} else if (input != null && input.isDriveJoystickCVCubeButtonPressedRaw()) {
 			return FSMState.CV_CUBE_ALIGN;
-		} else if (input != null && input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
-			System.out.println("here");
+		} /*else if (input != null && input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
 			SmartDashboard.putBoolean("11 button pressed" , input.isMechJoystickCVSwitchContourButtonPressedRaw());
 			return FSMState.CV_SWITCH_CONTOUR;
-		}
+		}*/
 		return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 	}
 	/* ------------------------ FSM state handlers ------------------------ */

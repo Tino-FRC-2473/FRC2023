@@ -40,7 +40,7 @@ public class GroundMountFSM {
 	private static final double ERROR = 10;
 	private static final double MAX_ACCEL = 0.03;
 	private static final double MAX_DECEL = 0.12;
-	private static final double ACCEL_CONSTANT = 0.90;
+	private static final double ACCEL_CONSTANT = 0.92;
 	private static final double MAX_LOWER_POWER = 0.19;
 	private static final double BELT_SKIP_THRESHOLD = 7;
 	private static final double PICKUP_ENCODER = 50;
