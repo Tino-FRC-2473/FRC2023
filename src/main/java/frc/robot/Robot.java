@@ -146,7 +146,7 @@ public class Robot extends TimedRobot {
 					}
 				}
 				if (node == 0) {
-					if (groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_DOWN)) {
+					if (groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_MID)) {
 						finishedDeposit =
 								spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
 					}

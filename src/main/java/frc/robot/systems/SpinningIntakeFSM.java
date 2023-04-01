@@ -31,7 +31,7 @@ public class SpinningIntakeFSM {
 	}
 	//FIX VALUES
 	private static final double KEEP_SPEED = 0.07;
-	private static final double INTAKE_SPEED = 0.4;
+	private static final double INTAKE_SPEED = 0.5;
 	private static final double RELEASE_SPEED = -1; //DONT FORGET -
 	private static final double RELEASE_SPEED_LOW = -0.3;
 	private static final double CURRENT_THRESHOLD = 20;
@@ -92,6 +92,7 @@ public class SpinningIntakeFSM {
 	 */
 	public void reset() {
 		currentState = SpinningIntakeFSMState.START_STATE;
+		hasTimerStarted = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -217,6 +218,7 @@ public class SpinningIntakeFSM {
 				return true;
 			case RELEASE:
 				//return distanceSensorObject.getValue() < MIN_RELEASE_DISTANCE;
+				System.out.println("timer: " + timer.get());
 				return timer.hasElapsed(1);
 				//NEEDS CHANGE ^
 			default:
@@ -305,13 +307,13 @@ public class SpinningIntakeFSM {
 	}
 	private void handleIdleStopState() {
 		//System.out.println("not in idle spinning");
-		timer.stop();
 		spinnerMotor.set(KEEP_SPEED);
 	}
 	private void handleReleaseState(TeleopInput input) {
 		//System.out.println("not in idle spinning");
 		if (input == null) {
 			if (!hasTimerStarted) {
+				timer.reset();
 				timer.start();
 				hasTimerStarted = true;
 			}

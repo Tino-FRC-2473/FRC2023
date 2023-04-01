@@ -778,9 +778,9 @@ public class DriveFSMSystem {
 		System.out.println("Robot x: " + roboX);
 		System.out.println("Robot y: " + roboY);
 
-		double power = Constants.AUTONOMUS_MOVE_POWER;
+		double power = Constants.AUTONOMUS_ARM_MOVE_POWER;
 		if (HardwareMap.isRobotGroundMount()) {
-			power = 2 * Constants.AUTONOMUS_MOVE_POWER;
+			power = Constants.AUTONOMUS_GROUND_MOUNT_MOVE_POWER;
 		}
 
 		if (!completedPoint) {

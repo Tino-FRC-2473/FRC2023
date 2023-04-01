@@ -37,7 +37,7 @@ public class GroundMountFSM {
 	private static final double PID_CONSTANT_PIVOT_P = 0.010;
 	private static final double PID_CONSTANT_PIVOT_I = 0.0000;
 	private static final double PID_CONSTANT_PIVOT_D = 0.001;
-	private static final double ERROR = 10;
+	private static final double ERROR = 2;
 	private static final double MAX_ACCEL = 0.03;
 	private static final double MAX_DECEL = 0.12;
 	private static final double ACCEL_CONSTANT = 0.92;
@@ -139,7 +139,7 @@ public class GroundMountFSM {
 					|| limitSwitchLow.isPressed();
 			case AUTONOMOUS_MID:
 				handleAutonomousMidState();
-				return withinError(pivotArmMotor.getEncoder().getPosition(), MID_ENCODER);
+				return pivotArmMotor.getEncoder().getPosition() > MID_ENCODER - 1;
 			case AUTONOMOUS_IDLE:
 				handleAutonomousIdleState();
 				return true;
@@ -323,8 +323,10 @@ public class GroundMountFSM {
 			double power = -MAX_POWER;
 			lastPower = capMotorPower(changePower(power));
 			pivotArmMotor.set(lastPower);
+			System.out.println("trying to go to max power");
 		} else {
 			pivotArmMotor.set(PIVOT_UP_POWER);
+			System.out.println("not hitting limit switch but expecting");
 		}
 	}
 
