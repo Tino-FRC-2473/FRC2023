@@ -28,7 +28,7 @@ public class GroundMountFSM {
 	//arbitrary constants, must test all of these
 	private static final double PIVOT_UP_POWER = -0.2;
 	private static final double MIN_POWER = -0.3;
-	private static final double MAX_POWER = 0.25;
+	private static final double MAX_POWER = 0.20;
 	private boolean zeroed = false;
 	//private static final double BOTTOM_ENCODER_LIMIT = 54.00; //ARBITRARY VALUE
 	private static final double MID_ENCODER = 25;
@@ -40,7 +40,7 @@ public class GroundMountFSM {
 	private static final double ERROR = 10;
 	private static final double MAX_ACCEL = 0.03;
 	private static final double MAX_DECEL = 0.12;
-	private static final double ACCEL_CONSTANT = 0.90;
+	private static final double ACCEL_CONSTANT = 0.92;
 	private static final double MAX_LOWER_POWER = 0.19;
 	private static final double BELT_SKIP_THRESHOLD = 7;
 	private static final double PICKUP_ENCODER = 50;
@@ -156,7 +156,7 @@ public class GroundMountFSM {
 		//System.out.println("power: " + pivotArmMotor.get());
 		double begin = Timer.getFPGATimestamp();
 		//System.out.println(itemType);
-		SmartDashboard.putNumber("encoder", pivotArmMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("ground mount encoder", pivotArmMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("power", pivotArmMotor.get());
 		SmartDashboard.putBoolean("limit low", isLimitSwitchLowPressed());
 		SmartDashboard.putBoolean("limit high", isLimitSwitchHighPressed());
@@ -242,19 +242,6 @@ public class GroundMountFSM {
 	}
 	private double changePower(double target) {
 		return lastPower * ACCEL_CONSTANT + target * (1 - ACCEL_CONSTANT);
-		// if (target > 0 && target < lastPower - MAX_DECEL) {
-		// 	return lastPower - MAX_DECEL;
-		// }
-		// if (target < 0 && target > lastPower + MAX_DECEL) {
-		// 	return lastPower + MAX_DECEL;
-		// }
-		// if (target > lastPower + MAX_ACCEL) {
-		// 	return lastPower + MAX_ACCEL;
-		// }
-		// if (target < lastPower - MAX_ACCEL) {
-		// 	return lastPower - MAX_ACCEL;
-		// }
-		// return target;
 	}
 	/* ------------------------ FSM state handlers ------------------------ */
 	/**
@@ -268,7 +255,6 @@ public class GroundMountFSM {
 		}
 	}
 	private void handlePivotingUpState() {
-		//pidControllerPivot.setReference(0, CANSparkMax.ControlType.kPosition);
 		if (limitSwitchHigh.isPressed()) {
 			pivotArmMotor.getEncoder().setPosition(0);
 		} else if (Math.abs(pivotArmMotor.getEncoder().getPosition()) > BELT_SKIP_THRESHOLD) {
@@ -278,21 +264,8 @@ public class GroundMountFSM {
 		} else {
 			pivotArmMotor.set(PIVOT_UP_POWER);
 		}
-		//System.out.println(-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT);
 	}
 	private void handlePivotingMidState() {
-		// double newMidEncoder = MID_ENCODER;
-		// if (pivotArmMotor.getEncoder().getPosition() > MID_ENCODER + 2) {
-		// 	newMidEncoder -= PIVOT_MID_DIFFERENCE;
-		// }
-		// if (pivotArmMotor.getEncoder().getPosition() < MID_ENCODER - 2) {
-		// 	newMidEncoder += PIVOT_MID_DIFFERENCE;
-		// }
-		// lastPower = capMotorPower(changePower((newMidEncoder
-		// 	- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
-		// pivotArmMotor.set(lastPower);
-		//pidControllerPivot.setReference(MID_ENCODER, CANSparkMax.ControlType.kPosition);
-
 		if (Math.abs(pivotArmMotor.getEncoder().getPosition() - MID_ENCODER)
 			> BELT_SKIP_THRESHOLD) {
 			double power = (pivotArmMotor.getEncoder().getPosition()
@@ -321,52 +294,52 @@ public class GroundMountFSM {
 				- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
 			pivotArmMotor.set(lastPower);
 		}
-		/*double targetEncoder = PICKUP_ENCODER + 5;
-		if (pivotArmMotor.getEncoder().getPosition() > PICKUP_ENCODER) {
-			targetEncoder = PICKUP_ENCODER;
-		}
-		lastPower = capMotorPower(changePower((targetEncoder
-			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
-		pivotArmMotor.set(lastPower);*/
-		//pidControllerPivot.setReference(BOTTOM_ENCODER_LIMIT, CANSparkMax.ControlType.kPosition);
 	}
 
 	/* AUTONOMOUS HANDLES */
 
 	private void handleAutonomousDownState() {
-		/*double targetEncoder = BOTTOM_ENCODER_LIMIT;
-		if (pivotArmMotor.getEncoder().getPosition() > PICKUP_ENCODER) {
-			targetEncoder = PICKUP_ENCODER;
+		if ((PICKUP_ENCODER - pivotArmMotor.getEncoder().getPosition()) > BELT_SKIP_THRESHOLD) {
+			if (PICKUP_ENCODER - pivotArmMotor.getEncoder().getPosition() > MID_ENCODER) {
+				double power = MAX_POWER;
+				lastPower = capMotorPower(changePower(power));
+				pivotArmMotor.set(lastPower);
+			} else {
+				double power = MAX_LOWER_POWER;
+				lastPower = capMotorPower(changePower(power));
+				pivotArmMotor.set(lastPower);
+			}
+		} else {
+			lastPower = capMotorPower(changePower((PICKUP_ENCODER
+				- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
+			pivotArmMotor.set(lastPower);
 		}
-		lastPower = capMotorPower(changePower((targetEncoder
-			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
-		pivotArmMotor.set(lastPower);*/
 	}
 
 	private void handleAutonomousUpState() {
-		/*if (limitSwitchHigh.isPressed()) {
+		if (limitSwitchHigh.isPressed()) {
 			pivotArmMotor.getEncoder().setPosition(0);
-		} else if (withinError(0, pivotArmMotor.getEncoder().getPosition())
-			&& !limitSwitchHigh.isPressed()) {
-			pivotArmMotor.set(PIVOT_UP_POWER);
-		} else {
-			lastPower = capMotorPower(changePower(
-				-pivotArmMotor.getEncoder().getPosition() * P_UP_CONSTANT));
+		} else if (Math.abs(pivotArmMotor.getEncoder().getPosition()) > BELT_SKIP_THRESHOLD) {
+			double power = -MAX_POWER;
+			lastPower = capMotorPower(changePower(power));
 			pivotArmMotor.set(lastPower);
-		}*/
+		} else {
+			pivotArmMotor.set(PIVOT_UP_POWER);
+		}
 	}
 
 	private void handleAutonomousMidState() {
-		/*double newMidEncoder = MID_ENCODER;
-		if (pivotArmMotor.getEncoder().getPosition() > MID_ENCODER + PIVOT_MID_ACCEL_THRESHOLD) {
-			newMidEncoder -= PIVOT_MID_ACCEL_THRESHOLD;
+		if (Math.abs(pivotArmMotor.getEncoder().getPosition() - MID_ENCODER)
+			> BELT_SKIP_THRESHOLD) {
+			double power = (pivotArmMotor.getEncoder().getPosition()
+								> MID_ENCODER) ? -MAX_POWER : MAX_POWER;
+			lastPower = capMotorPower(changePower(power));
+			pivotArmMotor.set(lastPower);
+		} else {
+			lastPower = capMotorPower(changePower((MID_ENCODER
+				- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
+			pivotArmMotor.set(lastPower);
 		}
-		if (pivotArmMotor.getEncoder().getPosition() < MID_ENCODER - PIVOT_MID_ACCEL_THRESHOLD) {
-			newMidEncoder += PIVOT_MID_ACCEL_THRESHOLD;
-		}
-		lastPower = capMotorPower(changePower((newMidEncoder
-			- pivotArmMotor.getEncoder().getPosition()) * P_CONSTANT));
-		pivotArmMotor.set(lastPower);*/
 	}
 
 	private void handleAutonomousIdleState() {

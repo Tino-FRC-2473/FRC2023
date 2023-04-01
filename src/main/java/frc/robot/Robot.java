@@ -72,13 +72,7 @@ public class Robot extends TimedRobot {
 	public static void setNode(int level) {
 		node = level;
 	}
-	/**
-	 * This function returns the node for the autonomous path of the robot.
-	 * @return An int representing the node. 0 is low, 1 is mid, 2 is high.
-	 */
-	public static int getNode() {
-		return node;
-	}
+
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -206,15 +200,16 @@ public class Robot extends TimedRobot {
 					finishedDeposit = true;
 				}
 			}
-		} else if (driveSystem.getCurrentState() == (FSMState.P1N2)
+		} else if (finishedDeposit && (driveSystem.getCurrentState() == (FSMState.P1N2)
 			|| driveSystem.getCurrentState() == (FSMState.P1N3)
 			|| driveSystem.getCurrentState() == (FSMState.P2N2)
 			|| driveSystem.getCurrentState() == (FSMState.P3N2)
 			|| driveSystem.getCurrentState() == (FSMState.P5N2)
 			|| driveSystem.getCurrentState() == (FSMState.P5N3)
 			|| driveSystem.getCurrentState() == (FSMState.P6N2)
-			|| driveSystem.getCurrentState() == (FSMState.P7N2)) {
-
+			|| driveSystem.getCurrentState() == (FSMState.P7N2)
+			|| driveSystem.getCurrentState() == FSMState.IDLE)) {
+			System.out.println("stop");
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
 			if (HardwareMap.isRobotGroundMount()) {
 				groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_UP);

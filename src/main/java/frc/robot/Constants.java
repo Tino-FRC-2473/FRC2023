@@ -41,7 +41,7 @@ public class Constants {
 	public static final double GYRO_TURN_MULTIPLER_BELOW_90 = 0.987;
 	public static final double CHARGING_STATION_LEVELED_ERROR_DEGREES = 2;
 	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 170;
-	public static final double AUTONOMUS_MOVE_POWER = 0.2;
+	public static final double AUTONOMUS_MOVE_POWER = 0.15;
 	public static final double AUTONOMUS_X_MOVE_THRESHOLD = 2;
 	public static final double AUTONOMUS_Y_MOVE_THRESHOLD = 20;
 	public static final double POWER_TO_HOLD_ROBO_ON_TILTED_CS = 0.03;
@@ -51,7 +51,7 @@ public class Constants {
 
 	// push in, out of community, charge station
 	public static final double P1X1 = 1;
-	public static final double P1X2 = -100;
+	public static final double P1X2 = -165;
 	public static final double P1X3 = -86;
 
 	// push in, charge station
@@ -67,7 +67,7 @@ public class Constants {
 
 	// deposit backwards, exit community, charge station
 	public static final double P5X1 = -1;
-	public static final double P5X2 = 100;
+	public static final double P5X2 = 150;
 	public static final double P5X3 = 86;
 
 	// deposit backwards, charge station

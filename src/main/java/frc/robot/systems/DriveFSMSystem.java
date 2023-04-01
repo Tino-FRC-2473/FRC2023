@@ -186,9 +186,10 @@ public class DriveFSMSystem {
 		rightMotorBack.set(0);
 		leftMotorFront.set(0);
 
-		gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
+		currentEncoderPos = 0;
+		prevEncoderPos = 0;
 		roboXPos = 0;
 		roboYPos = 0;
 		updateLineOdometryTele(0);
@@ -224,9 +225,10 @@ public class DriveFSMSystem {
 		rightMotorBack.set(0);
 		leftMotorFront.set(0);
 
-		gyro.reset();
 		gyro.zeroYaw();
 		gyroAngleForOdo = 0;
+		currentEncoderPos = 0;
+		prevEncoderPos = 0;
 		roboXPos = 0;
 		roboYPos = 0;
 		updateLineOdometryTele(0);
@@ -252,7 +254,8 @@ public class DriveFSMSystem {
 
 		updateLineOdometryTele(gyroAngleForOdo);
 		SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
-
+		SmartDashboard.putString("Drive state", currentState.toString());
+		SmartDashboard.putNumber("Robot X", roboXPos);
 		switch (currentState) {
 			case TELE_STATE_2_MOTOR_DRIVE:
 				handleTeleOp2MotorState(input);
@@ -463,7 +466,6 @@ public class DriveFSMSystem {
 			// auto paths
 			case P1N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
-					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.P1N2;
 				}
@@ -476,33 +478,34 @@ public class DriveFSMSystem {
 				return FSMState.P1N2;
 			case P1N3:
 				if (completedPoint) {
+					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.AUTO_STATE_BALANCE;
 				}
 				return FSMState.P1N3;
 			case P2N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
-					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.P2N2;
 				}
 				return FSMState.P2N1;
 			case P2N2:
 				if (completedPoint) {
+					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.AUTO_STATE_BALANCE;
 				}
 				return FSMState.P2N2;
 			case P3N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
-					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.P3N2;
 				}
-				return FSMState.P2N1;
+				return FSMState.P3N1;
 			case P3N2:
 				if (completedPoint) {
 					completedPoint = false;
+					Robot.resetFinishedDeposit();
 					return FSMState.IDLE;
 				}
 				return FSMState.P3N2;
@@ -512,9 +515,9 @@ public class DriveFSMSystem {
 					completedPoint = false;
 					return FSMState.IDLE;
 				}
+				return FSMState.P4N1;
 			case P5N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
-					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.P5N2;
 				}
@@ -527,32 +530,33 @@ public class DriveFSMSystem {
 				return FSMState.P5N2;
 			case P5N3:
 				if (completedPoint) {
+					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.AUTO_STATE_BALANCE;
 				}
 				return FSMState.P5N3;
 			case P6N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
-					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.P6N2;
 				}
 				return FSMState.P6N1;
 			case P6N2:
 				if (completedPoint) {
+					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.AUTO_STATE_BALANCE;
 				}
 				return FSMState.P6N2;
 			case P7N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
-					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.P7N2;
 				}
 				return FSMState.P7N1;
 			case P7N2:
 				if (completedPoint) {
+					Robot.resetFinishedDeposit();
 					completedPoint = false;
 					return FSMState.IDLE;
 				}
@@ -770,6 +774,9 @@ public class DriveFSMSystem {
 
 		double roboX = -roboXPos;
 		double roboY = roboYPos;
+
+		System.out.println("Robot x: " + roboX);
+		System.out.println("Robot y: " + roboY);
 
 		double power = Constants.AUTONOMUS_MOVE_POWER;
 		if (HardwareMap.isRobotGroundMount()) {

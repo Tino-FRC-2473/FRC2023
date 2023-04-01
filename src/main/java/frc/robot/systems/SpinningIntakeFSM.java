@@ -3,6 +3,8 @@ package frc.robot.systems;
 import edu.wpi.first.wpilibj.Timer;
 
 import frc.robot.Robot;
+import frc.robot.AutoPathChooser;
+
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
@@ -42,6 +44,7 @@ public class SpinningIntakeFSM {
 	private boolean toggleUpdate = true;
 	private boolean needsReset = true;
 	private int tick = 0;
+	private boolean hasTimerStarted = false;
 	private double[] currLogs = new double[AVERAGE_SIZE];
 
 	// private PrintWriter pw;
@@ -214,8 +217,7 @@ public class SpinningIntakeFSM {
 				return true;
 			case RELEASE:
 				//return distanceSensorObject.getValue() < MIN_RELEASE_DISTANCE;
-				//return timer.hasElapsed(0.25);
-				return true;
+				return timer.hasElapsed(1);
 				//NEEDS CHANGE ^
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -303,10 +305,17 @@ public class SpinningIntakeFSM {
 	}
 	private void handleIdleStopState() {
 		//System.out.println("not in idle spinning");
+		timer.stop();
 		spinnerMotor.set(KEEP_SPEED);
 	}
 	private void handleReleaseState(TeleopInput input) {
 		//System.out.println("not in idle spinning");
+		if (input == null) {
+			if (!hasTimerStarted) {
+				timer.start();
+				hasTimerStarted = true;
+			}
+		}
 		for (int i = 0; i < AVERAGE_SIZE; i++) {
 			currLogs[i] = 0;
 		}
@@ -317,7 +326,7 @@ public class SpinningIntakeFSM {
 				spinnerMotor.set(RELEASE_SPEED_LOW);
 			}
 		} else {
-			if (Robot.getNode() == 0) {
+			if (AutoPathChooser.getSelectedNode() == 0) {
 				spinnerMotor.set(RELEASE_SPEED_LOW);
 			} else {
 				spinnerMotor.set(RELEASE_SPEED);
