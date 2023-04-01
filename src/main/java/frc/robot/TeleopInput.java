@@ -30,6 +30,7 @@ public class TeleopInput {
 	private static final int CV_ALIGN_BUTTON_CUBE = 9;
 	private static final int CV_SWITCH_CONTOUR_BUTTON = 8;
 	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
+	private static final int CV_VISION_BUTTON = 8;
 	private static final int DISABLE_UPDATE_BUTTON = 2;
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
@@ -260,11 +261,19 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get if cv contour switch (11) is pressed.
+	 * Get if cv contour switch (8) is pressed.
 	 * @return true if button is pressed
 	 */
 	public boolean isMechJoystickCVSwitchContourButtonPressedRaw() {
 		return mechJoystick.getRawButton(CV_SWITCH_CONTOUR_BUTTON);
+	}
+
+	/**
+	 * Get if cv contour switch (8) is pressed.
+	 * @return true if button is pressed
+	 */
+	public boolean isMechJoystickCVVisionButtonPressedRaw() {
+		return mechJoystick.getRawButton(CV_VISION_BUTTON);
 	}
 
 	/**

@@ -42,6 +42,7 @@ public class DriveFSMSystem {
 		CV_CUBE_ALIGN,
 		CV_CONE_ALIGN,
 		CV_SWITCH_CONTOUR,
+		CV_VISION,
 		IDLE,
 
 		P1N1,
@@ -288,6 +289,10 @@ public class DriveFSMSystem {
 			case CV_SWITCH_CONTOUR:
 				handleCVSwitchContour();
 				break;
+			
+			case CV_VISION:
+				handleCVVisionState();
+				break;
 
 			case TELE_STATE_BALANCE:
 				handleTeleOpBalanceState(input);
@@ -436,6 +441,10 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_CONE_ALIGN;
+			case CV_VISION:
+				if (!input.isMechJoystickCVVisionButtonPressedRaw()) {
+					return FSMState.CV_VISION;
+				}
 			/*case CV_SWITCH_CONTOUR:
 				if (!input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
@@ -571,7 +580,9 @@ public class DriveFSMSystem {
 			return FSMState.CV_CONE_ALIGN;
 		} else if (input != null && input.isDriveJoystickCVCubeButtonPressedRaw()) {
 			return FSMState.CV_CUBE_ALIGN;
-		} /*else if (input != null && input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
+		} else if (input != null && input.isMechJoystickCVVisionButtonPressedRaw()) {
+			return FSMState.CV_VISION;
+		}/*else if (input != null && input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
 			SmartDashboard.putBoolean("11 button pressed" , input.isMechJoystickCVSwitchContourButtonPressedRaw());
 			return FSMState.CV_SWITCH_CONTOUR;
 		}*/
@@ -588,6 +599,10 @@ public class DriveFSMSystem {
 			targetContourIndex = 0;
 		}
 		SmartDashboard.putNumber("Contour Index", targetContourIndex);
+	}
+
+	private void handleCVVisionState() {
+		pcw.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 	}
 
 	/**
