@@ -23,7 +23,7 @@ import frc.robot.AutoPathChooser;
 import frc.robot.drive.DriveFunctions;
 import frc.robot.drive.DriveModes;
 import frc.robot.drive.DrivePower;
-
+import edu.wpi.first.math.controller.PIDController;
 
 // Java Imports
 
@@ -41,6 +41,8 @@ public class DriveFSMSystem {
 		CV_TAG_ALIGN,
 		CV_CUBE_ALIGN,
 		CV_CONE_ALIGN,
+		CV_SWITCH_CONTOUR,
+		CV_VISION,
 		IDLE,
 
 		P1N1,
@@ -92,6 +94,8 @@ public class DriveFSMSystem {
 	private boolean finishedTurning; // only for turn state
 
 	private boolean isNotForwardEnough = false;
+	private int targetContourIndex = 0;
+	private int lastContourSwitchCount = -1;
 	private PhotonCameraWrapper pcw = new PhotonCameraWrapper();
 	private CameraServer cam;
 	private CvSink cvSink;
@@ -101,6 +105,12 @@ public class DriveFSMSystem {
 	static final int MOVE_BACKWARD_OPT = 2;
 	static final int TURN_LEFT_OPT = 3;
 	static final int TURN_RIGHT_OPT = 4;
+
+	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
+	public static final double ANGULAR_P = 0.01;
+	public static final double ANGULAR_D = 0;
+	private PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
+
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -243,15 +253,16 @@ public class DriveFSMSystem {
 	 * Update FSM based on new inputs. This function only calls the FSM state
 	 * specific handlers.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
+	 *        the robot in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-
 		gyroAngleForOdo = gyro.getAngle() * Constants.GYRO_MULTIPLER_TELOP;
 
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
+		System.out.println("high dist: " + pcw.getLowerTapeDistance());
+		System.out.println("state: " + currentState);
 		updateLineOdometryTele(gyroAngleForOdo);
 		SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
 		SmartDashboard.putString("Drive state", currentState.toString());
@@ -274,10 +285,18 @@ public class DriveFSMSystem {
 				break;
 
 			case CV_CUBE_ALIGN:
-				handleCVCubeAlignState();
+				handleCVCubeAlignState(targetContourIndex);
 				break;
 			case CV_CONE_ALIGN:
-				handleCVConeAlignState();
+				handleCVConeAlignState(targetContourIndex);
+				break;
+
+			case CV_SWITCH_CONTOUR:
+				handleCVSwitchContour();
+				break;
+			
+			case CV_VISION:
+				handleCVVisionState();
 				break;
 
 			case TELE_STATE_BALANCE:
@@ -380,32 +399,6 @@ public class DriveFSMSystem {
 		currentState = nextState(input);
 	}
 
-	private void handleCVConeAlignState() {
-		double angle = pcw.getConeTurnAngle();
-		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
-			return;
-		}
-		System.out.println(pcw.getCubeTurnAngle());
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_RIGHT_OPT);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_LEFT_OPT);
-		}
-	}
-
-	private void handleCVCubeAlignState() {
-		double angle = pcw.getCubeTurnAngle();
-		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
-			return;
-		}
-		System.out.println(pcw.getCubeTurnAngle());
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_RIGHT_OPT);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_LEFT_OPT);
-		}
-	}
-
 	/* ======================== Private methods ======================== */
 	/**
 	 * Decide the next state to transition to. This is a function of the inputs
@@ -439,6 +432,7 @@ public class DriveFSMSystem {
 				return FSMState.CV_HIGH_TAPE_ALIGN;
 			case CV_TAG_ALIGN:
 				if (!input.isDriveJoystickCVTagButtonPressedRaw()) {
+					System.out.println("hello");
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_TAG_ALIGN;
@@ -452,6 +446,16 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_CONE_ALIGN;
+			case CV_VISION:
+				if (!input.isMechJoystickCVVisionButtonPressedRaw()) {
+					return FSMState.CV_VISION;
+				}
+			/*case CV_SWITCH_CONTOUR:
+				if (!input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
+					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
+				}
+				return FSMState.CV_SWITCH_CONTOUR;
+			*/
 			case IDLE: return FSMState.IDLE;
 			case TELE_STATE_BALANCE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
@@ -565,6 +569,7 @@ public class DriveFSMSystem {
 	}
 
 	private FSMState getCVState(TeleopInput input) {
+		System.out.println("here 1");
 		if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
 			return FSMState.TELE_STATE_BALANCE;
 		} else if (input != null && input.isSteeringWheelHoldPressedRaw()) {
@@ -581,10 +586,45 @@ public class DriveFSMSystem {
 			return FSMState.CV_CONE_ALIGN;
 		} else if (input != null && input.isDriveJoystickCVCubeButtonPressedRaw()) {
 			return FSMState.CV_CUBE_ALIGN;
-		}
+		} else if (input != null && input.isMechJoystickCVVisionButtonPressedRaw()) {
+			return FSMState.CV_VISION;
+		}/*else if (input != null && input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
+			SmartDashboard.putBoolean("11 button pressed" , input.isMechJoystickCVSwitchContourButtonPressedRaw());
+			return FSMState.CV_SWITCH_CONTOUR;
+		}*/
 		return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 	}
 	/* ------------------------ FSM state handlers ------------------------ */
+
+	private void handleCVSwitchContour() {
+		SmartDashboard.putNumber("Contour Index", targetContourIndex);
+		if (targetContourIndex < pcw.getNumberofTargets()) {
+			System.out.println(pcw.getNumberofTargets());
+			targetContourIndex++;
+		} else {
+			targetContourIndex = 0;
+		}
+		SmartDashboard.putNumber("Contour Index", targetContourIndex);
+	}
+
+	private void handleCVVisionState() {
+		pcw.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
+	}
+
+	/**
+	 * @param targetContour the contour target used
+	 * Handle behavior in CV_CONE_ALIGN.
+	 */
+	public void handleCVConeAlignState(int targetContour) {
+		double power = pcw.getConeTurnRotation(targetContour);
+		power = MathUtil.clamp(
+			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
+		leftMotorFront.set(-power);
+		rightMotorFront.set(-power);
+		leftMotorBack.set(-power);
+		rightMotorBack.set(-power);
+	}
+
 	/**
 	 * Handle behavior in TELE_STATE_2_MOTOR_DRIVE.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
@@ -836,29 +876,21 @@ public class DriveFSMSystem {
 		double angle;
 		if (lower) {
 			angle = pcw.getLowerTapeTurnAngle();
-			isNotForwardEnough =  pcw.getLowerTapeDistance()
-				> Constants.LOWER_TAPE_DRIVEUP_DISTANCE_INCHES;
-			//drives forward until within 42 inches of lower tape
 		} else {
 			angle = pcw.getHigherTapeTurnAngle();
-			isNotForwardEnough = pcw.getHigherTapeDistance()
-				> Constants.HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES;
-			//drives forward until within 65 inches of higher tape
 		}
-		if (angle == Constants.INVALID_TURN_RETURN_DEGREES) {
-			return;
-		}
-		if (angle > Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_RIGHT_OPT);
-		} else if (angle  < -Constants.ANGLE_TO_TARGET_THRESHOLD_DEGREES) {
-			cvmove(TURN_LEFT_OPT);
+		double power;
+		if (angle != Constants.INVALID_TURN_RETURN_DEGREES) {
+			power = -turnController.calculate(angle, 0);
 		} else {
-			if (isNotForwardEnough) {
-				cvmove(MOVE_FORWARD_OPT);
-			} else {
-				cvmove(0);
-			}
+			power = 0;
 		}
+		power = MathUtil.clamp(
+			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
+		leftMotorFront.set(-power);
+		rightMotorFront.set(-power);
+		leftMotorBack.set(-power);
+		rightMotorBack.set(-power);
 	}
 
 	/**.
@@ -867,6 +899,20 @@ public class DriveFSMSystem {
 	public void handleCVTagAlignState() {
 		double power = pcw.getTagTurnRotation();
 		isNotForwardEnough =  pcw.getTagDistance() > Constants.TAG_DRIVEUP_DISTANCE_INCHES;
+		power = MathUtil.clamp(
+			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
+		leftMotorFront.set(-power);
+		rightMotorFront.set(-power);
+		leftMotorBack.set(-power);
+		rightMotorBack.set(-power);
+	}
+
+	/**
+	* Aligns to cube rotationally.
+	* @param targetContour the contour target used
+	**/
+	public void handleCVCubeAlignState(int targetContour) {
+		double power = pcw.getCubeTurnRotation(targetContour);
 		power = MathUtil.clamp(
 			power, -Constants.CV_PID_CLAMP_THRESHOLD, Constants.CV_PID_CLAMP_THRESHOLD);
 		leftMotorFront.set(-power);
@@ -949,5 +995,6 @@ public class DriveFSMSystem {
 			default:
 				break;
 		}
+	
 	}
 }
