@@ -294,7 +294,7 @@ public class DriveFSMSystem {
 			case CV_SWITCH_CONTOUR:
 				handleCVSwitchContour();
 				break;
-			
+
 			case CV_VISION:
 				handleCVVisionState();
 				break;
@@ -588,8 +588,9 @@ public class DriveFSMSystem {
 			return FSMState.CV_CUBE_ALIGN;
 		} else if (input != null && input.isMechJoystickCVVisionButtonPressedRaw()) {
 			return FSMState.CV_VISION;
-		}/*else if (input != null && input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
-			SmartDashboard.putBoolean("11 button pressed" , input.isMechJoystickCVSwitchContourButtonPressedRaw());
+		} /*else if (input != null && input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
+			SmartDashboard.putBoolean("11 button pressed",
+				input.isMechJoystickCVSwitchContourButtonPressedRaw());
 			return FSMState.CV_SWITCH_CONTOUR;
 		}*/
 		return FSMState.TELE_STATE_2_MOTOR_DRIVE;
@@ -995,6 +996,5 @@ public class DriveFSMSystem {
 			default:
 				break;
 		}
-	
 	}
 }
