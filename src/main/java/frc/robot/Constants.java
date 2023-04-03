@@ -14,6 +14,8 @@ public class Constants {
 	public static final double LOWER_TAPE_DRIVEUP_DISTANCE_INCHES = 45;
 	public static final double TAG_DRIVEUP_DISTANCE_INCHES = 32;
 	public static final double CUBE_DRIVEUP_DISTANCE_INCHES = 45;
+	public static final double CUBE_DISTANCE_ADD = 10;
+	public static final double CONE_DISTANCE_ADD = 20;
 	public static final int WEBCAM_PIXELS_WIDTH = 480;
 	public static final int WEBCAM_PIXELS_HEIGHT = 480;
 	public static final double WHEEL_DIAMETER_INCHES = 6.0; //7.65
@@ -91,17 +93,18 @@ public class Constants {
 	public static class VisionConstants {
 		public static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.75);
 		public static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
-		public static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(9.5);
+		public static final double CUBE_HEIGHT_METERS = Units.inchesToMeters(8.3);
 		public static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
 		public static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
 		public static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
 		public static final double CAM_OFFSET_INCHES = -4;
 		public static final int TWODTAG_PIPELINE_INDEX = 0;
-		public static final int LOWERTAPE_PIPELINE_INDEX = 1;
-		public static final int HIGHERTAPE_PIPELINE_INDEX = 2;
-		public static final int THREEDTAG_PIPELINE_INDEX = 3;
+		public static final int LOWERTAPE_PIPELINE_INDEX = 3;
+		public static final int HIGHERTAPE_PIPELINE_INDEX = 1;
+		public static final int THREEDTAG_PIPELINE_INDEX = 5;
 		public static final int CUBE_PIPELINE_INDEX = 4;
-		public static final int CONE_PIPELINE_INDEX = 5;
+		public static final int CONE_PIPELINE_INDEX = 2;
+
 
 	}
 	public static class AprilTagConstants {
