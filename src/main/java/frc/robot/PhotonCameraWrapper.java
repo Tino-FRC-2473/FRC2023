@@ -103,6 +103,48 @@ public class PhotonCameraWrapper {
 	}
 
 	/**
+	 * Returns the rotation power for the robot to align with the cube object.
+	 * @param cntID the specific contour selected
+	 * @return a power to apply to all the motors
+	 */
+	public double getCubeTurnRotation(int cntID) {
+		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
+		var result = photonCamera.getLatestResult();
+		double rotationSpeed;
+		double curTs = photonCamera.getLatestResult().getTimestampSeconds();
+		//compare curTs to lastTs: check if code is running faster than limelight (causes overshoot)
+		if (result.hasTargets() && (lastTs == 0 || curTs != lastTs)) {
+			rotationSpeed = -turnController.calculate(getCubeTurnAngle(cntID), 0);
+		} else {
+			// If we have no targets, stay still.
+			rotationSpeed = 0;
+		}
+		lastTs = photonCamera.getLatestResult().getTimestampSeconds();
+		return rotationSpeed;
+	}
+
+	/**
+	 * Returns the rotation power for the robot to align with the cone object.
+	 * @param cntID the specific contour selected
+	 * @return a power to apply to all the motors
+	 */
+	public double getConeTurnRotation(int cntID) {
+		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
+		var result = photonCamera.getLatestResult();
+		double rotationSpeed;
+		double curTs = photonCamera.getLatestResult().getTimestampSeconds();
+		//compare curTs to lastTs: check if code is running faster than limelight (causes overshoot)
+		if (result.hasTargets() && (lastTs == 0 || curTs != lastTs)) {
+			rotationSpeed = -turnController.calculate(getConeTurnAngle(cntID), 0);
+		} else {
+			// If we have no targets, stay still.
+			rotationSpeed = 0;
+		}
+		lastTs = photonCamera.getLatestResult().getTimestampSeconds();
+		return rotationSpeed;
+	}
+
+	/**
 	 * Returns the angle for the robot to turn to align with the lower reflective tape.
 	 * @return an angle that tells the robot how much to turn to align in degrees
 	 */
@@ -117,7 +159,7 @@ public class PhotonCameraWrapper {
 	}
 
 	/**
-	 * Returns the angle for the robot to turn to align with the higher reflective tape.
+	 * Returns the angle for the robot to turn to align with the higher reflective x.
 	 * @return an angle that tells the robot how much to turn to align in degrees
 	 */
 	public double getHigherTapeTurnAngle() {
@@ -222,7 +264,7 @@ public class PhotonCameraWrapper {
 			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
 				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CONE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
-					result.getBestTarget().getPitch())));
+					result.getBestTarget().getPitch()))) + Constants.CONE_DISTANCE_ADD;
 		}
 		return -1;
 	}
@@ -234,27 +276,31 @@ public class PhotonCameraWrapper {
 			return Units.metersToInches(PhotonUtils.calculateDistanceToTargetMeters(
 				VisionConstants.CAM_HEIGHT_METERS, VisionConstants.CUBE_HEIGHT_METERS,
 				VisionConstants.CAM_PITCH_RADIANS, Units.degreesToRadians(
-					result.getBestTarget().getPitch())));
+					result.getBestTarget().getPitch()))) + Constants.CUBE_DISTANCE_ADD;
 		}
 		return -1;
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cone
+ * @param cnt the specific contour to find the angle towards
  * and 360 if there are no cones.*/
-	public double getConeTurnAngle() {
+	public double getConeTurnAngle(int cnt) {
 		photonCamera.setPipelineIndex(VisionConstants.CONE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return result.getBestTarget().getYaw();
+			return result.getTargets().get(cnt).getYaw() + Math.toDegrees(Math.atan(
+				VisionConstants.CAM_OFFSET_INCHES / getDistanceToCone()));
 		}
 		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
 /** @return Returns the angle needed to turn for aligning the robot to the cube
+ * @param cnt the specific contour to find the angle towards
  * and 360 if there are no cubes.*/
-	public double getCubeTurnAngle() {
+	public double getCubeTurnAngle(int cnt) {
 		photonCamera.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-			return result.getBestTarget().getYaw();
+			return result.getTargets().get(cnt).getYaw() + Math.toDegrees(Math.atan(
+				VisionConstants.CAM_OFFSET_INCHES / getDistanceToCube()));
 		}
 		return Constants.INVALID_TURN_RETURN_DEGREES;
 	}
@@ -279,5 +325,11 @@ public class PhotonCameraWrapper {
 			return true;
 		}
 		return false;
+	}
+/**
+ * @return Returns the number of targets.
+ */
+	public int getNumberofTargets() {
+		return photonCamera.getLatestResult().getTargets().size();
 	}
 }

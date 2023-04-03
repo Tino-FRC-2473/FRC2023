@@ -86,11 +86,11 @@ public class Robot extends TimedRobot {
 			driveSystem = new DriveFSMSystem();
 		}
 		if (isArmEnabled) {
-			if (HardwareMap.isRobotGroundMount()) {
+			//if (HardwareMap.isRobotGroundMount()) {
 				groundMountFSM = new GroundMountFSM();
-			} else {
-				armSystem = new ArmFSM();
-			}
+			//} else {
+				//armSystem = new ArmFSM();
+			//}
 		}
 		if (isIntakeEnabled) {
 			spinningIntakeFSM = new SpinningIntakeFSM();
@@ -101,11 +101,11 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		if (isArmEnabled) {
-			if (HardwareMap.isRobotGroundMount()) {
-				groundMountFSM .reset();
-			} else {
+			//if (HardwareMap.isRobotGroundMount()) {
+				//groundMountFSM .reset();
+			//} else {
 				armSystem.reset();
-			}
+			//}
 		}
 		if (isDriveEnabled) {
 			driveSystem.resetAutonomous();
@@ -227,11 +227,11 @@ public class Robot extends TimedRobot {
 		DriverStation.startDataLog(DataLogManager.getLog(), false);
 		myStringLog = new StringLogEntry(DataLogManager.getLog(), "/my/string");
 		if (isArmEnabled) {
-			if (HardwareMap.isRobotGroundMount()) {
+			//if (HardwareMap.isRobotGroundMount()) {
 				groundMountFSM.reset();
-			} else {
-				armSystem.reset();
-			}
+			//} else {
+				//armSystem.reset();
+			//}
 		}
 		if (isDriveEnabled) {
 			driveSystem.resetTeleop();
@@ -245,11 +245,11 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		if (isArmEnabled) {
-			if (HardwareMap.isRobotGroundMount()) {
+			//if (HardwareMap.isRobotGroundMount()) {
 				groundMountFSM.update(input);
-			} else {
-				armSystem.update(input);
-			}
+			//} else {
+				//armSystem.update(input);
+			//}
 		}
 		if (isDriveEnabled) {
 			driveSystem.update(input);
