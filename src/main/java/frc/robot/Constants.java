@@ -41,7 +41,7 @@ public class Constants {
 	public static final double GYRO_TURN_MULTIPLER_BELOW_90 = 0.987;
 	public static final double CHARGING_STATION_LEVELED_ERROR_DEGREES = 2;
 	public static final double CHARGING_STATION_BALANCE_CONSTANT_PID_P = 170;
-	public static final double AUTONOMUS_ARM_MOVE_POWER = 0.2;
+	public static final double AUTONOMUS_ARM_MOVE_POWER = 0.25;
 	public static final double AUTONOMUS_GROUND_MOUNT_MOVE_POWER = 0.3;
 	public static final double AUTONOMUS_X_MOVE_THRESHOLD = 2;
 	public static final double AUTONOMUS_Y_MOVE_THRESHOLD = 20;
