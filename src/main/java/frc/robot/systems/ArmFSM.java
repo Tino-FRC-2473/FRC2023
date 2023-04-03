@@ -120,7 +120,7 @@ public class ArmFSM {
 	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS =
 		(125 + PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE) * ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 
-	private static final double AUTONOMOUS_UP_ANGLE_ENCODER_ROTATIONS = 158;
+	private static final double AUTONOMOUS_UP_ANGLE_ENCODER_ROTATIONS = 144;
 	private static final double PID_PIVOT_MAX_POWER = 0.7;
 	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.1;
 	private static final double ERROR_ARM_ROTATIONS = 2.0;
