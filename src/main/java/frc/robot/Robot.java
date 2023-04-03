@@ -214,9 +214,8 @@ public class Robot extends TimedRobot {
 			if (HardwareMap.isRobotGroundMount()) {
 				groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_UP);
 			} else {
-				if (armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT)) {
-					armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
-				}
+				armSystem.updateAuto(ArmFSMState.AUTONOMOUS_RETRACT);
+				armSystem.updateAuto(ArmFSMState.MOVING_TO_START_STATE);
 			}
 		}
 	}
