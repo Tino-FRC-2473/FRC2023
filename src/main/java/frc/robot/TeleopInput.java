@@ -25,12 +25,11 @@ public class TeleopInput {
 	private static final int HOMING_BUTTON = 10;
 	private static final int CV_ALIGN_BUTTON_LEFT_NODE = 4;
 	private static final int CV_ALIGN_BUTTON_MIDDLE_NODE = 3;
-	private static final int CV_ALIGN_BUTTON_TAG = 7;
+	private static final int CV_ALIGN_BUTTON_TAG = 5;
 	private static final int CV_ALIGN_BUTTON_CONE = 8;
 	private static final int CV_ALIGN_BUTTON_CUBE = 9;
 	private static final int CV_SWITCH_CONTOUR_BUTTON = 8;
-	private static final int CV_ALIGN_BUTTON_RIGHT_NODE = 5;
-	private static final int CV_VISION_BUTTON = 8;
+	private static final int CV_VISION_BUTTON = 7;
 	private static final int DISABLE_UPDATE_BUTTON = 2;
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
@@ -273,7 +272,7 @@ public class TeleopInput {
 	 * @return true if button is pressed
 	 */
 	public boolean isMechJoystickCVVisionButtonPressedRaw() {
-		return mechJoystick.getRawButton(CV_VISION_BUTTON);
+		return driveJoystick.getRawButton(CV_VISION_BUTTON);
 	}
 
 	/**

@@ -261,8 +261,8 @@ public class DriveFSMSystem {
 		currentEncoderPos = ((leftMotorBack.getEncoder().getPosition()
 			- rightMotorFront.getEncoder().getPosition()) / 2.0);
 
-		System.out.println("high dist: " + pcw.getLowerTapeDistance());
-		System.out.println("state: " + currentState);
+		//System.out.println("high dist: " + pcw.getLowerTapeDistance());
+		//System.out.println("state: " + currentState);
 		updateLineOdometryTele(gyroAngleForOdo);
 		SmartDashboard.putBoolean("Is Parallel With Substation: ", pcw.isParallelToSubstation());
 		SmartDashboard.putString("Drive state", currentState.toString());
@@ -448,8 +448,9 @@ public class DriveFSMSystem {
 				return FSMState.CV_CONE_ALIGN;
 			case CV_VISION:
 				if (!input.isMechJoystickCVVisionButtonPressedRaw()) {
-					return FSMState.CV_VISION;
+					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
+				return FSMState.CV_VISION;
 			/*case CV_SWITCH_CONTOUR:
 				if (!input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
@@ -569,7 +570,6 @@ public class DriveFSMSystem {
 	}
 
 	private FSMState getCVState(TeleopInput input) {
-		System.out.println("here 1");
 		if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
 			return FSMState.TELE_STATE_BALANCE;
 		} else if (input != null && input.isSteeringWheelHoldPressedRaw()) {
@@ -609,6 +609,7 @@ public class DriveFSMSystem {
 	}
 
 	private void handleCVVisionState() {
+		System.out.println("here");
 		pcw.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
 	}
 
