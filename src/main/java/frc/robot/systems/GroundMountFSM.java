@@ -11,6 +11,7 @@ import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
+import frc.robot.Constants;
 
 public class GroundMountFSM {
 	/* ======================== Constants ======================== */
@@ -44,7 +45,6 @@ public class GroundMountFSM {
 	private static final double MAX_LOWER_POWER = 0.19;
 	private static final double BELT_SKIP_THRESHOLD = 7;
 	private static final double PICKUP_ENCODER = 50;
-	private static final double OVERRUN_THRESHOLD = 0.02;
 	private static final double PIVOT_MID_DIFFERENCE = 8;
 	private SparkMaxPIDController pidControllerPivot;
 
@@ -181,8 +181,7 @@ public class GroundMountFSM {
 		}
 		currentState = nextState(input);
 		double tt = (Timer.getFPGATimestamp() - begin);
-		//System.out.println("ground mount time taken: " + );
-		if (tt > OVERRUN_THRESHOLD) {
+		if (tt > Constants.OVERRUN_THRESHOLD) {
 			System.out.println("ALERT ALERT GROUND MOUNT " +  tt);
 		}
 	}

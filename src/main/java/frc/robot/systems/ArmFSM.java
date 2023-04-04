@@ -7,10 +7,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
+import frc.robot.Constants;
 
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
+
+import edu.wpi.first.wpilibj.Timer;
 
 public class ArmFSM {
 	/* ======================== Constants ======================== */
@@ -231,6 +234,7 @@ public class ArmFSM {
 		if (input == null) {
 			return;
 		}
+		double begin = Timer.getFPGATimestamp();
 		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
@@ -326,6 +330,13 @@ public class ArmFSM {
 			SmartDashboard.putString("Current State", " " + currentState);
 		}
 		currentState = state;
+
+		double tt = (Timer.getFPGATimestamp() - begin);
+		//System.out.println("ground mount time taken: " + );
+		if (tt > Constants.OVERRUN_THRESHOLD) {
+			System.out.println("ALERT ALERT ARM " +  tt);
+			System.out.println("arm state: " + currentState);
+		}
 	}
 
 	/**
@@ -647,7 +658,6 @@ public class ArmFSM {
 					if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
 						&& pivotMotor.getEncoder().getPosition()
 							< ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
-						System.out.println("High");
 						pidControllerPivot.setReference(PIVOT_MOTOR_SLOW_DOWN_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
 					} else {

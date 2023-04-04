@@ -261,9 +261,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledInit() {
 		System.out.println("-------- Disabled Init --------");
-		if (spinningIntakeFSM != null) {
-			spinningIntakeFSM.closePrintWriter();
-		}
 	}
 
 	@Override

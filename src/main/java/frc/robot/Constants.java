@@ -48,18 +48,18 @@ public class Constants {
 	public static final double AUTONOMUS_X_MOVE_THRESHOLD = 2;
 	public static final double AUTONOMUS_Y_MOVE_THRESHOLD = 20;
 	public static final double POWER_TO_HOLD_ROBO_ON_TILTED_CS = 0.03;
-	public static final double OVERRUN_THRESHOLD = 0.02;
+	public static final double OVERRUN_THRESHOLD = 0.007;
 
 	// Path points
 
 	// push in, out of community, charge station
 	public static final double P1X1 = 1;
 	public static final double P1X2 = -170;
-	public static final double P1X3 = -92;
+	public static final double P1X3 = -94;
 
 	// push in, charge station
 	public static final double P2X1 = 1;
-	public static final double P2X2 = -90;
+	public static final double P2X2 = -94;
 
 	// push in, out of community (on edges)
 	public static final double P3X1 = 1;
