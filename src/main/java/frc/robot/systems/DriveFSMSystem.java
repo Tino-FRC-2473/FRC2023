@@ -41,7 +41,6 @@ public class DriveFSMSystem {
 		CV_TAG_ALIGN,
 		CV_CUBE_ALIGN,
 		CV_CONE_ALIGN,
-		CV_SWITCH_CONTOUR,
 		CV_VISION,
 		IDLE,
 
@@ -288,10 +287,6 @@ public class DriveFSMSystem {
 				handleCVConeAlignState(targetContourIndex);
 				break;
 
-			case CV_SWITCH_CONTOUR:
-				handleCVSwitchContour();
-				break;
-
 			case CV_VISION:
 				handleCVVisionState();
 				break;
@@ -442,12 +437,6 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
 				return FSMState.CV_VISION;
-			/*case CV_SWITCH_CONTOUR:
-				if (!input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
-					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
-				}
-				return FSMState.CV_SWITCH_CONTOUR;
-			*/
 			case IDLE: return FSMState.IDLE;
 			case TELE_STATE_BALANCE:
 				if (input != null && input.isDriveJoystickEngageButtonPressedRaw()) {
@@ -586,16 +575,6 @@ public class DriveFSMSystem {
 		return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 	}
 	/* ------------------------ FSM state handlers ------------------------ */
-
-	private void handleCVSwitchContour() {
-		SmartDashboard.putNumber("Contour Index", targetContourIndex);
-		if (targetContourIndex < pcw.getNumberofTargets()) {
-			targetContourIndex++;
-		} else {
-			targetContourIndex = 0;
-		}
-		SmartDashboard.putNumber("Contour Index", targetContourIndex);
-	}
 
 	private void handleCVVisionState() {
 		pcw.setPipelineIndex(VisionConstants.CUBE_PIPELINE_INDEX);
