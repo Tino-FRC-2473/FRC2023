@@ -732,15 +732,6 @@ public class ArmFSM {
 					pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
-				// if (pivotEncoderRotationsIntoIdle <= ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
-				// 	if (withinError(teleArmMotor.getEncoder().getPosition(),
-				// 		ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS)) {
-				// 		teleArmMotor.set(0);
-				// 	} else {
-				// 		pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS,
-				// 			CANSparkMax.ControlType.kPosition);
-				// 	}
-				// }
 			} else {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS) || isMaxHeight() || isMinHeight()) {
