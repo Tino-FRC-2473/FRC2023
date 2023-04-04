@@ -153,9 +153,7 @@ public class GroundMountFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		//System.out.println("power: " + pivotArmMotor.get());
 		double begin = Timer.getFPGATimestamp();
-		//System.out.println(itemType);
 		SmartDashboard.putNumber("ground mount encoder", pivotArmMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("power", pivotArmMotor.get());
 		SmartDashboard.putBoolean("limit low", isLimitSwitchLowPressed());
@@ -322,10 +320,8 @@ public class GroundMountFSM {
 			double power = -MAX_POWER;
 			lastPower = capMotorPower(changePower(power));
 			pivotArmMotor.set(lastPower);
-			System.out.println("trying to go to max power");
 		} else {
 			pivotArmMotor.set(PIVOT_UP_POWER);
-			System.out.println("not hitting limit switch but expecting");
 		}
 	}
 

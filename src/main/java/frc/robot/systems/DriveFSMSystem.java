@@ -408,15 +408,10 @@ public class DriveFSMSystem {
 	 */
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
-			case TELE_STATE_2_MOTOR_DRIVE:
-				return getCVState(input);
-			case AUTO_STATE_BALANCE:
-				return FSMState.AUTO_STATE_BALANCE;
-			case TURNING_STATE:
-				if (finishedTurning) {
-					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
-				}
-				return FSMState.TURNING_STATE;
+			case TELE_STATE_2_MOTOR_DRIVE: return getCVState(input);
+			case AUTO_STATE_BALANCE: return FSMState.AUTO_STATE_BALANCE;
+			case TURNING_STATE: return finishedTurning
+				? FSMState.TELE_STATE_2_MOTOR_DRIVE : FSMState.TURNING_STATE;
 			case CV_LOW_TAPE_ALIGN:
 				if (!input.isDriveJoystickCVLowTapeButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
@@ -444,8 +439,9 @@ public class DriveFSMSystem {
 				return FSMState.CV_CONE_ALIGN;
 			case CV_VISION:
 				if (!input.isMechJoystickCVVisionButtonPressedRaw()) {
-					return FSMState.CV_VISION;
+					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
 				}
+				return FSMState.CV_VISION;
 			/*case CV_SWITCH_CONTOUR:
 				if (!input.isMechJoystickCVSwitchContourButtonPressedRaw()) {
 					return FSMState.TELE_STATE_2_MOTOR_DRIVE;
@@ -463,7 +459,6 @@ public class DriveFSMSystem {
 					return FSMState.TELE_STATE_HOLD_WHILE_TILTED;
 				}
 				return FSMState.TELE_STATE_2_MOTOR_DRIVE;
-			// auto paths
 			case P1N1:
 				if (completedPoint && Robot.getFinishedDeposit()) {
 					completedPoint = false;

@@ -325,18 +325,27 @@ public class ArmFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
+
+		double currentTime = Timer.getFPGATimestamp();
+		double tt = (currentTime - begin);
+		if (tt > Constants.OVERRUN_THRESHOLD) {
+			System.out.println("ALERT ALERT ARM HANDLERS" +  tt);
+			System.out.println("arm state: " + currentState);
+		}
+
 		ArmFSMState state = nextState(input);
+
+		currentTime = Timer.getFPGATimestamp();
+		tt = (Timer.getFPGATimestamp() - begin);
+		if (tt > Constants.OVERRUN_THRESHOLD) {
+			System.out.println("ALERT ALERT ARM nextState" +  tt);
+			System.out.println("arm state: " + currentState);
+		}
+
 		if (currentState != state) {
 			SmartDashboard.putString("Current State", " " + currentState);
 		}
 		currentState = state;
-
-		double tt = (Timer.getFPGATimestamp() - begin);
-		//System.out.println("ground mount time taken: " + );
-		if (tt > Constants.OVERRUN_THRESHOLD) {
-			System.out.println("ALERT ALERT ARM " +  tt);
-			System.out.println("arm state: " + currentState);
-		}
 	}
 
 	/**
@@ -405,7 +414,6 @@ public class ArmFSM {
 	 */
 	private ArmFSMState nextState(TeleopInput input) {
 		if (input == null) {
-			// return ArmFSMState.IDLE;
 			return null;
 		}
 		switch (currentState) {

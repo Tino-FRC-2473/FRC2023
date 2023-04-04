@@ -41,6 +41,7 @@ public class Robot extends TimedRobot {
 	private static boolean finishedDeposit = false;
 	private static int node = -1; // -1 is none, 0 is low, 1, mid, 2 is high
 	private AutoPathChooser autoPathChooser;
+
 	/**
 	 * get string log.
 	 * @return string log
@@ -48,6 +49,7 @@ public class Robot extends TimedRobot {
 	public static StringLogEntry getStringLog() {
 		return myStringLog;
 	}
+
 	/**
 	 * This function that returns whether or not the robot has finished
 	 * 	depositing the object in autonomus.
@@ -238,7 +240,6 @@ public class Robot extends TimedRobot {
 			spinningIntakeFSM.reset();
 		}
 	}
-
 
 	@Override
 	public void teleopPeriodic() {

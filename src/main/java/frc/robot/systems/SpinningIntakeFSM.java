@@ -200,7 +200,6 @@ public class SpinningIntakeFSM {
 			case IDLE_STOP:
 				return true;
 			case RELEASE:
-				System.out.println("timer: " + timer.get());
 				return timer.hasElapsed(1);
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
