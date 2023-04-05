@@ -16,20 +16,23 @@ public class TeleopInput {
 	private static final int DRIVE_JOYSTICK_PORT = 1;
 	private static final int STEERING_WHEEL_PORT = 3;
 
-	private static final int PIVOT_INCREASE_BUTTON = 3;
-	private static final int PIVOT_DECREASE_BUTTON = 5;
-	private static final int FINE_TUNING_BUTTON = 12;
+	// drive joystick
 	private static final int BALANCE_BUTTON = 2;
 	private static final int HOLD_BUTTON = 5;
 	private static final int FINE_TUNING_BUTTON_DRIVE = 6;
-	private static final int HOMING_BUTTON = 10;
 	private static final int CV_ALIGN_BUTTON_LEFT_NODE = 4;
 	private static final int CV_ALIGN_BUTTON_MIDDLE_NODE = 3;
 	private static final int CV_ALIGN_BUTTON_TAG = 5;
 	private static final int CV_ALIGN_BUTTON_CONE = 8;
 	private static final int CV_ALIGN_BUTTON_CUBE = 9;
-	private static final int CV_SWITCH_CONTOUR_BUTTON = 8;
 	private static final int CV_VISION_BUTTON = 7;
+
+	// mech joystick
+
+	private static final int PIVOT_INCREASE_BUTTON = 3;
+	private static final int PIVOT_DECREASE_BUTTON = 5;
+	private static final int FINE_TUNING_BUTTON = 12;
+	private static final int HOMING_BUTTON = 10;
 	private static final int DISABLE_UPDATE_BUTTON = 2;
 	private static final int AIM_HIGH_BUTTON = 7;
 	private static final int AIM_MID_BUTTON = 9;
@@ -257,14 +260,6 @@ public class TeleopInput {
 	 */
 	public boolean isDriveJoystickEngageButtonPressedRaw() {
 		return driveJoystick.getRawButton(BALANCE_BUTTON);
-	}
-
-	/**
-	 * Get if cv contour switch (8) is pressed.
-	 * @return true if button is pressed
-	 */
-	public boolean isMechJoystickCVSwitchContourButtonPressedRaw() {
-		return mechJoystick.getRawButton(CV_SWITCH_CONTOUR_BUTTON);
 	}
 
 	/**
