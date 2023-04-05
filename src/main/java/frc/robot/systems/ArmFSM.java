@@ -7,10 +7,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
+import frc.robot.Constants;
 
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
+
+import edu.wpi.first.wpilibj.Timer;
 
 public class ArmFSM {
 	/* ======================== Constants ======================== */
@@ -33,12 +36,12 @@ public class ArmFSM {
 
 	//starts at 71 inches to 33 inches
 	//encoder over angle
-	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = -204.036 / 126.4;
+	private static final double ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT = 143.75 / 76;
 	private static final double ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT = 246 / 21;
 	private static final float TELEARM_MOTOR_POWER = 1.0f;
 	private static final float TELEARM_MOTOR_POWER_FINE_TUNING = 0.05f;
-	private static final float PIVOT_MOTOR_POWER = 0.5f;
-	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.2f;
+	private static final float PIVOT_MOTOR_POWER = 0.7f;
+	private static final float PIVOT_MOTOR_SLOW_DOWN_POWER = 0.1f;
 	private static final float PIVOT_MOTOR_POWER_FINE_TUNING = 0.05f;
 
 	//increase this constant to make the tele arm motor power greater
@@ -49,13 +52,13 @@ public class ArmFSM {
 	//
 	private static final double PIVOT_MOTOR_POWER_CONTROL_CONSTANT = 0.5;
 
-	private static final double PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE = 13;
+	private static final double PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE = 7;
 	//20 inches
 	private static final double ARM_ENCODER_MAX_LENGTH_ROTATIONS = 33
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 
 	//19 inches
-	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 24
+	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 14.5
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//11 inches
 	private static final double ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS = 21
@@ -64,7 +67,7 @@ public class ArmFSM {
 	private static final double ARM_ENCODER_HIGH_BACKWARD_ROTATIONS = 26
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//3 inches
-	private static final double ARM_ENCODER_MID_FORWARD_ROTATIONS = 14.5
+	private static final double ARM_ENCODER_MID_FORWARD_ROTATIONS = 0
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//4 inches
 	private static final double ARM_ENCODER_MID_BACKWARD_ROTATIONS = 14
@@ -81,44 +84,51 @@ public class ArmFSM {
 
 	//All encoder measures are from minimum limit switch
 	//Angle measure in comments are assuming 0 is horizon not min limit switch
-	private static final double ENCODER_TICKS_SLOW_DOWN_RANGE_MAX =
-		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (75 + 13);
 	private static final double ENCODER_TICKS_SLOW_DOWN_RANGE_MIN =
-		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (105 + 13);
+		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (75 + PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE);
+	private static final double ENCODER_TICKS_SLOW_DOWN_RANGE_MAX =
+		ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT * (90 + PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE);
 	//90 degrees
-	private static final double ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS = (90 + 13)
+	private static final double ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS = (90
+		+ PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//111.8 degrees
-	private static final double ARM_ENCODER_STARTING_ANGLE_ROTATIONS = (111 + 13)
+	private static final double ARM_ENCODER_STARTING_ANGLE_ROTATIONS = (69
+		+ PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//36.762 degrees
-	private static final double SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS = (39 + 13)
+	private static final double SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS = (30
+		+ PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//40.368 degrees
-	private static final double SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS = (42 + 13)
+	private static final double SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS = (42
+		+ PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//150.98 degrees
-	private static final double SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS = (140 + 13)
+	private static final double SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS = (140
+		+ PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//147.976 degrees
-	private static final double SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS = (135 + 13)
+	private static final double SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS = (135
+		+ PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//-12.837 degrees
 	private static final double SHOOT_LOW_ANGLE_ENCODER_ROTATIONS = 0.163
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//41.2 degrees
-	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS = (45 + 13)
+	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS = (45
+		+ PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)
 		* ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 	//142.46 degrees
 	private static final double SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS =
-		(125 + 13) * ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
+		(125 + PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE) * ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT;
 
-	private static final double AUTONOMOUS_UP_ANGLE_ENCODER_ROTATIONS = -158;
-	private static final double PID_PIVOT_MAX_POWER = 0.5;
-	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.2;
-	private static final double ERROR_ARM_ROTATIONS = 1.0;
-	private static final double PID_CONSTANT_PIVOT_P = 0.00014f;
-	private static final double PID_CONSTANT_PIVOT_I = 0.000030f;
+	private static final double AUTONOMOUS_UP_ANGLE_ENCODER_ROTATIONS = 144;
+	private static final double PID_PIVOT_MAX_POWER = 0.7;
+	private static final double PID_PIVOT_SLOW_DOWN_MAX_POWER = 0.1;
+	private static final double ERROR_ARM_ROTATIONS = 2.0;
+	private static final double PID_CONSTANT_PIVOT_P = 0.000007f;
+	private static final double PID_CONSTANT_PIVOT_I = 0.000025f;
 	private static final double PID_CONSTANT_PIVOT_D = 0.000008f;
 	private static final double PID_CONSTANT_ARM_P = 0.00006f;
 	private static final double PID_CONSTANT_ARM_I = 0.00001f;
@@ -152,10 +162,10 @@ public class ArmFSM {
 		// Perform hardware init
 		pivotMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_PIVOT,
 									CANSparkMax.MotorType.kBrushless);
-		pivotLimitSwitchHigh = pivotMotor.getReverseLimitSwitch(
+		pivotLimitSwitchHigh = pivotMotor.getForwardLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchHigh.enableLimitSwitch(true);
-		pivotLimitSwitchLow = pivotMotor.getForwardLimitSwitch(
+		pivotLimitSwitchLow = pivotMotor.getReverseLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchLow.enableLimitSwitch(true);
 		pivotMotor.setInverted(true);
@@ -201,7 +211,7 @@ public class ArmFSM {
 		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 		pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 		// Call one tick of update to ensure outputs reflect start state
-		if (pivotMotor.getEncoder().getPosition() > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+		if (pivotMotor.getEncoder().getPosition() < ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
 			maxArmExtensionEncoderRotations = TELEARM_MAX_EXTENSION_CONSTANT
 				/ Math.abs(Math.cos(Math.toRadians(
 				pivotMotor.getEncoder().getPosition()
@@ -224,6 +234,7 @@ public class ArmFSM {
 		if (input == null) {
 			return;
 		}
+		double begin = Timer.getFPGATimestamp();
 		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
@@ -234,8 +245,8 @@ public class ArmFSM {
 		if (input.isFineTuningButtonPressed()) {
 			isFineTuning = !isFineTuning;
 		}
-		if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX
-			&& pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN) {
+		if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+			&& pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
 			pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,
 				PID_PIVOT_SLOW_DOWN_MAX_POWER);
 		} else {
@@ -262,7 +273,7 @@ public class ArmFSM {
 				* Math.abs(Math.cos(Math.toRadians(pivotMotor.getEncoder().getPosition()
 				/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT
 				- PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE))) + PIVOT_MOTOR_SLOW_DOWN_POWER;
-		if (pivotMotor.getEncoder().getPosition() > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+		if (pivotMotor.getEncoder().getPosition() < ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
 			maxArmExtensionEncoderRotations = TELEARM_MAX_EXTENSION_CONSTANT
 				/ Math.abs(Math.cos(Math.toRadians(
 				pivotMotor.getEncoder().getPosition()
@@ -314,7 +325,23 @@ public class ArmFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
+
+		double currentTime = Timer.getFPGATimestamp();
+		double tt = (currentTime - begin);
+		if (tt > Constants.OVERRUN_THRESHOLD) {
+			System.out.println("ALERT ALERT ARM HANDLERS" +  tt);
+			System.out.println("arm state: " + currentState);
+		}
+
 		ArmFSMState state = nextState(input);
+
+		currentTime = Timer.getFPGATimestamp();
+		tt = (Timer.getFPGATimestamp() - begin);
+		if (tt > Constants.OVERRUN_THRESHOLD) {
+			System.out.println("ALERT ALERT ARM nextState" +  tt);
+			System.out.println("arm state: " + currentState);
+		}
+
 		if (currentState != state) {
 			SmartDashboard.putString("Current State", " " + currentState);
 		}
@@ -332,8 +359,8 @@ public class ArmFSM {
 		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
 		SmartDashboard.putBoolean("At Min Height", isMinHeight());
-		if (pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX
-			&& pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN) {
+		if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+			&& pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
 			pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,
 				PID_PIVOT_SLOW_DOWN_MAX_POWER);
 		} else {
@@ -387,7 +414,6 @@ public class ArmFSM {
 	 */
 	private ArmFSMState nextState(TeleopInput input) {
 		if (input == null) {
-			// return ArmFSMState.IDLE;
 			return null;
 		}
 		switch (currentState) {
@@ -582,8 +608,9 @@ public class ArmFSM {
 	private void handleIdleState(TeleopInput input) {
 		if (input != null) {
 			teleArmMotor.set(0);
-			pidControllerPivot.setReference(pivotEncoderRotationsIntoIdle,
-				CANSparkMax.ControlType.kPosition);
+			// pidControllerPivot.setReference(pivotEncoderRotationsIntoIdle,
+			// 	CANSparkMax.ControlType.kPosition);
+			pivotMotor.set(0);
 		}
 	}
 
@@ -599,7 +626,7 @@ public class ArmFSM {
 		if (isMinHeight()) {
 			pivotMotor.set(0);
 		} else {
-			pivotMotor.set(PIVOT_MOTOR_POWER);
+			pivotMotor.set(-PIVOT_MOTOR_POWER);
 		}
 		if (teleArmLimitSwitch.isPressed()) {
 			teleArmMotor.set(0);
@@ -636,12 +663,30 @@ public class ArmFSM {
 		if (input != null) {
 			if (!isFineTuning) {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
+					if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+						&& pivotMotor.getEncoder().getPosition()
+							< ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
+						pidControllerPivot.setReference(PIVOT_MOTOR_SLOW_DOWN_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
+					} else {
+						pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
+								CANSparkMax.ControlType.kDutyCycle);
+					}
 					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-					pidControllerPivot.setReference(PIVOT_MOTOR_POWER,
+					if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+						&& pivotMotor.getEncoder().getPosition()
+							< ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
+						pidControllerPivot.setReference(-PIVOT_MOTOR_SLOW_DOWN_POWER,
 							CANSparkMax.ControlType.kDutyCycle);
+					} else {
+						pidControllerPivot.setReference(-PIVOT_MOTOR_POWER,
+								CANSparkMax.ControlType.kDutyCycle);
+					}
+					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
+				} else if (input.isPivotIncreaseButtonPressed() && isMaxHeight()) {
+					pidControllerPivot.setReference(PIVOT_MOTOR_POWER_FINE_TUNING,
+						CANSparkMax.ControlType.kDutyCycle);
 					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else {
 					pidControllerPivot.setReference(pivotEncoderRotationsAfterPivot,
@@ -650,11 +695,11 @@ public class ArmFSM {
 				teleArmMotor.set(-input.getmechJoystickY() * TELEARM_MOTOR_POWER);
 			} else {
 				if (input.isPivotIncreaseButtonPressed() && !isMaxHeight()) {
-					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER_FINE_TUNING,
+					pidControllerPivot.setReference(PIVOT_MOTOR_POWER_FINE_TUNING,
 						CANSparkMax.ControlType.kDutyCycle);
 					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else if (input.isPivotDecreaseButtonPressed() && !isMinHeight()) {
-					pidControllerPivot.setReference(PIVOT_MOTOR_POWER_FINE_TUNING,
+					pidControllerPivot.setReference(-PIVOT_MOTOR_POWER_FINE_TUNING,
 						CANSparkMax.ControlType.kDutyCycle);
 					pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 				} else {
@@ -672,51 +717,42 @@ public class ArmFSM {
 
 	private void handleShootHighForwardState(TeleopInput input) {
 		if (input != null) {
-			if (SpinningIntakeFSM.getObjectType() == SpinningIntakeFSM.ItemType.CUBE) {
+			if (SpinningIntakeFSM.getObjectType() == SpinningIntakeFSM.ItemType.CONE) {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS) || isMaxHeight() || isMinHeight()) {
 					pivotMotor.set(0);
 					if (withinError(teleArmMotor.getEncoder().getPosition(),
-						ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
+						ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS)) {
 						teleArmMotor.set(0);
 					} else {
-						pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
+						pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS,
 							CANSparkMax.ControlType.kPosition);
 					}
 				} else {
 					pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
-				}
-				if (pivotEncoderRotationsIntoIdle > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
-					if (withinError(teleArmMotor.getEncoder().getPosition(),
-						ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
-						teleArmMotor.set(0);
-					} else {
-						pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
-							CANSparkMax.ControlType.kPosition);
-					}
 				}
 			} else {
 				if (withinError(pivotMotor.getEncoder().getPosition(),
 					SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS) || isMaxHeight() || isMinHeight()) {
 					pivotMotor.set(0);
 					if (withinError(teleArmMotor.getEncoder().getPosition(),
-						ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS)) {
+						ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
 						teleArmMotor.set(0);
 					} else {
-						pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS,
+						pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
 							CANSparkMax.ControlType.kPosition);
 					}
 				} else {
 					pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
-				if (pivotEncoderRotationsIntoIdle > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+				if (pivotEncoderRotationsIntoIdle <= ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
 					if (withinError(teleArmMotor.getEncoder().getPosition(),
-						ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS)) {
+						ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
 						teleArmMotor.set(0);
 					} else {
-						pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS,
+						pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
 							CANSparkMax.ControlType.kPosition);
 					}
 				}
@@ -756,7 +792,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
-			if (pivotEncoderRotationsIntoIdle <= ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+			if (pivotEncoderRotationsIntoIdle > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
 				if (withinError(teleArmMotor.getEncoder().getPosition(),
 						ARM_ENCODER_HIGH_BACKWARD_ROTATIONS)) {
 					teleArmMotor.set(0);
@@ -801,7 +837,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
-			if (pivotEncoderRotationsIntoIdle > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+			if (pivotEncoderRotationsIntoIdle <= ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
 				if (withinError(teleArmMotor.getEncoder().getPosition(),
 						ARM_ENCODER_MID_FORWARD_ROTATIONS)) {
 					teleArmMotor.set(0);
@@ -845,7 +881,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
-			if (pivotEncoderRotationsIntoIdle <= ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+			if (pivotEncoderRotationsIntoIdle > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
 				if (withinError(teleArmMotor.getEncoder().getPosition(),
 						ARM_ENCODER_MID_BACKWARD_ROTATIONS)) {
 					teleArmMotor.set(0);
@@ -889,7 +925,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SHOOT_LOW_ANGLE_ENCODER_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
-			if (pivotEncoderRotationsIntoIdle > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+			if (pivotEncoderRotationsIntoIdle <= ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
 				if (withinError(teleArmMotor.getEncoder().getPosition(),
 							ARM_ENCODER_LOW_ROTATIONS)) {
 					teleArmMotor.set(0);
@@ -935,7 +971,7 @@ public class ArmFSM {
 					SUBSTATION_PICKUP_ANGLE_ENCODER_FORWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
-			if (pivotEncoderRotationsIntoIdle > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+			if (pivotEncoderRotationsIntoIdle <= ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
 				if (withinError(teleArmMotor.getEncoder().getPosition(),
 						ARM_ENCODER_SUBSTATION_FORWARD_ROTATIONS)) {
 					teleArmMotor.set(0);
@@ -967,7 +1003,7 @@ public class ArmFSM {
 				pidControllerPivot.setReference(SUBSTATION_PICKUP_ANGLE_ENCODER_BACKWARD_ROTATIONS,
 					CANSparkMax.ControlType.kPosition);
 			}
-			if (pivotEncoderRotationsIntoIdle <= ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+			if (pivotEncoderRotationsIntoIdle > ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
 				if (withinError(teleArmMotor.getEncoder().getPosition(),
 					ARM_ENCODER_SUBSTATION_BACKWARD_ROTATIONS)) {
 					teleArmMotor.set(0);

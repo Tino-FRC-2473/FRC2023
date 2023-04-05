@@ -1,0 +1,11 @@
+{
+  "baseName" : "unicam",
+  "uniqueName" : "unicam",
+  "nickname" : "OV5647",
+  "FOV" : 74.8,
+  "path" : "/dev/video0",
+  "cameraType" : "ZeroCopyPicam",
+  "currentPipelineIndex" : 1,
+  "calibrations" : [ ],
+  "streamIndex" : 0
+}
