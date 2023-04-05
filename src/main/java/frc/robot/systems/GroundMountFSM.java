@@ -46,6 +46,7 @@ public class GroundMountFSM {
 	private static final double BELT_SKIP_THRESHOLD = 7;
 	private static final double PICKUP_ENCODER = 50;
 	private static final double PIVOT_MID_DIFFERENCE = 8;
+	private boolean toggleUpdate = true;
 	private SparkMaxPIDController pidControllerPivot;
 
 	/* ======================== Private variables ======================== */
@@ -154,6 +155,10 @@ public class GroundMountFSM {
 	 */
 	public void update(TeleopInput input) {
 		double begin = Timer.getFPGATimestamp();
+		if (input.isDisableUpdatedPressed()) {
+			toggleUpdate = !toggleUpdate;
+			SmartDashboard.putBoolean("Is arm update enabled", toggleUpdate);
+		}
 		SmartDashboard.putNumber("ground mount encoder", pivotArmMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("power", pivotArmMotor.get());
 		SmartDashboard.putBoolean("limit low", isLimitSwitchLowPressed());
@@ -161,26 +166,28 @@ public class GroundMountFSM {
 		if (input == null) {
 			return;
 		}
-		switch (currentState) {
-			case START_STATE:
-				handleStartState();
-				break;
-			case PIVOTING_DOWN:
-				handlePivotingDownState();
-				break;
-			case PIVOTING_UP:
-				handlePivotingUpState();
-				break;
-			case PIVOTING_MID:
-				handlePivotingMidState();
-				break;
-			default:
-				throw new IllegalStateException("Invalid state: " + currentState.toString());
-		}
-		currentState = nextState(input);
-		double tt = (Timer.getFPGATimestamp() - begin);
-		if (tt > Constants.OVERRUN_THRESHOLD) {
-			System.out.println("ALERT ALERT GROUND MOUNT " +  tt);
+		if (toggleUpdate) {
+			switch (currentState) {
+				case START_STATE:
+					handleStartState();
+					break;
+				case PIVOTING_DOWN:
+					handlePivotingDownState();
+					break;
+				case PIVOTING_UP:
+					handlePivotingUpState();
+					break;
+				case PIVOTING_MID:
+					handlePivotingMidState();
+					break;
+				default:
+					throw new IllegalStateException("Invalid state: " + currentState.toString());
+			}
+			currentState = nextState(input);
+			double tt = (Timer.getFPGATimestamp() - begin);
+			if (tt > Constants.OVERRUN_THRESHOLD) {
+				System.out.println("ALERT ALERT GROUND MOUNT " +  tt);
+			}
 		}
 	}
 	/* ======================== Private methods ======================== */

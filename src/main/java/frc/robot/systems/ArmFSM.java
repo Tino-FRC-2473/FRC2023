@@ -155,6 +155,7 @@ public class ArmFSM {
 	private double maxArmExtensionEncoderRotations = ARM_ENCODER_MAX_LENGTH_ROTATIONS;
 
 	private boolean isFineTuning = false;
+	private boolean toggleUpdate = true;
 	/**
 	 * Creates an instance of an ArmFSM.
 	 */
@@ -235,117 +236,122 @@ public class ArmFSM {
 			return;
 		}
 		double begin = Timer.getFPGATimestamp();
-		SmartDashboard.putNumber("Pivot Motor Rotations", pivotMotor.getEncoder().getPosition());
-		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
-		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
-		SmartDashboard.putBoolean("At Min Height", isMinHeight());
-		SmartDashboard.putBoolean("At Arm Min", teleArmLimitSwitch.isPressed());
-		SmartDashboard.putNumber("Extension Fraction", teleArmMotor.getEncoder().getPosition()
-			/ ARM_ENCODER_MAX_LENGTH_ROTATIONS);
-		if (input.isFineTuningButtonPressed()) {
-			isFineTuning = !isFineTuning;
+		if (input.isDisableUpdatedPressed()) {
+			toggleUpdate = !toggleUpdate;
+			SmartDashboard.putBoolean("Is arm update enabled", toggleUpdate);
 		}
-		if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
-			&& pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
-			pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,
-				PID_PIVOT_SLOW_DOWN_MAX_POWER);
-		} else {
-			pidControllerPivot.setOutputRange(-PID_PIVOT_MAX_POWER,
-				PID_PIVOT_MAX_POWER);
+		if (toggleUpdate) {
+			SmartDashboard.putNumber("Pivot Motor Rotations",
+				pivotMotor.getEncoder().getPosition());
+			SmartDashboard.putNumber("Arm Motor Rotations",
+				teleArmMotor.getEncoder().getPosition());
+			SmartDashboard.putBoolean("At Max Height", isMaxHeight());
+			SmartDashboard.putBoolean("At Min Height", isMinHeight());
+			SmartDashboard.putBoolean("At Arm Min", teleArmLimitSwitch.isPressed());
+			SmartDashboard.putNumber("Extension Fraction", teleArmMotor.getEncoder().getPosition()
+				/ ARM_ENCODER_MAX_LENGTH_ROTATIONS);
+			if (input.isFineTuningButtonPressed()) {
+				isFineTuning = !isFineTuning;
+			}
+			if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
+				&& pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
+				pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,
+					PID_PIVOT_SLOW_DOWN_MAX_POWER);
+			} else {
+				pidControllerPivot.setOutputRange(-PID_PIVOT_MAX_POWER,
+					PID_PIVOT_MAX_POWER);
+			}
+			if (isMinHeight()) {
+				pivotMotor.getEncoder().setPosition(0);
+				pivotEncoderRotationsIntoIdle = 0;
+			}
+			if (teleArmLimitSwitch.isPressed()) {
+				teleArmMotor.getEncoder().setPosition(0);
+			}
+			if (!withinError(pivotMotor.getEncoder().getPosition(),
+				pivotEncoderRotationsAfterPivot)) {
+				pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
+			}
+			if (teleArmMotor.getEncoder().getPosition() <= TELEARM_MOTOR_POWER_CONTROL_CONSTANT) {
+				teleArmMotorPower = 1.0;
+			} else {
+				teleArmMotorPower = TELEARM_MOTOR_POWER_CONTROL_CONSTANT
+					/ teleArmMotor.getEncoder().getPosition();
+			}
+			pivotMotorPower = PIVOT_MOTOR_POWER_CONTROL_CONSTANT
+					* Math.abs(Math.cos(Math.toRadians(pivotMotor.getEncoder().getPosition()
+					/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT
+					- PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE))) + PIVOT_MOTOR_SLOW_DOWN_POWER;
+			if (pivotMotor.getEncoder().getPosition() < ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
+				maxArmExtensionEncoderRotations = TELEARM_MAX_EXTENSION_CONSTANT
+					/ Math.abs(Math.cos(Math.toRadians(
+					pivotMotor.getEncoder().getPosition()
+					/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT
+					- PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)));
+			} else {
+				maxArmExtensionEncoderRotations = TELEARM_MAX_EXTENSION_CONSTANT
+					/ Math.abs(Math.cos(Math.toRadians(
+					(pivotMotor.getEncoder().getPosition() - ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS)
+					/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT)));
+			}
+			switch (currentState) {
+				case UNHOMED_STATE:
+					handleUnhomedState();
+					break;
+				case IDLE:
+					handleIdleState(input);
+					break;
+				case HOMING_STATE:
+					handleHomingState(input);
+					break;
+				case MOVING_TO_START_STATE:
+					handleMovingToStartState(input);
+					break;
+				case ARM_MOVEMENT:
+					handleArmMechState(input);
+					break;
+				case SHOOT_HIGH_FORWARD:
+					handleShootHighForwardState(input);
+					break;
+				case SHOOT_HIGH_BACKWARD:
+					handleShootHighBackwardState(input);
+					break;
+				case SHOOT_MID_FORWARD:
+					handleShootMidForwardState(input);
+					break;
+				case SHOOT_MID_BACKWARD:
+					handleShootMidBackwardState(input);
+					break;
+				case SHOOT_LOW_FORWARD:
+					handleShootLowState(input);
+					break;
+				case SUBSTATION_PICKUP_FORWARD:
+					handleSubstationPickupForwardState(input);
+					break;
+				case SUBSTATION_PICKUP_BACKWARD:
+					handleSubstationPickupBackwardState(input);
+					break;
+				default:
+					throw new IllegalStateException("Invalid state: " + currentState.toString());
+			}
+			double currentTime = Timer.getFPGATimestamp();
+			double tt = (currentTime - begin);
+			if (tt > Constants.OVERRUN_THRESHOLD) {
+				System.out.println("ALERT ALERT ARM HANDLERS" +  tt);
+				System.out.println("arm state: " + currentState);
+			}
+			ArmFSMState state = nextState(input);
+			currentTime = Timer.getFPGATimestamp();
+			tt = (Timer.getFPGATimestamp() - begin);
+			if (tt > Constants.OVERRUN_THRESHOLD) {
+				System.out.println("ALERT ALERT ARM nextState" +  tt);
+				System.out.println("arm state: " + currentState);
+			}
+			if (currentState != state) {
+				SmartDashboard.putString("Current State", " " + currentState);
+			}
+			currentState = state;
 		}
-		if (isMinHeight()) {
-			pivotMotor.getEncoder().setPosition(0);
-			pivotEncoderRotationsIntoIdle = 0;
-		}
-		if (teleArmLimitSwitch.isPressed()) {
-			teleArmMotor.getEncoder().setPosition(0);
-		}
-		if (!withinError(pivotMotor.getEncoder().getPosition(), pivotEncoderRotationsAfterPivot)) {
-			pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
-		}
-		if (teleArmMotor.getEncoder().getPosition() <= TELEARM_MOTOR_POWER_CONTROL_CONSTANT) {
-			teleArmMotorPower = 1.0;
-		} else {
-			teleArmMotorPower = TELEARM_MOTOR_POWER_CONTROL_CONSTANT
-				/ teleArmMotor.getEncoder().getPosition();
-		}
-		pivotMotorPower = PIVOT_MOTOR_POWER_CONTROL_CONSTANT
-				* Math.abs(Math.cos(Math.toRadians(pivotMotor.getEncoder().getPosition()
-				/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT
-				- PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE))) + PIVOT_MOTOR_SLOW_DOWN_POWER;
-		if (pivotMotor.getEncoder().getPosition() < ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS) {
-			maxArmExtensionEncoderRotations = TELEARM_MAX_EXTENSION_CONSTANT
-				/ Math.abs(Math.cos(Math.toRadians(
-				pivotMotor.getEncoder().getPosition()
-				/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT
-				- PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE)));
-		} else {
-			maxArmExtensionEncoderRotations = TELEARM_MAX_EXTENSION_CONSTANT
-				/ Math.abs(Math.cos(Math.toRadians(
-				(pivotMotor.getEncoder().getPosition() - ARM_ENCODER_VERTICAL_ANGLE_ROTATIONS)
-				/ ENCODER_TICKS_TO_ARM_ANGLE_DEGREES_CONSTANT)));
-		}
-		switch (currentState) {
-			case UNHOMED_STATE:
-				handleUnhomedState();
-				break;
-			case IDLE:
-				handleIdleState(input);
-				break;
-			case HOMING_STATE:
-				handleHomingState(input);
-				break;
-			case MOVING_TO_START_STATE:
-				handleMovingToStartState(input);
-				break;
-			case ARM_MOVEMENT:
-				handleArmMechState(input);
-				break;
-			case SHOOT_HIGH_FORWARD:
-				handleShootHighForwardState(input);
-				break;
-			case SHOOT_HIGH_BACKWARD:
-				handleShootHighBackwardState(input);
-				break;
-			case SHOOT_MID_FORWARD:
-				handleShootMidForwardState(input);
-				break;
-			case SHOOT_MID_BACKWARD:
-				handleShootMidBackwardState(input);
-				break;
-			case SHOOT_LOW_FORWARD:
-				handleShootLowState(input);
-				break;
-			case SUBSTATION_PICKUP_FORWARD:
-				handleSubstationPickupForwardState(input);
-				break;
-			case SUBSTATION_PICKUP_BACKWARD:
-				handleSubstationPickupBackwardState(input);
-				break;
-			default:
-				throw new IllegalStateException("Invalid state: " + currentState.toString());
-		}
-
-		double currentTime = Timer.getFPGATimestamp();
-		double tt = (currentTime - begin);
-		if (tt > Constants.OVERRUN_THRESHOLD) {
-			System.out.println("ALERT ALERT ARM HANDLERS" +  tt);
-			System.out.println("arm state: " + currentState);
-		}
-
-		ArmFSMState state = nextState(input);
-
-		currentTime = Timer.getFPGATimestamp();
-		tt = (Timer.getFPGATimestamp() - begin);
-		if (tt > Constants.OVERRUN_THRESHOLD) {
-			System.out.println("ALERT ALERT ARM nextState" +  tt);
-			System.out.println("arm state: " + currentState);
-		}
-
-		if (currentState != state) {
-			SmartDashboard.putString("Current State", " " + currentState);
-		}
-		currentState = state;
 	}
 
 	/**
