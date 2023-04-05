@@ -82,6 +82,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		System.out.println("robotInit");
+		DataLogManager.start();
+		DriverStation.startDataLog(DataLogManager.getLog(), false);
+		myStringLog = new StringLogEntry(DataLogManager.getLog(), "/my/string");
 		input = new TeleopInput();
 		autoPathChooser = new AutoPathChooser();
 		if (isDriveEnabled) {
@@ -209,7 +212,6 @@ public class Robot extends TimedRobot {
 			|| driveSystem.getCurrentState() == (FSMState.P6N2)
 			|| driveSystem.getCurrentState() == (FSMState.P7N2)
 			|| driveSystem.getCurrentState() == FSMState.IDLE)) {
-			System.out.println("stop");
 			spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.IDLE_STOP);
 			if (HardwareMap.isRobotGroundMount()) {
 				groundMountFSM.updateAutonomous(GroundMountFSMState.AUTONOMOUS_UP);
@@ -223,9 +225,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		DataLogManager.start();
-		DriverStation.startDataLog(DataLogManager.getLog(), false);
-		myStringLog = new StringLogEntry(DataLogManager.getLog(), "/my/string");
 		if (isArmEnabled) {
 			if (HardwareMap.isRobotGroundMount()) {
 				groundMountFSM.reset();
