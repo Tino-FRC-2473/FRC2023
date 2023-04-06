@@ -164,7 +164,7 @@ public class ArmFSM {
 									CANSparkMax.MotorType.kBrushless);
 		pivotLimitSwitchHigh = pivotMotor.getForwardLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
-		pivotLimitSwitchHigh.enableLimitSwitch(true);
+		pivotLimitSwitchHigh.enableLimitSwitch(false);
 		pivotLimitSwitchLow = pivotMotor.getReverseLimitSwitch(
 								SparkMaxLimitSwitch.Type.kNormallyClosed);
 		pivotLimitSwitchLow.enableLimitSwitch(true);
