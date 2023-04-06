@@ -184,25 +184,25 @@ public class Robot extends TimedRobot {
 			|| driveSystem.getCurrentState() == (FSMState.P6N1)
 			|| driveSystem.getCurrentState() == (FSMState.P7N1)) {
 
-			if (HardwareMap.isRobotGroundMount()) {
-				finishedDeposit = true;
-			} else {
-				if (node == 2) {
-					if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_BACKWARD)) {
-						finishedDeposit =
-							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-					}
-				}
-				if (node == 1) {
-					if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_BACKWARD)) {
-						finishedDeposit =
-							spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
-					}
-				}
-				if (node == -1 || node == 0) {
-					finishedDeposit = true;
-				}
-			}
+			// if (HardwareMap.isRobotGroundMount()) {
+			// 	finishedDeposit = true;
+			// } else {
+			// 	if (node == 2) {
+			// 		if (armSystem.updateAuto(ArmFSMState.SHOOT_HIGH_BACKWARD)) {
+			// 			finishedDeposit =
+			// 				spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+			// 		}
+			// 	}
+			// 	if (node == 1) {
+			// 		if (armSystem.updateAuto(ArmFSMState.SHOOT_MID_BACKWARD)) {
+			// 			finishedDeposit =
+			// 				spinningIntakeFSM.updateAutonomous(SpinningIntakeFSMState.RELEASE);
+			// 		}
+			// 	}
+			// 	if (node == -1 || node == 0) {
+			// 		finishedDeposit = true;
+			// 	}
+			// }
 		} else if (finishedDeposit && (driveSystem.getCurrentState() == (FSMState.P1N2)
 			|| driveSystem.getCurrentState() == (FSMState.P1N3)
 			|| driveSystem.getCurrentState() == (FSMState.P2N2)
