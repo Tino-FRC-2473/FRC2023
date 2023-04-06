@@ -54,7 +54,7 @@ public class ArmFSM {
 
 	private static final double PIVOT_MOTOR_LOW_LIMIT_SWITCH_ANGLE = 7;
 	//20 inches
-	private static final double ARM_ENCODER_MAX_LENGTH_ROTATIONS = 33
+	private static final double ARM_ENCODER_MAX_LENGTH_ROTATIONS = 17
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 
 	//19 inches
