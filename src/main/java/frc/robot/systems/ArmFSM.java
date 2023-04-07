@@ -26,8 +26,8 @@ public class ArmFSM {
 		MOVING_TO_START_STATE,
 		ARM_MOVEMENT,
 		SHOOT_HIGH_FORWARD,
-		SHOOT_HIGH_BACKWARD,
 		SHOOT_MID_FORWARD,
+		SHOOT_HIGH_BACKWARD,
 		SHOOT_MID_BACKWARD,
 		SHOOT_LOW_FORWARD,
 		SUBSTATION_PICKUP_FORWARD,
@@ -304,11 +304,11 @@ public class ArmFSM {
 			case SHOOT_HIGH_FORWARD:
 				handleShootHighForwardState(input);
 				break;
-			case SHOOT_HIGH_BACKWARD:
-				handleShootHighBackwardState(input);
-				break;
 			case SHOOT_MID_FORWARD:
 				handleShootMidForwardState(input);
+				break;
+			case SHOOT_HIGH_BACKWARD:
+				handleShootHighBackwardState(input);
 				break;
 			case SHOOT_MID_BACKWARD:
 				handleShootMidBackwardState(input);
@@ -384,14 +384,14 @@ public class ArmFSM {
 				handleShootHighForwardState(null);
 				return atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 									ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS);
-			case SHOOT_HIGH_BACKWARD:
-				handleShootHighBackwardState(null);
-				return atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
-									ARM_ENCODER_HIGH_BACKWARD_ROTATIONS);
 			case SHOOT_MID_FORWARD:
 				handleShootMidForwardState(null);
 				return atArmPosition(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
 									ARM_ENCODER_MID_FORWARD_ROTATIONS);
+			case SHOOT_HIGH_BACKWARD:
+				handleShootHighBackwardState(null);
+				return atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
+									ARM_ENCODER_HIGH_BACKWARD_ROTATIONS);
 			case SHOOT_MID_BACKWARD:
 				handleShootMidBackwardState(null);
 				return atArmPosition(SHOOT_MID_ANGLE_ENCODER_BACKWARD_ROTATIONS,
@@ -496,18 +496,18 @@ public class ArmFSM {
 					return ArmFSMState.SHOOT_HIGH_FORWARD;
 				}
 				return ArmFSMState.IDLE;
-			case SHOOT_HIGH_BACKWARD:
-				if (input.isShootHighButtonPressed() && !input.isThrottleForward()
-						&& !atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
-						ARM_ENCODER_HIGH_BACKWARD_ROTATIONS)) {
-					return ArmFSMState.SHOOT_HIGH_BACKWARD;
-				}
-				return ArmFSMState.IDLE;
 			case SHOOT_MID_FORWARD:
 				if (input.isShootMidButtonPressed() && input.isThrottleForward()
 					&& !atArmPosition(SHOOT_MID_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						ARM_ENCODER_MID_FORWARD_ROTATIONS)) {
 					return ArmFSMState.SHOOT_MID_FORWARD;
+				}
+				return ArmFSMState.IDLE;
+			case SHOOT_HIGH_BACKWARD:
+				if (input.isShootHighButtonPressed() && !input.isThrottleForward()
+						&& !atArmPosition(SHOOT_HIGH_ANGLE_ENCODER_BACKWARD_ROTATIONS,
+						ARM_ENCODER_HIGH_BACKWARD_ROTATIONS)) {
+					return ArmFSMState.SHOOT_HIGH_BACKWARD;
 				}
 				return ArmFSMState.IDLE;
 			case SHOOT_MID_BACKWARD:
