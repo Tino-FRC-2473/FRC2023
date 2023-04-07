@@ -760,19 +760,23 @@ public class ArmFSM {
 				}
 			}
 		} else {
-			if (withinError(pivotMotor.getEncoder().getPosition(),
-					SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
-				pivotMotor.set(0);
-				if (withinError(teleArmMotor.getEncoder().getPosition(),
-					ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
-					teleArmMotor.set(0);
+			if (!isMaxHeight()) {
+				if (withinError(pivotMotor.getEncoder().getPosition(),
+						SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS)) {
+					pivotMotor.set(0);
+					if (withinError(teleArmMotor.getEncoder().getPosition(),
+						ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS)) {
+						teleArmMotor.set(0);
+					} else {
+						pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
+							CANSparkMax.ControlType.kPosition);
+					}
 				} else {
-					pidControllerTeleArm.setReference(ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS,
+					pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
 						CANSparkMax.ControlType.kPosition);
 				}
 			} else {
-				pidControllerPivot.setReference(SHOOT_HIGH_ANGLE_ENCODER_FORWARD_ROTATIONS,
-					CANSparkMax.ControlType.kPosition);
+				System.out.println("High Limit Switch: " + isMaxHeight());
 			}
 		}
 		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
