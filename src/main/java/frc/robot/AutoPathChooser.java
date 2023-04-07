@@ -24,8 +24,8 @@ public class AutoPathChooser {
 		SmartDashboard.putData("Auto Path", autoPathChooser);
 
 		nodeChooser = new SendableChooser<>();
-		nodeChooser.setDefaultOption("Low", 0);
-		nodeChooser.addOption("Mid", 1);
+		nodeChooser.setDefaultOption("Mid", 1);
+		nodeChooser.addOption("Low", 0);
 		nodeChooser.addOption("High", 2);
 		nodeChooser.addOption("None", -1);
 		SmartDashboard.putData("Node", nodeChooser);
