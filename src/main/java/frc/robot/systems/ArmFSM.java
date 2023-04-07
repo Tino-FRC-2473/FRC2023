@@ -365,6 +365,11 @@ public class ArmFSM {
 		SmartDashboard.putNumber("Arm Motor Rotations", teleArmMotor.getEncoder().getPosition());
 		SmartDashboard.putBoolean("At Max Height", isMaxHeight());
 		SmartDashboard.putBoolean("At Min Height", isMinHeight());
+		System.out.println("Encoder Pivot: " + pivotMotor.getEncoder().getPosition());
+		System.out.println("Pivot limit switch high pressed: " + isMaxHeight());
+		System.out.println("Pivot limit switch low pressed: " + isMinHeight());
+		System.out.println("State: " + currentState);
+		System.out.println("Power: " + pivotMotor.get());
 		if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
 			&& pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
 			pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,
