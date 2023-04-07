@@ -389,6 +389,8 @@ public class DriveFSMSystem {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
+
+		System.out.println("current drive State: " + currentState);
 	}
 
 	/* ======================== Private methods ======================== */

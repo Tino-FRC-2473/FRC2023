@@ -118,6 +118,8 @@ public class Robot extends TimedRobot {
 		if (isIntakeEnabled) {
 			spinningIntakeFSM.reset();
 		}
+
+		System.out.println("AUTO NODE: " + node);
 	}
 
 	@Override
