@@ -372,9 +372,6 @@ public class ArmFSM {
 			pidControllerPivot.setOutputRange(-PID_PIVOT_MAX_POWER,
 				PID_PIVOT_MAX_POWER);
 		}
-		if (isMinHeight()) {
-			pivotMotor.getEncoder().setPosition(0);
-		}
 		if (teleArmLimitSwitch.isPressed()) {
 			teleArmMotor.getEncoder().setPosition(0);
 		}
