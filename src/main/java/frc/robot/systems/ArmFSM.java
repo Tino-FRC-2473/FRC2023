@@ -208,6 +208,7 @@ public class ArmFSM {
 	 */
 	public void reset() {
 		currentState = ArmFSMState.IDLE;
+		pivotMotor.getEncoder().setPosition(ARM_ENCODER_STARTING_ANGLE_ROTATIONS);
 		pivotEncoderRotationsIntoIdle = pivotMotor.getEncoder().getPosition();
 		pivotEncoderRotationsAfterPivot = pivotMotor.getEncoder().getPosition();
 		// Call one tick of update to ensure outputs reflect start state
