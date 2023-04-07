@@ -242,6 +242,11 @@ public class ArmFSM {
 		SmartDashboard.putBoolean("At Arm Min", teleArmLimitSwitch.isPressed());
 		SmartDashboard.putNumber("Extension Fraction", teleArmMotor.getEncoder().getPosition()
 			/ ARM_ENCODER_MAX_LENGTH_ROTATIONS);
+		System.out.println("Encoder Pivot: " + pivotMotor.getEncoder().getPosition());
+		System.out.println("Pivot limit switch high pressed: " + isMaxHeight());
+		System.out.println("Pivot limit switch low pressed: " + isMinHeight());
+		System.out.println("State: " + currentState);
+		System.out.println("Power: " + pivotMotor.get());
 		if (input.isFineTuningButtonPressed()) {
 			isFineTuning = !isFineTuning;
 		}
