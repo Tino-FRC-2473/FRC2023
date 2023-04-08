@@ -58,7 +58,7 @@ public class ArmFSM {
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 
 	//19 inches
-	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 14.5
+	private static final double ARM_ENCODER_HIGH_FORWARD_CUBE_ROTATIONS = 12
 		* ENCODER_TICKS_TO_ARM_LENGTH_INCHES_CONSTANT;
 	//11 inches
 	private static final double ARM_ENCODER_HIGH_FORWARD_CONE_ROTATIONS = 21
