@@ -247,7 +247,9 @@ public class ArmFSM {
 		System.out.println("Pivot limit switch high pressed: " + isMaxHeight());
 		System.out.println("Pivot limit switch low pressed: " + isMinHeight());
 		System.out.println("State: " + currentState);
-		System.out.println("Power: " + pivotMotor.get());
+		System.out.println("Is Fine Tuning: " + isFineTuning);
+		System.out.println("Applied Output: " + pivotMotor.getAppliedOutput());
+		System.out.println("Power Arm: " + teleArmMotor.get());
 		if (input.isFineTuningButtonPressed()) {
 			isFineTuning = !isFineTuning;
 		}
@@ -369,7 +371,8 @@ public class ArmFSM {
 		System.out.println("Pivot limit switch high pressed: " + isMaxHeight());
 		System.out.println("Pivot limit switch low pressed: " + isMinHeight());
 		System.out.println("State: " + currentState);
-		System.out.println("Power: " + pivotMotor.get());
+		System.out.println("Applied Output Pivot: " + pivotMotor.getAppliedOutput());
+		System.out.println("Applied Output Arm: " + teleArmMotor.getAppliedOutput());
 		if (pivotMotor.getEncoder().getPosition() > ENCODER_TICKS_SLOW_DOWN_RANGE_MIN
 			&& pivotMotor.getEncoder().getPosition() < ENCODER_TICKS_SLOW_DOWN_RANGE_MAX) {
 			pidControllerPivot.setOutputRange(-PID_PIVOT_SLOW_DOWN_MAX_POWER,

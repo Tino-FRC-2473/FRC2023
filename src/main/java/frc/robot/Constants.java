@@ -55,7 +55,7 @@ public class Constants {
 	// push in, out of community, charge station
 	public static final double P1X1 = 1;
 	public static final double P1X2 = -168;
-	public static final double P1X3 = -88;
+	public static final double P1X3 = -85;
 
 	// push in, charge station
 	public static final double P2X1 = 1;
