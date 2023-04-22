@@ -46,6 +46,10 @@ public class DriveFSMSystem {
 	private int direction = 1;
 	private int pointNum = 0;
 	private boolean firstRun = true;
+	private boolean done = false;
+	private double innerVelocity = Constants.OUTER_VELOCITY;
+
+	
 	
 
 	/* ======================== Constructor ======================== */
@@ -126,6 +130,9 @@ public class DriveFSMSystem {
 		roboXPos = 0;
 		roboYPos = 0;
 		updateLineOdometryTele(0);
+		resetPurePursuitProperties();
+
+		currentState = FSMState.PURE_PERSUIT;
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -188,7 +195,7 @@ public class DriveFSMSystem {
 				break;
 
 			case PURE_PERSUIT:
-				handlePurePursuit(input, 0, 0, 5, 5, 10, 10);
+				handlePurePursuit(input, 0, 0, 10, 0, 40, 0);
 				break;
 
 			default:
@@ -196,7 +203,6 @@ public class DriveFSMSystem {
 		}
 
 		currentState = nextState(input);
-		
 	}
 
 	/* ======================== Private methods ======================== */
@@ -211,6 +217,13 @@ public class DriveFSMSystem {
 	 */
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
+
+			case IDLE:
+				return FSMState.IDLE;
+
+			case PURE_PERSUIT:
+			return FSMState.PURE_PERSUIT;
+
 		
 		default: throw new IllegalStateException("Invalid state: " + currentState.toString()); }
 	}
@@ -220,7 +233,6 @@ public class DriveFSMSystem {
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-
 	
 	public void handleIdleState(TeleopInput input) {
 
@@ -258,11 +270,19 @@ public class DriveFSMSystem {
 			return;			
 		}
 
+		if (done) {
+			System.out.println("DONE");
+			rightMotorFront.set(0);
+			rightMotorBack.set(0);
+			leftMotorFront.set(0);
+			leftMotorBack.set(0);
+			return;
+		}
+
 		double roboX = -roboXPos;
 		double roboY = roboYPos;
 		double currentAngle = (-gyro.getAngle()) % 360;
 		System.out.println("x: " + roboX + " y: " + roboY);
-		double innerVelocity = 10;
 		
 		if (firstRun) {
 			calculateWaypoints(x1, y1, mx, my, x2, y2);
@@ -271,28 +291,37 @@ public class DriveFSMSystem {
 
 		if (roboX < x2 + Constants.AUTONOMUS_MOVE_THRESHOLD && roboX > x2 - Constants.AUTONOMUS_MOVE_THRESHOLD && roboY < y2 + Constants.AUTONOMUS_MOVE_THRESHOLD && roboY > y2 - Constants.AUTONOMUS_MOVE_THRESHOLD) { // within range of endpoint
 			System.out.println("STOP");
-			resetPurePursuitProperties();
+			leftMotorFront.set(0);
+			leftMotorBack.set(0);
+			rightMotorFront.set(0);
+			rightMotorBack.set(0);
+			done = true;
 		}
 
 		if (target != findTargetPoint(roboX, roboY)) { // when there is a new target point
-
 			pointNum++; // robot has advanced to a new point
+			System.out.println("ROBOT HAS ADVANCED TO A NEW POINT " + pointNum);
 			target = findTargetPoint(roboX, roboY);
 			innerVelocity = calculateInnerCurveVelocity(currentAngle, roboX, roboY, waypoints[0][target], waypoints[1][target], Constants.OUTER_VELOCITY);
 		}
 
 		// set motor powers (note: velcoties must be between [-7.9, +7.9])
 		if (direction == -1) { // turning left
+			System.out.println("left");
 			leftMotorFront.set(-innerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 			leftMotorBack.set(-innerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 			rightMotorFront.set(Constants.OUTER_VELOCITY / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 			rightMotorBack.set(Constants.OUTER_VELOCITY / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 		} else if (direction == 1) { // turning right
+			System.out.println("right");
 			leftMotorFront.set(-Constants.OUTER_VELOCITY / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 			leftMotorBack.set(-Constants.OUTER_VELOCITY / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 			rightMotorFront.set(innerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 			rightMotorBack.set(innerVelocity / Constants.PURE_PURSUIT_VELOCITY_CONSTANT);
 		}
+
+		System.out.println("input velocity: " + innerVelocity + ", " + Constants.OUTER_VELOCITY);
+		System.out.println("motor powers: " + leftMotorFront.get() + ", " + rightMotorBack.get());
 	}
 
 	/**
@@ -352,7 +381,11 @@ public class DriveFSMSystem {
 	 */
 	public double calculateInnerCurveVelocity(double startAngle, double x1, double y1, double x2, double y2, double outerVelocity) {
 		double theta = Math.atan2(y2 - y1, x2 - x1) - Math.toRadians(startAngle);
-		if (theta == 0) return outerVelocity; // innerVelocity = outerVelocity (going straight)
+		if (theta == 0) {
+			System.out.println("THETA IS ZERO");
+			return outerVelocity; 
+		}
+		// innerVelocity = outerVelocity (going straight)
 		double radius = (Math.tan(theta) + (1 / Math.tan(theta))) * Math.hypot(y2 - y1, x2 - x1) / 2;
 		double arcRatio;
 		if (radius > 0) {
@@ -363,7 +396,6 @@ public class DriveFSMSystem {
 			arcRatio = (radius + Constants.ROBOT_WIDTH) / (radius - Constants.ROBOT_WIDTH);
 		}
 		double innerVelocity = outerVelocity * (arcRatio); // (ensures that inner velcoity must be <= outer velocity)
-		System.out.println(innerVelocity);
 		return innerVelocity;
 	}
 
@@ -375,6 +407,8 @@ public class DriveFSMSystem {
 		target = -1;
 		pointNum = 0;
 		firstRun = true;
+		done = false;
+		innerVelocity = Constants.OUTER_VELOCITY;
 		stateCounter++;
 	}
 

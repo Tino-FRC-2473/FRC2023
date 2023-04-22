@@ -18,8 +18,8 @@ public class Constants {
 	public static final double ROBOT_WIDTH = 20;
 	public static final double PURE_PURSUIT_VELOCITY_CONSTANT = 7.95867322835;
 	public static final int PARTITIONS = 8;
-	public static final int LOOK_DISTANCE = 10;
-	public static final double OUTER_VELOCITY = 10;
+	public static final int LOOK_DISTANCE = 3;
+	public static final double OUTER_VELOCITY = 0.6;
 
 	// ODO Constants
 	public static final double DX_INCHES_CONST = 0.8880486672;
