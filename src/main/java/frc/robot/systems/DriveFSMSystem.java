@@ -380,13 +380,14 @@ public class DriveFSMSystem {
 	 * @return inner wheel velocity
 	 */
 	public double calculateInnerCurveVelocity(double startAngle, double x1, double y1, double x2, double y2, double outerVelocity) {
-		double theta = Math.atan2(y2 - y1, x2 - x1) - Math.toRadians(startAngle);
+		double theta = Math.toRadians(startAngle) - Math.atan2(y2 - y1, x2 - x1);
 		if (theta == 0) {
 			System.out.println("THETA IS ZERO");
 			return outerVelocity; 
 		}
 		// innerVelocity = outerVelocity (going straight)
-		double radius = (Math.tan(theta) + (1 / Math.tan(theta))) * Math.hypot(y2 - y1, x2 - x1) / 2;
+		double radius = Math.hypot((Math.hypot(y2 - y1, x2 - x1) / 2) / Math.tan(theta), (Math.hypot(y2 - y1, x2 - x1)));
+		System.out.println("RADIUS: " + radius);
 		double arcRatio;
 		if (radius > 0) {
 			direction = -1; // left
